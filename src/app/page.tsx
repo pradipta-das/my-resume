@@ -116,13 +116,11 @@ export default function Page() {
 
   return(
     <section className="resumeContainer h-dvh w-dvw box-border">
-    
       <LandingSection />  
       <EmploymentSection/>     
       <PortfolioSection />
       <ExperienceSection />  
       <ContactSection />
-      
     </section>
   );
   };
