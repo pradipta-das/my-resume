@@ -121,7 +121,6 @@ export default function Page() {
       <EmploymentSection/>     
       <PortfolioSection />
       <ExperienceSection />  
-      
       <ContactSection />
       
     </section>
