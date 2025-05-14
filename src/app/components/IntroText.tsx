@@ -8,7 +8,7 @@ export default function IntroText(){
 
     useEffect(() => {
         const typed = new Typed(headRef.current, {
-            strings: ['Let\'s get into codes.'],
+            strings: ['Let\'s get into codes now.'],
             typeSpeed: 50,
             showCursor: false
           });
