@@ -1,32 +1,162 @@
 @import "tailwindcss";
 
 
+  @keyframes scroll {
+    0%, 100% {
+      transform: none;
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(600%);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+
+  
+
+
 :root {
   --background: #ffffff;
+  --backgroundimage: '@/../public/bgrepeat.png';
   --foreground: #171717;
   --font-sans: var(--font-inter);
+  --maincolor: #B9EE00;
+  --animate-scroll: scroll 3s ease infinite;
+  --skillcol1: #f0dfcd;
+
 
 }
 
 
 
+
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #ffffff;
     --foreground: #161616;
   }
 }
 
 body {
   background: var(--background);
+  background-image: var(--backgroundimage);
   color: var(--foreground);
   font-family: var(--font-josefin);
 }
 
-h1 {
-  font-family: var(--font-josefin);
+h1, h2 {
+  font-family: var(--font-inter);
+  font-size: 10rem;
+  line-height: 9rem;
+  text-align: right;
+  font-weight: 100;
+  text-transform: uppercase;
 }
 
+
+.sub-title{
+  width: auto;
+  text-align:right;
+  margin-left: 0rem;
+}
+
+.scroll-btn-cont{
+  width: 20px;
+}
+.scroll-scrub{
+  font-size: 1rem;
+  
+}
+.scroll-bar{
+  background-color: #2A3139;
+  width: 5px;
+  height: 100px;
+  margin-bottom: 80px;
+}
+
+
+
+
+.scroll-btn{
+  width: 5px;
+  height: 14px;
+  background-color: var(--maincolor);
+  animation: var(--animate-scroll);
+}
+
+.skill-block{
+  padding-right: 100px;
+  padding-bottom: 80px;
+  position: relative;
+  span{
+    font-size: 10rem;
+    font-weight: bold;
+    line-height: 10rem;
+    width: auto;
+    color: var(--skillcol1);
+  }
+  .border{
+    width:200px;
+    height: 10px;
+    background: var(--skillcol1);
+    display: block;
+    margin-top: -40px;
+  }
+
+  h5{
+    font-size: 1.5rem;
+    margin-left: 50px;
+    margin-top: -33px;
+  }
+
+  p{
+    font-size: 1rem;
+    margin-left: 50px;
+    font-weight: 200;
+    text-transform: uppercase;
+    margin-right: 100px;
+    line-height: 2rem;
+  }
+
+  &:nth-child(2){
+    span{
+      color: #C4B6A9;
+     
+    }
+    .border{
+       background-color: #C4B6A9;
+    }
+  }
+
+  &:nth-child(2){
+    span{
+      color: #C4B6A9;
+     
+    }
+    .border{
+       background-color: #C4B6A9;
+    }
+  }
+
+}
+
+.aboutcont{
+  h5{
+    font-size: 1.5rem;
+    margin-left: 50px;
+    margin-top: -33px;
+  }
+
+  p{
+    font-size: 1rem;
+    margin-left: 50px;
+    font-weight: 200;
+    text-transform: uppercase;
+    margin-right: 100px;
+    line-height: 2rem;
+  }
+}
 .first-name,.last-name{ 
   font-family: var(--font-ubuntu-mono);
 }

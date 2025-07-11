@@ -1,12 +1,6 @@
 'use client'
 
-
-import LandingSection from "./components/LandingSection";
-import PortfolioSection from "./components/PortfolioSection";
-import ExperienceSection from "./components/ExperienceSection";
-import ContactSection from "./components/ContactSection";
-import EmploymentSection from "./components/EmploymentSection";
-
+import FirstFrame from "./components/FirstFrame";
 
 export default function Page() {
   
@@ -115,12 +109,9 @@ export default function Page() {
   }) */
 
   return(
-    <section className="resumeContainer h-dvh w-dvw box-border">
-      <LandingSection />  
-      <EmploymentSection/>     
-      <PortfolioSection />
-      <ExperienceSection />  
-      <ContactSection />
+    <section className="resumeContainer m-auto box-border">
+      <FirstFrame/>
     </section>
+  
   );
   };
