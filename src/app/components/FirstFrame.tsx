@@ -63,7 +63,6 @@ export default function FirstFrame(){
           </div>
           <span className="absolute scroll-scrub -translate-7 rotate-90 font-bold uppercase">scroll</span>
           </div>
-       
     </div>
 </section>
   )
