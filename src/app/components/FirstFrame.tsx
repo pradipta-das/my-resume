@@ -4,19 +4,17 @@ import React,{useRef} from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import ScrollTrigger from 'gsap/dist/ScrollTrigger';
-import MotionPathPlugin from 'gsap-trial/dist/MotionPathPlugin';
+
 
 
 export default function FirstFrame(){
 
-  const frameContext = useRef(null);
   gsap.registerPlugin(ScrollTrigger);
 
-  const skillArr =['Next','Tailwind'];
 
- useGSAP((frameContext)=>{
+ useGSAP(()=>{
 
-    let tl = gsap.timeline({
+    const tl = gsap.timeline({
       // add it to an entire timeline!
       scrollTrigger: {
           trigger: '.landingcont',
@@ -29,9 +27,7 @@ export default function FirstFrame(){
        }
      });
     
-     tl.to('#Ellipse_1',{y:-30,scale:.7,duration:2,transformOrigin:"50% 50%"})
-       .to('#Rectangle_14',{rotation:300,duration:3,transformOrigin:"50% 50%"}) 
-       .to('.title',{x:150,duration:2},'<')
+     tl.to('.title',{x:150,duration:2},'<')
        .to('.sub-title',{x:-214,duration:2},'<')
        .to('#Ellipse_120',{x:100,duration:2},'<')
       
@@ -44,7 +40,7 @@ export default function FirstFrame(){
   )
 
   return(
-<section className="w-auto h-dvh container m-auto landingcont" ref={frameContext}>
+<section className="w-auto h-dvh container m-auto landingcont" >
     <div className="big-circle absolute -top-120 -right-90">
 
 

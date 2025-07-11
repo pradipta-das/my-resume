@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import {Inter, Roboto, Josefin_Sans, Playfair, Ubuntu_Mono} from "next/font/google";
+import {Inter, Josefin_Sans, Playfair, Ubuntu_Mono} from "next/font/google";
 import "./globals.css";
-import bgImg from '@/../public/bgrepeat.png';
 
 const ubuntu = Ubuntu_Mono({
   variable: '--font-ubuntu-mono',
