@@ -27,8 +27,8 @@ export default function FirstFrame(){
        }
      });
     
-     tl.to('.title',{x:150,duration:2},'<')
-       .to('.sub-title',{x:-214,duration:2},'<')
+     tl.to('.title',{scale:.8,duration:2},'<')
+       .to('.sub-title',{x:-70,duration:2},'<')
        .to('#Ellipse_120',{x:100,duration:2},'<')
       
        
