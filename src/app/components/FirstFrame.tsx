@@ -93,7 +93,6 @@ const backgroundStyle = {
 gsap.registerPlugin(ScrollTrigger,ScrollSmoother);
 gsap.registerPlugin(MotionPathPlugin);
 
-useState[]
 
  useGSAP(()=>{
 
