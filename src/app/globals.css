@@ -257,9 +257,7 @@ a {
 .whyworksec img{ max-width:80px;}
 
 @media screen and (min-width:991px) {
-  .caption-cont-half{
- 
-  }
+
   .aboutsection p{ font-size:1.75rem;}
   .skillcont ul li{
     width:40%; 

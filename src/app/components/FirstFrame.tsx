@@ -36,10 +36,10 @@ gsap.registerPlugin(MotionPathPlugin);
 
  
 
-const textElements = gsap.utils.toArray(".text");
+const textElements: HTMLElement[] = gsap.utils.toArray(".text");
 
 
-textElements.forEach((text:any) => {
+textElements.forEach((text) => {
 
   console.log(text)
   gsap.to(text, {
@@ -124,9 +124,9 @@ for (var i = 0; i < spriteSheet.total; i++) {
      })*/
     // tlprobs.to(".image-cont-prob",{opacity:1,duration:1})
 
-     const highlightText = gsap.utils.toArray(".text-highlight");
+     const highlightText:HTMLElement[] = gsap.utils.toArray(".text-highlight");
 
-     highlightText.forEach((highlighttxt:any) => {
+     highlightText.forEach((highlighttxt) => {
       ScrollTrigger.create({
         trigger: highlighttxt,
         start: "-100px center",
