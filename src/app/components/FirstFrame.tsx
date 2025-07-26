@@ -16,7 +16,7 @@ import MotionPathPlugin from "gsap/dist/MotionPathPlugin";
 export default function FirstFrame(){
 
 const backgroundStyle = {
-        backgroundImage: `url("/web-bg.png")`,
+        backgroundImage: 'url("/web-bg.png")',
         backgroundSize: "100% auto", // Optional: Adjust as needed
         backgroundPosition: "top center", // Optional: Adjust as needed
         backgroundRepeat: "repeat-x",
@@ -232,27 +232,27 @@ for (var i = 0; i < spriteSheet.total; i++) {
         <Image className="mx-auto flex-1/4" src={"/web-dev.svg"} width={50} height={50} alt="partnership" />
         <div className="flex-3/4 p-2">
         <h3 className="text-xl font-bold mt-2 mb-2">Website Development & Customization</h3>
-        <p className="">Web development using cutting edge tech stack.</p>
+        <p>Web development using cutting edge tech stack.</p>
         </div>
       </div>
       <div className="flex flex-row flex-wrap  p-3 rounded shadow transition hover:shadow-2xl service-block">
         <Image className="mx-auto flex-1/4" src={"/web-maintenance.svg"} width={50} height={50} alt="partnership" />
          <div className="flex-3/4 p-2">
         <h3 className="text-xl font-bold mt-2 mb-2">Website Maintenance & Support</h3>
-        <p className="">Performance optimization, plugin/theme updates, fixes</p>
+        <p>Performance optimization, plugin/theme updates, fixes</p>
         </div>
       </div>
       <div className="flex flex-row flex-wrap p-3 rounded shadow transition hover:shadow-2xl service-block" >
         <Image className="mx-auto flex-1/4" src={"/partnership.svg"} width={50} height={50} alt="partnership" />
          <div className="flex-3/4 p-2">
         <h3 className="text-xl font-bold mt-2 mb-2">White-Label Partnership for Agencies</h3>
-        <p className="">Seamless collaboration with your clients under your brand</p>
+        <p>Seamless collaboration with your clients under your brand</p>
         </div>
       </div>
     </div>
     </div>
      <div className="flex-1/2 md:px-4 py-4 ">
-     <Image className=" border-[#f4ae32] border-1 border-s p-2" src="/whatioffer.png" width={600} height={400} alt="my offer"/>
+     <Image className=" border-[#f4ae32] border-1 border-s p-2" src={"/whatioffer.png"} width={600} height={400} alt="my offer"/>
     </div>
     </div>
     </div>
@@ -291,7 +291,7 @@ for (var i = 0; i < spriteSheet.total; i++) {
     <div className="max-w-5xl mx-auto flex flex-row flex-wrap">
       <div className="flex-1/2 border-[#f4ae32] border-1 border-s p-2">
     
-        <Image className="shadow" src="/whowework.png" width={600} height={400} alt="my offer"/>
+        <Image className="shadow" src={"/whowework.png"} width={600} height={400} alt="my offer"/>
       </div>
       <div className="flex-1/2 pt-3 px-6 ">
     <ul className="grid grid-rows-1 gap-6">
