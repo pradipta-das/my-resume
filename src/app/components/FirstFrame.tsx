@@ -9,73 +9,7 @@ import ScrollTrigger from 'gsap/dist/ScrollTrigger';
 import ScrollSmoother from 'gsap/ScrollSmoother';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Slider from 'react-slick';
 import MotionPathPlugin from 'gsap/dist/MotionPathPlugin';
-
-
-function MySlider() {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 12,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 2000,
-    cssEase: "linear",
-    arrows: false,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 8,
-          slidesToScroll: 8,
-          infinite: true,
-          dots: true
-        }
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 7,
-          slidesToScroll: 7,
-          initialSlide: 0
-        }
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 5,
-          slidesToScroll: 5
-        }
-      }
-    ]
-  };
-  return (
-    <Slider {...settings}>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      <div><Image src='/html5.svg' width={70} height={70} alt='html logo'/></div>
-      
-    </Slider>
-  );
-}
-
-
-
-
-
 
 
 
