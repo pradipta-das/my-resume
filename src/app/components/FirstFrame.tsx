@@ -39,7 +39,9 @@ gsap.registerPlugin(MotionPathPlugin);
 const textElements = gsap.utils.toArray(".text");
 
 
-textElements.forEach((text) => {
+textElements.forEach((text:any) => {
+
+  console.log(text)
   gsap.to(text, {
     backgroundSize: "100%",
     ease: "none",
@@ -124,7 +126,7 @@ for (var i = 0; i < spriteSheet.total; i++) {
 
      const highlightText = gsap.utils.toArray(".text-highlight");
 
-     highlightText.forEach((highlighttxt) => {
+     highlightText.forEach((highlighttxt:any) => {
       ScrollTrigger.create({
         trigger: highlighttxt,
         start: "-100px center",
