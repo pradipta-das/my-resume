@@ -11,6 +11,7 @@ const ubuntu = Ubuntu_Mono({
 const inter = Inter({
     variable: '--font-inter',
     subsets: ['latin'],
+    weight: ["100","200"]
 })
 
 const josefin = Josefin_Sans({
@@ -43,3 +44,4 @@ export default function RootLayout({
     </html>
   );
 }
+

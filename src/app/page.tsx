@@ -109,9 +109,11 @@ export default function Page() {
   }) */
 
   return(
-    <section className="resumeContainer m-auto box-border">
+    <>
       <FirstFrame/>
-    </section>
+    </>
+      
+    
   
   );
   };
