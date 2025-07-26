@@ -180,11 +180,11 @@ for (var i = 0; i < spriteSheet.total; i++) {
     <p className="mb-10">
     <em>Agencies lose valuable clients due to delivery delays.<br/>Business owners lose trust and revenue every time their website breaks or slows down.</em></p>
 
-    <h2 className="text-2xl font-semibold mb-10">Website problems aren&quot;t just technical - they&quot;re business problems.</h2>
+    <h2 className="text-2xl font-semibold mb-10">Website problems aren&#39;t just technical - they&#39;re business problems.</h2>
 
-    <p className="mb-10">Are you a <strong className="text-highlight">business owner constantly firefighting site issues</strong>, missing out on leads or sales because your website isn&quot;t reliable?<br/>You&quot;re not alone.</p>
+    <p className="mb-10">Are you a <strong className="text-highlight">business owner constantly firefighting site issues</strong>, missing out on leads or sales because your website isn&#39;t reliable?<br/>You&#39;re not alone.</p>
 
-    <p className="mb-10">But it doesn&quot;t have to be this way.</p>
+    <p className="mb-10">But it doesn&#39;t have to be this way.</p>
 
     <p className="mb-10">What if you had <strong className="text-highlight">an expert developer you could call in anytime</strong> — someone who understands deadlines, fixes problems fast, and works as an extension of your team?</p>
     </div>
@@ -197,7 +197,7 @@ for (var i = 0; i < spriteSheet.total; i++) {
     
     <div className="max-w-5xl mx-auto mb-10">
       <h2 className="text-2xl font-semibold mb-10">Get Expert Web Development Support, On Demand</h2>
-      <p>I help agencies, startups, and small businesses by stepping in exactly where your internal resources hit a wall.<br/>Think of me as your go-to freelance web developer — <span className="text-highlight">ready to deliver clean, scalable solutions without the delays, learning curves, or overheads</span>.<br/>Here&quot;s how I can help:</p>
+      <p>I help agencies, startups, and small businesses by stepping in exactly where your internal resources hit a wall.<br/>Think of me as your go-to freelance web developer — <span className="text-highlight">ready to deliver clean, scalable solutions without the delays, learning curves, or overheads</span>.<br/>Here&#39;s how I can help:</p>
     </div>
     <div className="max-w-5xl mx-auto flex flex-row flex-wrap mb-10">
       <div className="md:flex-1/2">
@@ -306,7 +306,7 @@ for (var i = 0; i < spriteSheet.total; i++) {
   </section>
 
   <section className="py-12 text-center">
-    <h2 className="text-3xl font-bold mb-4">Let"s Take the Bottleneck Off Your Plate</h2>
+    <h2 className="text-3xl font-bold mb-4">Let&#39;s Take the Bottleneck Off Your Plate</h2>
     <p className="text-lg mb-6">Need a freelance web developer you can count on?</p>
     <div className="space-x-4">
       <Link href="#" className="bg-[#f4ae32] text-black px-6 py-3  shadow">Book a Free Consultation</Link>
