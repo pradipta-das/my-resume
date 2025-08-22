@@ -7,7 +7,7 @@
       animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
     }
     50% {
-      transform: translateY(600%);
+      transform: translateY(-20%);
       animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
     }
   }
@@ -16,21 +16,23 @@
 
 
 :root {
-  --background: #f2f2f2;
+  --background: #ffffff;
   --backgroundimage: none;
   --foreground: #010101;
   --font-sans: var(--font-inter);
+  --font-body: 1.125rem;
   --maincolor: #B9EE00;
-  --animate-scroll: scroll 3s ease infinite;
+  --animate-scroll: scroll .3s ease infinite;
   --skillcol1: #f0dfcd;
   --bg-color-hsl: 59, 3%, 94%;
   --bg-color: hsl(var(--bg-color-hsl));
   --bg-color-translucent: hsla(var(--bg-color-hsl), 0.95);
-  --bg-color-highlight: #f4ae32;
+  --bg-color-highlight: #010101;
   --color-text: hsl(192, 14%, 20%);
-  --color-text-highlight: hsl(192, 14%, 0%);
-  --duration: 1s;
+  --color-text-highlight:#f4ae32;
+  --duration: 3s;
   --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
 
 }
 
@@ -51,14 +53,16 @@ body {
   background-repeat: repeat;
   color: var(--foreground);
   font-family: var(--font-playfair);
-  font-size: 1rem;
+  font-size: var(--font-body);
+  line-height: 1.5;
 }
 
-
+h1{ font-size: 4rem;}
+h2{ font-size: 4rem; font-family: var(--font-playfair); }
+h3{ font-size: 1.5rem; font-family: var(--font-playfair); }
 li,p{
-   font-family: var(--font-josefin);
+   font-family: var(--font-inter);
    font-weight: 300;
-   font-size: 1.115rem;
 }
 
 em{
@@ -70,9 +74,119 @@ em{
   font-weight: 400;
 
 }
+
+
+.cards-anim{
+  text-align: center;
+  position: relative;
+  width: 100%;
+
+  padding: 3rem 1rem;
+  .cards{
+    display: block;
+    width:80%;
+    height:140px;
+    
+    border: #FC0000 2px solid;
+    border-radius: .5rem;
+    background-color: #efefef;
+    position: absolute;
+    scale: 1;
+    left:0;
+    right:0;
+    margin: auto;
+  }
+}
+.anim-cont{
+ margin-top: 40px;
+ z-index: -10;
+}
+.anim-cont>div{ height: auto;}
+
+.rating-img{
+ position: relative;
+}
+.rating-cont{
+  height: 40vh;
+}
+.anim-cont canvas,.rating-cont canvas{
+  
+ 
+}
+.intro-text{
+  h1,h2,p,ul{
+    
+  }
+}
+.logo-cont{ 
+  padding-block: 16em;
+  img{
+
+  }
+}
+
+.offer-slide-cont{
+
+    position: relative;
+    height: 100vh;
+    
+    &::before{
+      z-index: 1;
+      position: absolute;
+      content: '';
+      width: 300px;
+      height: 100%;
+      background: white;
+      filter: blur(15px);
+      right: -250px;
+      top: 0;
+    }
+
+    ul{
+      width: 100vw;
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      
+
+      li{
+        
+         width: 32%;
+         margin-left: 1%;
+         height: 300px;
+        
+      }
+
+    }
+
+}
+
+.who-text{
+  ul{
+    width: 100vw;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      
+    li{
+        width: 32%;
+         margin-left: 1%;
+    }
+  }
+}
+
+.service-list li{ opacity:.2; margin-bottom: 1rem; }
 header p{ font-size: .9em;} 
+footer { background-color: #ffffff; }
 footer span{ font-size: .9em; font-family: var(--font-inter);}
-.title span{
+.menu span{
   font-size: 1rem;
   line-height: 2rem;
   font-weight: 100;
@@ -110,6 +224,7 @@ footer span{ font-size: .9em; font-family: var(--font-inter);}
   background-size: 100% 100%;
   background-image: linear-gradient(var(--bg-color-highlight), var(--bg-color-highlight));
   font-weight: 500;
+  transition: all calc(var(--duration) / 4) var(--ease);
 }
 
 [data-highlight=underline] .text-highlight {
@@ -257,7 +372,7 @@ a {
 .whyworksec img{ max-width:80px;}
 
 @media screen and (min-width:991px) {
-
+  
   .aboutsection p{ font-size:1.75rem;}
   .skillcont ul li{
     width:40%; 
@@ -291,4 +406,18 @@ a {
 
 }
 
+}
+@media screen and (min-width:1020px) {
+    h1{ font-size:2.75rem;}
+}
+@media screen and (min-width:1200px) {
+    h1{ font-size:3rem;}
+}
+
+@media screen and (min-width:1440px) {
+    h1{ font-size:3rem;}
+}
+
+@media screen and (min-width:1600px) {
+    h1{ font-size:3.75rem;}
 }

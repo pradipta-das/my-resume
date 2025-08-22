@@ -7,23 +7,60 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import ScrollSmoother from "gsap/ScrollSmoother";
+import SplitText from "gsap/dist/SplitText";
+import ScrambleTextPlugin from "gsap/dist/ScrambleTextPlugin";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import MotionPathPlugin from "gsap/dist/MotionPathPlugin";
+import SiteHead from "./SiteHead";
+import AnimComp from "./AnimComp";
+import RatingComp from "./RatingComp";
 
 
 
 export default function FirstFrame(){
 
 const backgroundStyle = {
-        backgroundImage: 'url("/web-bg.png")',
-        backgroundSize: "100% auto", // Optional: Adjust as needed
+        backgroundImage: 'url("/slide_1_bg.png")',
+        backgroundSize: "100%", // Optional: Adjust as needed
         backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "repeat-x",
-        minHeight: "100vh", // Optional: Ensure the background covers the desired area
+        backgroundRepeat: "no-repeat", 
+        
       };
 
-gsap.registerPlugin(ScrollTrigger,ScrollSmoother);
+const slidetwoBG = {
+        backgroundImage: 'url("/slide_bg_2.png")',
+        backgroundSize: "100%", // Optional: Adjust as needed
+        backgroundPosition: "top center", // Optional: Adjust as needed
+        backgroundRepeat: "no-repeat", 
+        
+      };
+
+const slidethreeBG = {
+        backgroundImage: 'url("/slide_bg_3.png")',
+        backgroundSize: "100%", // Optional: Adjust as needed
+        backgroundPosition: "top center", // Optional: Adjust as needed
+        backgroundRepeat: "no-repeat", 
+        
+      };
+
+const slidefourBG = {
+        backgroundImage: 'url("/slide_bg_4.png")',
+        backgroundSize: "100%", // Optional: Adjust as needed
+        backgroundPosition: "top center", // Optional: Adjust as needed
+        backgroundRepeat: "no-repeat", 
+        
+      };
+
+const slidefiveBG = {
+        backgroundImage: 'url("/slide_bg_5.png")',
+        backgroundSize: "100%", // Optional: Adjust as needed
+        backgroundPosition: "top center", // Optional: Adjust as needed
+        backgroundRepeat: "no-repeat", 
+        
+      };
+
+gsap.registerPlugin(ScrollTrigger,ScrollSmoother,SplitText,ScrambleTextPlugin);
 gsap.registerPlugin(MotionPathPlugin);
 
 
@@ -35,8 +72,7 @@ gsap.registerPlugin(MotionPathPlugin);
   });
 
  
-
-const textElements: HTMLElement[] = gsap.utils.toArray(".text");
+/*const textElements: HTMLElement[] = gsap.utils.toArray(".text");
 
 
 textElements.forEach((text:HTMLElement) => {
@@ -52,7 +88,7 @@ textElements.forEach((text:HTMLElement) => {
     },
   });
 });
-
+*/
 /*var spriteSheet = {
   width: 800,
   height: 335,
@@ -81,243 +117,321 @@ for (var i = 0; i < spriteSheet.total; i++) {
   }, i / (spriteSheet.total - 1) * spriteSheet.duration);
 }
 */
-  const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: ".hero-anim",
-        start: "top top",
-        end: "2500",
-        scrub: 0.6,
-        pin: true,
-       markers: true,
-        
-      },
-      duration:1
-    })
 
-     tl.to(".header-sec",{opacity: 1},">");
-     tl.addLabel("start-box")
-     tl.from("#div", {
-      motionPath: {
-       path: [{x:0, y:0}, {x:-200, y:-500}, {x:-1400, y:-500}],
-       alignOrigin: [0.5, 0.5],
-       autoRotate: true,
-        type: "cubic"
-      },
-      transformOrigin: "50% 50%",
-      duration: 1,
-    })
-     tl.addLabel("end-box")
+let headersplit = SplitText.create(".intro-head h1");
+let splitintro = SplitText.create(".split-text-intro");
+var tlintro = gsap.timeline({  scrollTrigger: {
+    trigger: ".intro-text",
+    start: "top top",
+    end: "300",
+    pin:true,
+    scrub: true,
+    markers: true,
+  }});
+//tlintro.to(".intro-text", {duration: 1, scrambleText: "{original}"});
+tlintro.from(headersplit.chars,{
+  opacity: 0.2,
+  stagger: 0.1,
+})
 
-     /*const tlprobs = gsap.timeline({
-        
-        scrollTrigger: {
-        trigger: ".image-cont-prob",
-        start: "center center",
-        end: "+=300",
-        scrub: 0.6,
-        pin: true,
-        markers: true,
-        
-      },
-      duration:2
-     })*/
-    // tlprobs.to(".image-cont-prob",{opacity:1,duration:1})
+tlintro.addLabel('start')
+ 
+ //.to('.cards-anim',{scale:.7})
+ //.addLabel('anim 2')
+ //.from('.anim-cont',{scale:.8,filter:"blur(0.5rem)"})
+ .addLabel('text anim 1')
+ .from(splitintro.chars, {
+  opacity: 0.2,
+  stagger: 0.1,
+})
+.addLabel('anim end')
+/*const highlightText:HTMLElement[] = gsap.utils.toArray(".text-highlight");
 
-     const highlightText:HTMLElement[] = gsap.utils.toArray(".text-highlight");
+highlightText.forEach((highlighttxt:HTMLElement, index) => {
 
-     highlightText.forEach((highlighttxt:HTMLElement) => {
-      ScrollTrigger.create({
-        trigger: highlighttxt,
-        start: "-100px center",
-        onEnter: () => highlighttxt.classList.add("active"),
-        onLeave:() => highlighttxt.classList.remove("active")
+  tlintro.from(highlightText,
+    { scrollTrigger: {
+    trigger: ".intro-text",
+    start: "top 30%",
+    end: "top 20%",
+    scrub: true,
+    markers: true,
+    },opacity:1,  
+    onStart: () => highlighttxt.classList.add("active"),
+    onComplete:() => highlighttxt.classList.remove("active")
+  })
+    
+    });*/
 
-      });
-    });
 
-    }
+
+
+
+var tlsupport = gsap.timeline({
+  defaults:{
+    duration:"2s"
+  }
+});
+
+let split = SplitText.create(".split-text");
+gsap.from(split.chars, {
+  scrollTrigger: {
+    trigger: ".problemdiv p",
+    start: "top 50%",
+    end: "top 20%",
+    scrub: true,
+    markers: false,
+  },
+  opacity: 0.2,
+  stagger: 0.1,
+});
+
+
+const servList:HTMLElement[] = gsap.utils.toArray(".service-list li");
+servList.forEach((servElem:HTMLElement,index)=>{
+
+  tlsupport.to(servElem,{opacity: 1, delay:.5*index});  
+
+})
+
+}
+  
    
   )
 
   return(
     <div id="smooth-wrapper">
   <div id="smooth-content">
-<header className="header-sec w-dvw py-1 px-1 bg-[#f4ae32]">
-    <div className="mx-auto max-w-5xl text-center"><p className="text-[.5em]">Eliminate Bottlenecks. Fix Downtime. Keep Projects Moving.</p></div>
-  </header>
+
+  <SiteHead/>
   
-  
-<section style={backgroundStyle} className="hero-anim relative h-dvh mx-auto px-4 py-4 mb-20">
-  <div id="div" className="w-2.5 h-2.5 absolute left-[50%] border-2 z-10"></div>
-  <div className="px-4 py-6 w-full">
-      <h1 className="text-5xl font-bold text-center text-white">Your frustration ends here.</h1>
-      <p className="mt-2 text-lg text-center"></p>
-    </div>
-    <div className="z-20 scroll-btn-cont absolute top-[35%] left-[5%] h-[200px] bottom-auto">
-      <div className="scroll-bar mt-4">
-          <div className="scroll-btn animate-[scroll]"></div>
+<section className="intro-section w-dvw h-dvh">
+   <div className="mx-auto px-9 py-9 flex flex-wrap flex-col">
+    <div className="flex-auto md:flex-1/2">
+    <div className="intro-text">
+      <div className="intro-head">
+      <h1 className="mb-12"><span className="text-highlight">Top Rated</span> Freelance Web Developer for <span className="text-highlight">Agencies & Businesses</span> <i>Needing</i> <span className="text-highlight">Reliable</span> Website <span className="text-highlight">Support</span></h1>
       </div>
-      <span className="absolute scroll-scrub -translate-7 rotate-90 font-bold uppercase">scroll</span>
+      <div className="split-text-intro pb-12">
+      <h2>Eliminate Bottlenecks. Fix Site Downtime. Keep Projects Moving.</h2>
+      </div>
+      <div className="split-text-intro pb-12">
+      <p>Is your agency overloaded with development work and too few hands to deliver on time? Are you a business owner losing sales due to website downtime or poor site performance? You&#39;re not alone. Many teams face resource crunches and tech gaps that slow things down. But you don&#39;t have to.</p>
+      </div>
+      <ul className="grid grid-cols-4">
+        <li>linkedIn</li> 
+        <li>github</li>
+        <li>youtube</li>
+        <li>pinterest</li>
+      </ul>
+     
+      </div>
+      
     </div>
-  <div className="flex-wrap flex-row hidden">
-   <div className="py-10 px-4 caption-cont align-middle">
-      <p className="text">77% of small businesses in the U.S. reported that hiring and retaining employees was one of their top challenges.<span>(NFIB, 2023)</span></p>
-      <p className="text">54% of creative and marketing agencies admitted to turning down new projects in 2023 due to insufficient manpower.<span>Statista Agency Report</span></p>
-      <p className="text">78% of businesses using freelancers during bottlenecks reported faster project delivery.<span>Upwork Future Workforce Report, 2023</span></p>
-      <p className="text">Small businesses can save $15,000-$30,000 annually by using freelancers instead of hiring full-time developers for intermittent work.<span>Payoneer SMB Report, 2022</span></p>
+    
     </div>
-   </div> 
 </section>
-
-  <section className="relative problemdiv py-4 px-4 max-w-5xl mx-auto">
+<section className="intro-anim-sec w-dvw h-dvh px-9 py-9" style={backgroundStyle}>
    
-    <div className="flex flex-row flex-wrap">
-     <div className="bg-[#f4ae32] square absolute w-5 h-5 rotate-12 -z-10 top-[50%] right-0" data-lag=".8"></div>
-      <div className="bg-[#f4ae32] square absolute w-5 h-5  -z-10 top-[2%] -left-2" data-lag=".5"></div>
-    <h2 className="text-2xl font-semibold mb-10">Facing Too Many Projects or Website Issues?</h2>
-    <p className="mb-10">Is your <strong className="text-highlight">agency flooded with development tasks</strong>, struggling to meet deadlines with a stretched team?<br/>Every hour spent trying to fix a broken site, every opportunity delayed due to a missing developer, adds up to <strong className="text-highlight">frustration, lost money, and missed growth</strong>.
-    </p>
 
-    <p className="mb-10">
-    <em>Agencies lose valuable clients due to delivery delays.<br/>Business owners lose trust and revenue every time their website breaks or slows down.</em></p>
+      <AnimComp/>
 
-    <h2 className="text-2xl font-semibold mb-10">Website problems aren&#39;t just technical - they&#39;re business problems.</h2>
-
-    <p className="mb-10">Are you a <strong className="text-highlight">business owner constantly firefighting site issues</strong>, missing out on leads or sales because your website isn&#39;t reliable?<br/>You&#39;re not alone.</p>
-
-    <p className="mb-10">But it doesn&#39;t have to be this way.</p>
-
-    <p className="mb-10">What if you had <strong className="text-highlight">an expert developer you could call in anytime</strong> — someone who understands deadlines, fixes problems fast, and works as an extension of your team?</p>
+  
+</section>
+<section className="problemdiv mx-auto w-dvw " style={slidetwoBG}>
+   <div className="prob-text-header px-9">
+      <h2>Get <span className="text-highlight">Expert</span> Web Development <span className="text-highlight">Support</span>, On <i>Demand</i></h2>
     </div>
+    <div className="px-9 py-9 flex flex-row flex-wrap">
+    <div className="prob-text flex-auto md:flex-1/2 py-15">
+      <div className="split-text pb-12">
+      <p>I help agencies, startups, and small businesses by stepping in exactly where your internal resources hit a wall. Think of me as your go-to freelance web developer — ready to deliver clean, scalable solutions without the delays, learning curves, or overheads.</p>
+      </div>
+       <div className="split-text pb-12">
+      <p>Here&#39;s how I can help:</p>
+      </div>
+      <div className="service-cont">
+        <ul className="service-list">
+          <li className="split-text">Clear your project backlog</li>
+          <li className="split-text">Keep your website online and optimized</li>
+          <li className="split-text">Keep your website online and optimized</li>
+          <li className="split-text">Solve recurring technical issues</li>
+          <li className="split-text">Free up your in-house team</li>
+          <li className="split-text">Meet deadlines and impress your clients</li>
+          </ul> 
+           
+      </div>
+    </div>
+    <div className="rating-img flex-1/2">
+      <RatingComp/>
+    </div>
+    </div>
+    </section>
+    <section className="offer-sec mx-auto w-dvw" style={slidetwoBG}>
+
+    <div className="mx-auto px-9 py-9 flex flex-row flex-nowrap">
+     
+    <div className="flex-auto md:flex-3/5 pr-16  bg-white overflow-hidden">
+        <div className="split-prob-text pb-12">
+              <h2>What I Offer</h2>
+         </div>
+      <div className="offer-slide-cont">
+          <ul>
+        <li className="px-10 py-10 shadow-2xs">
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+              <div className="offer-head pb-12">
+                  <h3>Website Development & Customization</h3>
+              </div>
+              <div className="offer-txt">
+                   <p>I build custom, responsive, and scalable websites using modern technologies that match your business goals and brand identity. Whether you&#39;re launching a new project or refreshing an old one, I deliver clean, maintainable code and visually polished UI/UX.</p>
+              </div>
+             
+            </div>
+          </div>
+        </li>
+         <li className="px-10 py-10 shadow-2xs">
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+              <div className="offer-head pb-12">
+                  <h3>Website Maintenance & Technical Support</h3>
+              </div>
+              <div className="offer-txt">
+                   <p>Your website needs more than just a launch — it needs ongoing care. I provide monthly website maintenance, performance optimisation, bug fixes, plugin/theme updates, and emergency troubleshooting to keep your site secure, fast, and fully operational.</p>
+              </div>
+             
+            </div>
+          </div>
+        </li>
+         <li className="px-10 py-10 shadow-2xs">
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+                <div className="offer-head pb-12">
+                    <h3>Reliable White-Label Partnership for Agencies</h3>
+                </div>
+              <div className="offer-txt">
+                   <p>I offer white-label web development services to digital agencies and design studios who need extra development bandwidth without hiring full-time staff. I communicate clearly, meet deadlines, and work under your branding - making you look good in front of your clients.</p>
+              </div>
+             
+            </div>
+          </div>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    <div className="intro-text flex-auto md:flex-2/5 z-10 align-middle items-center-safe" >
+      <div className="logo-cont px-10 h-dvh">
+       <p>
+           <Image src={'/service_logos.png'} width={619} height={470} alt="Logo of stack" />
+       </p>
+           
+
+      </div>
+    </div>
+    </div>
+    </section>
+ <section className="offer-sec mx-auto w-dvw " style={slidefourBG}>
    
+    <div className="mx-auto px-9 py-9">
+    
+    <div className="why-head pb-12">
+       <h2>Who & Why</h2>
+    </div>
+     <div className="who-text relative">
+      <ul>
+        <li>
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+              <div className="why-head pb-12">
+                <h3>Digital Agencies with Overflowing Development Work</h3>
+              </div>
+              <div className="why-cont">
+                <p>When your in-house dev team is at capacity and deadlines are looming, I step in to keep projects on track. As a white-label freelance web developer, I integrate seamlessly with your workflow, helping you deliver polished websites faster — without hiring full-time staff.</p>
+              </div>
+            </div>
+          </div>
+        </li>
+         <li className="">
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+              <div className="why-head pb-12">
+                  <h3>Business Owners with Ongoing Website Support Needs</h3>
+              </div>
+              <div className="why-cont">
+                   <p>If you run a small business, you know how critical a reliable website is. I provide recurring website maintenance, quick updates, and performance fixes — so you can focus on your business while I keep your site live, secure, and updated.</p>
+              </div>
+             
+            </div>
+          </div>
+        </li>
+         <li>
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+               <div className="why-head pb-12">
+                 <h3>Startups Needing a Flexible, Cost-Effective Developer</h3>
+               </div>
+             <div className="why-cont">
+                 <p>Startups move fast — and I do too. Whether you need help building an MVP, adding new features, or iterating quickly, I offer flexible freelance development services that adapt to your growth, tech stack, and deadlines.</p>
+             </div>
+             
+            </div>
+          </div>
+        </li>
+         <li>
+          <div className="offer-sec pb-12">
+            <div className="icon"></div>
+            <div className="offer-text">
+               <div className="why-head pb-12">
+                  <h3>E-Commerce Brands Requiring High-Performance Websites </h3>
+               </div>
+               <div className="why-cont">
+                   <p>From Shopify to WooCommerce, I help online stores stay fast, secure, and bug-free. Whether you&#39;re launching a product, optimizing checkout, or fixing downtime issues - I bring the tech skills to keep your ecommerce site running smoothly.</p>
+               </div>
+             
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div className="intro-text">
+      <div className="why-cont  px-20 py-20">
+       
+            <div className="why-points">
+              <p>Direct Communication. Fast Response.</p>
+            </div>
+             <div className="why-points">
+              <p>Trusted by Global Agencies for Ongoing Development Work</p>
+            </div>
+             <div className="why-points">
+                <p>Clean, Scalable Code Built for Performance and Maintainability</p>
+             </div>
+           
+
+
+
+      </div>
+    </div>
+    </div>
+    </section>
+    <section className="" style={slidefiveBG}>
+      <div>
+     
+      </div>
     </section>
 
 
-  <section className="benefit-section relative overflow-hidden  max-w-5xl mx-auto px-4">
-    <div className="bg-[#f4ae32] highlight-benefit absolute w-5 h-5  -z-10 top-[50%] right-0" data-speed=".8"></div>
-    
-    <div className="max-w-5xl mx-auto mb-10">
-      <h2 className="text-2xl font-semibold mb-10">Get Expert Web Development Support, On Demand</h2>
-      <p>I help agencies, startups, and small businesses by stepping in exactly where your internal resources hit a wall.<br/>Think of me as your go-to freelance web developer — <span className="text-highlight">ready to deliver clean, scalable solutions without the delays, learning curves, or overheads</span>.<br/>Here&#39;s how I can help:</p>
+  <footer className="w-dvw text-right text-sm py-6">
+    <div className="container mx-auto">
+       <span>© 2025 Pradipta Das. All rights reserved.</span>
     </div>
-    <div className="max-w-5xl mx-auto flex flex-row flex-wrap mb-10">
-      <div className="md:flex-1/2">
-      <div className="caption-cont caption-cont-half px-4">
-      <p className="text shadow">Clear your project backlog.<span>Deliver faster, without burning out your team.</span></p>
-      <p className="text shadow">Keep your website online and optimized.<span>Because downtime costs money.</span></p>
-      <p className="text shadow">Solve recurring technical issues.<span>No more chasing bugs or patching quick fixes.</span></p>
-      <p className="text shadow">Free up your in-house team.<span>Best let your core staff focus on what they do.</span></p>
-      <p className="text shadow">Meet deadlines and impress your clients.<span>Turn chaos into smooth delivery.</span></p>
-       <p className="text shadow">Get ongoing website care and updates.<span>So you stay secure, fast, and future-ready.</span></p>
-       
-    </div>
-       
-      </div>
-      <div className="md:flex-1/2 pt-18">
-        <Image className=" border-[#f4ae32] border-1 border-s p-2" src="/expert-support.png" width={600} height={400} alt="my offer"/>
-      </div>
-    
-    </div>
-  </section>
-
-
-  <section className="relative service-blocks py-10 px-4 ">
-     <div className="bg-[#f4ae32] absolute w-5 h-5  -z-10 top-[50%] right-33" data-speed=".7"></div>
-    <div className="max-w-5xl mx-auto">
-    <h2 className="text-2xl font-semibold mb-10">What I Offer</h2>
-    <div className="flex flex-row flex-wrap justify-center align-middle">
-     
-    <div className="flex-1/2">
-    <div className="grid grid-rows-1 gap-6">
-      <div className="flex flex-row flex-wrap p-3 rounded shadow transition hover:shadow-2xl service-block">
-        <Image className="mx-auto flex-1/4" src={"/web-dev.svg"} width={50} height={50} alt="partnership" />
-        <div className="flex-3/4 p-2">
-        <h3 className="text-xl font-bold mt-2 mb-2">Website Development & Customization</h3>
-        <p>Web development using cutting edge tech stack.</p>
-        </div>
-      </div>
-      <div className="flex flex-row flex-wrap  p-3 rounded shadow transition hover:shadow-2xl service-block">
-        <Image className="mx-auto flex-1/4" src={"/web-maintenance.svg"} width={50} height={50} alt="partnership" />
-         <div className="flex-3/4 p-2">
-        <h3 className="text-xl font-bold mt-2 mb-2">Website Maintenance & Support</h3>
-        <p>Performance optimization, plugin/theme updates, fixes</p>
-        </div>
-      </div>
-      <div className="flex flex-row flex-wrap p-3 rounded shadow transition hover:shadow-2xl service-block" >
-        <Image className="mx-auto flex-1/4" src={"/partnership.svg"} width={50} height={50} alt="partnership" />
-         <div className="flex-3/4 p-2">
-        <h3 className="text-xl font-bold mt-2 mb-2">White-Label Partnership for Agencies</h3>
-        <p>Seamless collaboration with your clients under your brand</p>
-        </div>
-      </div>
-    </div>
-    </div>
-     <div className="flex-1/2 md:px-4 py-4 ">
-     <Image className=" border-[#f4ae32] border-1 border-s p-2" src={"/whatioffer.png"} width={600} height={400} alt="my offer"/>
-    </div>
-    </div>
-    </div>
-  </section>
-
-
-  <section className="py-10 px-4 whyworksec">
-    <div className="max-w-5xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-10">Why Work With Me?</h2>
-      <ul className="list-none flex flex-wrap flex-row space-y-2 text-center">
-        <li className="flex-1/1 md:flex-1/5 py-3 px-4">
-        <Link href="https://www.google.com">
-         <Image className="mx-auto py-4" src={"/experience.svg"} width={100} height={100} alt="Highly experience" />
-        10+ years of experience building and managing websites
-        </Link>
-        </li>
-        <li className="flex-1/1 md:flex-1/5 py-3 px-4"> 
-        <Image className="mx-auto py-4" src={"/trusted.svg"} width={100} height={100} alt="trusted" />
-        Trusted by global agencies for recurring work</li>
-        <li className="flex-1/1 md:flex-1/5 py-3 px-4"> <Image className="mx-auto py-4" src={"/onetime.svg"} width={100} height={100} alt="Available for contracts" />
-        Available for one-time projects and long-term contracts</li>
-        <li className="flex-1/1 md:flex-1/5 py-3 px-4"> <Image className="mx-auto py-4" src={"/communication.svg"} width={100} height={100} alt="Quick response" />
-        Direct communication, quick response time</li>
-        <li className="flex-1/1 md:flex-1/5 py-3 px-4">
-         <Image className="mx-auto py-4" src={"/clean-optimized.svg"} width={100} height={100} alt="Clean codes" />
-         Clean, optimized, and scalable code</li>
-      </ul>
-    </div>
-  </section>
-
-
-  <section className="relative py-10 px-4 max-w-5xl mx-auto">
-    <h2 className="text-2xl font-semibold mb-10">Who I Help</h2>
-     <div className="bg-[#f4ae32] absolute w-10 h-10  -z-10 top-[50%] -left-1" data-speed=".7"></div>
-     
-    <div className="max-w-5xl mx-auto flex flex-row flex-wrap">
-      <div className="flex-1/2 border-[#f4ae32] border-1 border-s p-2">
-    
-        <Image className="shadow" src={"/whowework.png"} width={600} height={400} alt="my offer"/>
-      </div>
-      <div className="flex-1/2 pt-3 px-6 ">
-    <ul className="grid grid-rows-1 gap-6">
-      <li className="p-4 rounded shadow transition hover:shadow-2xl ">Digital Agencies with too many client projects</li>
-      <li className="p-4 rounded shadow transition hover:shadow-2xl ">Business Owners needing reliable website support</li>
-      <li className="p-4 rounded shadow transition hover:shadow-2xl ">Startups seeking flexible, skilled development help</li>
-      <li className="p-4 rounded shadow transition hover:shadow-2xl ">E-commerce brands requiring stable, fast websites</li>
-    </ul>
-    </div>
-     
-    </div>
-  </section>
-
-  <section className="py-12 text-center">
-    <h2 className="text-3xl font-bold mb-4">Let&#39;s Take the Bottleneck Off Your Plate</h2>
-    <p className="text-lg mb-6">Need a freelance web developer you can count on?</p>
-    <div className="space-x-4">
-      <Link href="#" className="bg-[#f4ae32] text-black px-6 py-3  shadow">Book a Free Consultation</Link>
-      <Link href="#" className="bg-white border border-[#f4ae32] text-black-600 px-6 py-3  shadow">Send Project Details</Link>
-    </div>
-  </section>
-
-
-  <footer className="text-center text-sm py-6">
-    <span>© 2025 Pradipta Das. All rights reserved.</span>
+   
   </footer>
 </div>
 </div>
