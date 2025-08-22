@@ -11,8 +11,8 @@ export default function AnimComp(){
 
    
 
-    let cards: HTMLElement[]= gsap.utils.toArray(".cards");
-    let totalCards = cards.length;
+    const cards: HTMLElement[]= gsap.utils.toArray(".cards");
+    const totalCards = cards.length;
     let activeIndex = -1;
     let zIndex = 9999;
 
@@ -23,8 +23,8 @@ export default function AnimComp(){
         
         if (activeIndex === totalCards) activeIndex = 0 ;
         const activeItem = cards[activeIndex];
-        let nextIndex = (activeIndex+1) % totalCards;
-        let nextItem = cards[nextIndex];
+        const nextIndex = (activeIndex+1) % totalCards;
+        const nextItem = cards[nextIndex];
         const tl = gsap.timeline({defaults:{delay:0.8,ease:"power1.inOut"}})
         tl.set(nextItem,{scale:.7,yPercent:0,filter:"blur(0rem)","--background-opacity":0.2,opacity:1,zIndex:zIndex-1,delay:0})
         tl.set(activeItem,{scale:.7,yPercent:0,filter:"blur(0rem)","--background-opacity":0.2,opacity:1,zIndex:zIndex,delay:0})

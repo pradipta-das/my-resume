@@ -118,9 +118,9 @@ for (var i = 0; i < spriteSheet.total; i++) {
 }
 */
 
-let headersplit = SplitText.create(".intro-head h1");
-let splitintro = SplitText.create(".split-text-intro");
-var tlintro = gsap.timeline({  scrollTrigger: {
+const headersplit = SplitText.create(".intro-head h1");
+const splitintro = SplitText.create(".split-text-intro");
+let tlintro = gsap.timeline({  scrollTrigger: {
     trigger: ".intro-text",
     start: "top top",
     end: "300",
@@ -167,7 +167,7 @@ highlightText.forEach((highlighttxt:HTMLElement, index) => {
 
 
 
-var tlsupport = gsap.timeline({
+let tlsupport = gsap.timeline({
   defaults:{
     duration:"2s"
   }
@@ -219,7 +219,7 @@ servList.forEach((servElem:HTMLElement,index)=>{
       <p>Is your agency overloaded with development work and too few hands to deliver on time? Are you a business owner losing sales due to website downtime or poor site performance? You&#39;re not alone. Many teams face resource crunches and tech gaps that slow things down. But you don&#39;t have to.</p>
       </div>
       <ul className="grid grid-cols-4">
-        <li>linkedIn</li> 
+        <li><Link href={'/'}>linkedIn</Link></li> 
         <li>github</li>
         <li>youtube</li>
         <li>pinterest</li>
@@ -267,7 +267,7 @@ servList.forEach((servElem:HTMLElement,index)=>{
     </div>
     </div>
     </section>
-    <section className="offer-sec mx-auto w-dvw" style={slidetwoBG}>
+    <section className="offer-sec mx-auto w-dvw" style={slidethreeBG}>
 
     <div className="mx-auto px-9 py-9 flex flex-row flex-nowrap">
      
