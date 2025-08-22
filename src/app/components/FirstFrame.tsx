@@ -120,11 +120,11 @@ for (var i = 0; i < spriteSheet.total; i++) {
 
 const headersplit = SplitText.create(".intro-head h1");
 const splitintro = SplitText.create(".split-text-intro");
-let tlintro = gsap.timeline({  scrollTrigger: {
+const tlintro = gsap.timeline({  scrollTrigger: {
     trigger: ".intro-text",
     start: "top top",
     end: "300",
-    pin:true,
+    pin:false,
     scrub: true,
     markers: true,
   }});
@@ -167,13 +167,13 @@ highlightText.forEach((highlighttxt:HTMLElement, index) => {
 
 
 
-let tlsupport = gsap.timeline({
+const tlsupport = gsap.timeline({
   defaults:{
     duration:"2s"
   }
 });
 
-let split = SplitText.create(".split-text");
+const split = SplitText.create(".split-text");
 gsap.from(split.chars, {
   scrollTrigger: {
     trigger: ".problemdiv p",
