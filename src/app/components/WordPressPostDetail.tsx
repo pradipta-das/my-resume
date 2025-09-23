@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { fetchPostBySlug } from '../lib/wordpress';
 
 interface BlogPost {
@@ -102,8 +103,10 @@ export default function WordPressPostDetail({ slug }: { slug: string }) {
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {featuredImageUrl && (
-            <img 
-              src={featuredImageUrl} 
+            <Image 
+              src={featuredImageUrl}
+              width={1920}
+              height={1080} 
               alt={post.title.rendered} 
               className="w-full h-64 object-cover"
             />

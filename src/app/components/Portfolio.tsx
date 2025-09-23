@@ -20,9 +20,6 @@ export default function Portfolio() {
     const [portfolios, setPortfolios] = useState<PortfolioItem[]>([]);
     const pfolioCont = useRef<HTMLDivElement>(null);
     const pfolioItem = useRef<HTMLDivElement>(null);
-    const minScale = 0.5;
-    const spacer = 200;
-    const distributor = gsap.utils.distribute({ base: minScale, amount: 0.2 });
     const slidethreeBG = {
         backgroundImage: 'url("/slide_bg_2.png")',
         backgroundSize: "100%", // Optional: Adjust as needed
@@ -51,19 +48,15 @@ export default function Portfolio() {
 
         gsap.registerPlugin(ScrollTrigger);
 
-        const tlPortFolio = gsap.timeline({
-        defaults:{
-            duration:"2s"
-        }
-        });
+        
 
         const pfItems:HTMLDivElement[] = gsap.utils.toArray('.pfolio-img');
         const pfItemsText:HTMLDivElement[] = gsap.utils.toArray('.pfolio-text');
 
-        pfItems.forEach((elem,index)=>{
+        pfItems.forEach((elem)=>{
 
 
-          const tween = gsap.to(elem, {
+          gsap.to(elem, {
             scrollTrigger: {
               trigger: elem,
               start: 'top center',
@@ -83,7 +76,7 @@ export default function Portfolio() {
 
         pfItemsText.forEach((txtelem,index)=>{
 
-          const tweentxt = gsap.to(txtelem, {
+         gsap.to(txtelem, {
             scrollTrigger: {
               trigger: txtelem,
               start: 'top center',

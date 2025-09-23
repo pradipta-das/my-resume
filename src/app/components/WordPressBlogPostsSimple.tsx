@@ -54,11 +54,7 @@ export default function WordPressBlogPostsSimple() {
 
     gsap.registerPlugin(ScrollTrigger);
 
-    const tlBlog = gsap.timeline({
-      defaults:{
-        duration:"2s"
-      }
-    });
+    
     
 
     const blogListInit:HTMLElement[] = gsap.utils.toArray(".blog-cont li");
@@ -71,7 +67,7 @@ export default function WordPressBlogPostsSimple() {
       
     const scaleVal = distributor(index, blogListInit[index], blogListInit);
   
-    const tween = gsap.to(servElem, {
+     gsap.to(servElem, {
       scrollTrigger: {
         trigger: servElem,
         start: 'top top',
@@ -105,7 +101,7 @@ export default function WordPressBlogPostsSimple() {
       // Get the total height of the list
       const listHeight = blogList.scrollHeight;
       // Get the container height
-      const containerHeight = blogContainer.offsetHeight;
+      //const containerHeight = blogContainer.offsetHeight;
       // Calculate the maximum scroll distance
       const maxScroll = listHeight;
 
@@ -170,8 +166,10 @@ export default function WordPressBlogPostsSimple() {
               >
                 {post.featured_image_url ? (
                   <div className="h-dvh w-full">
-                    <img
+                    <Image
                       src={post.featured_image_url}
+                      width={1920}
+                      height={1080}
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { fetchBlogPosts } from '../lib/wordpress';
 
 interface BlogPost {
@@ -17,8 +18,8 @@ interface BlogPost {
     name: string;
     avatar_url: string;
   };
-  categories: Array<any>;
-  tags: Array<any>;
+  categories: [];
+  tags: [];
 }
 
 interface BlogPostsResponse {
@@ -112,8 +113,10 @@ export default function WordPressBlogPosts() {
               {posts.map((post) => (
                 <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   {post.featured_image_url && (
-                    <img 
+                    <Image 
                       src={post.featured_image_url} 
+                      width={1920}
+                      height={1080}
                       alt={post.title} 
                       className="w-full h-48 object-cover"
                     />

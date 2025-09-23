@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -55,19 +55,12 @@ const slidethreeBG = {
         backgroundRepeat: "no-repeat", 
         
       };
-const slidethreeBGFixed = {
-        backgroundImage: 'url("/slide_bg_2.png")',
-        backgroundSize: "100%", // Optional: Adjust as needed
-        backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "repeat", 
-        backgroundAttachment: "fixed"
-      };
 
 
 
 gsap.registerPlugin(ScrollTrigger,ScrollSmoother,SplitText);
 
-const [sitesettings, setSitesettings] = useState([]);
+
 
 const [siteHeader, setSiteheader] = useState('');
 const [siteDesc, setSitedesc] = useState('');
@@ -136,8 +129,6 @@ tlintro.from(headersplit.chars,{
 
 
 const servList:HTMLElement[] = gsap.utils.toArray(".service-list li");
-const servLength = servList.length;
-let activeIndex = 0;
 const tl = gsap.timeline({defaults:{delay:0.8,ease:"power1.inOut"}})
 tl.to('.problem-text',{opacity:1,xPercent: 0,scrollTrigger:{
       trigger: '.problem-text',
@@ -245,7 +236,7 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
           
           </ul> 
       <p className="py-25">
-        <Link href="/quote">Let's discuss your project</Link>
+        <Link href="/quote">Let&apos;s discuss your project</Link>
       </p>  
       </div>
       
@@ -261,7 +252,7 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
   <div className="mx-auto px-9 py-9">
     <div className="why-head pb-25">
           <h2 className="mb-25">Portfolio / Case Studies</h2>
-          <p>Over the years, I've collaborated with global agencies and direct clients, building more than 50+ websites across industries.</p>
+          <p>Over the years, I&apos;ve collaborated with global agencies and direct clients, building more than 50+ websites across industries.</p>
        </div>
   </div>
   
@@ -283,8 +274,8 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
     <Image src={'onetime.svg'} width={800} height={800} alt="contact-image"></Image>
   </div>
     <div className="why-head pb-12">
-    <h2>Let's Build Something Great Together</h2>
-    <p>Whether you're an agency with overflow work or a business owner needing a reliable developer,<br/> I'm here to help. I focus on results, not excuses.</p>
+    <h2>Let&apos;s Build Something Great Together</h2>
+    <p>Whether you&apos;re an agency with overflow work or a business owner needing a reliable developer,<br/> I&apos;m here to help. I focus on results, not excuses.</p>
       </div>
       <div className="footer-social w-50">
         <ul className="grid grid-cols-4">
