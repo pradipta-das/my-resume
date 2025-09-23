@@ -74,7 +74,7 @@ export default function Portfolio() {
 
         })
 
-        pfItemsText.forEach((txtelem,index)=>{
+        pfItemsText.forEach((txtelem)=>{
 
          gsap.to(txtelem, {
             scrollTrigger: {

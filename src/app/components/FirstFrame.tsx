@@ -296,7 +296,7 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
           </ul>
       </div>
         <div className="footer-text w-dvw blur-xl">
-    <p className="relative text-[15rem] text-[var(--foreground)] left-20">I'm Online</p>
+    <p className="relative text-[15rem] text-[var(--foreground)] left-20">I&apos;m Online</p>
   </div>
   
       </div>

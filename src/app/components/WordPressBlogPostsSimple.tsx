@@ -95,7 +95,7 @@ export default function WordPressBlogPostsSimple() {
     })
 
     if (blogSlideRef.current && blogListRef.current) {
-      const blogContainer = blogSlideRef.current;
+      //const blogContainer = blogSlideRef.current;
       const blogList = blogListRef.current;
      
       // Get the total height of the list
