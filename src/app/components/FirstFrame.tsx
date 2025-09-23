@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -8,18 +8,32 @@ import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import ScrollSmoother from "gsap/ScrollSmoother";
 import SplitText from "gsap/dist/SplitText";
-import ScrambleTextPlugin from "gsap/dist/ScrambleTextPlugin";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import MotionPathPlugin from "gsap/dist/MotionPathPlugin";
-import SiteHead from "./SiteHead";
-import AnimComp from "./AnimComp";
-import RatingComp from "./RatingComp";
 
+import {fetchSiteOptions} from '../lib/wordpress';
+import WordPressBlogPostsSimple from "./WordPressBlogPostsSimple";
+
+import Portfolio from "./Portfolio";
+import ReviewSlider from "./ReviewSlider";
+import OfferSlider from "./OfferSlider";
+
+interface SocialLink {
+  social_key: number;
+  social_name: string;
+  social_link: string;
+  social_icon: string;
+}
+
+interface WorkList{
+  work_key: number;
+  why_work_list_text: string;
+  why_work_list_icon: string;
+
+}
 
 
 export default function FirstFrame(){
-
 const backgroundStyle = {
         backgroundImage: 'url("/slide_1_bg.png")',
         backgroundSize: "100%", // Optional: Adjust as needed
@@ -27,7 +41,6 @@ const backgroundStyle = {
         backgroundRepeat: "no-repeat", 
         
       };
-
 const slidetwoBG = {
         backgroundImage: 'url("/slide_bg_2.png")',
         backgroundSize: "100%", // Optional: Adjust as needed
@@ -35,34 +48,63 @@ const slidetwoBG = {
         backgroundRepeat: "no-repeat", 
         
       };
-
 const slidethreeBG = {
-        backgroundImage: 'url("/slide_bg_3.png")',
+        backgroundImage: 'url("/slide_bg_2.png")',
         backgroundSize: "100%", // Optional: Adjust as needed
         backgroundPosition: "top center", // Optional: Adjust as needed
         backgroundRepeat: "no-repeat", 
         
       };
-
-const slidefourBG = {
-        backgroundImage: 'url("/slide_bg_4.png")',
+const slidethreeBGFixed = {
+        backgroundImage: 'url("/slide_bg_2.png")',
         backgroundSize: "100%", // Optional: Adjust as needed
         backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "no-repeat", 
-        
+        backgroundRepeat: "repeat", 
+        backgroundAttachment: "fixed"
       };
 
-const slidefiveBG = {
-        backgroundImage: 'url("/slide_bg_5.png")',
-        backgroundSize: "100%", // Optional: Adjust as needed
-        backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "no-repeat", 
-        
-      };
 
-gsap.registerPlugin(ScrollTrigger,ScrollSmoother,SplitText,ScrambleTextPlugin);
-gsap.registerPlugin(MotionPathPlugin);
 
+gsap.registerPlugin(ScrollTrigger,ScrollSmoother,SplitText);
+
+const [sitesettings, setSitesettings] = useState([]);
+
+const [siteHeader, setSiteheader] = useState('');
+const [siteDesc, setSitedesc] = useState('');
+const [socialIcon, setSocialicon] = useState<SocialLink[]>([]);
+const [workDesc, setWorkdesc] = useState('');
+const [workList, setWorklist] = useState<WorkList[]>([]);
+
+
+useEffect(() => {
+
+  const fetchSettings = async () =>{
+
+    try {
+      const data = await fetchSiteOptions();
+      setSiteheader(data.header_text || '');
+      setSitedesc(data.header_description || '');
+      setSocialicon(data.social_links || []);
+      setWorkdesc(data.why_work_description || '');
+      setWorklist(data.why_work_list || []);
+    } catch (error) {
+      console.error('Failed to fetch site settings:', error);
+      // Set default values or handle error
+      setSiteheader('Welcome');
+      setSitedesc('Default description');
+      setSocialicon([]);
+      setWorkdesc('Default work description');
+      setWorklist([]);
+    }
+
+  }
+
+  fetchSettings();
+
+},[])
+
+ 
+/* GSAP animation codes */
 
  useGSAP(()=>{
 
@@ -71,370 +113,211 @@ gsap.registerPlugin(MotionPathPlugin);
     effects: true,
   });
 
- 
-/*const textElements: HTMLElement[] = gsap.utils.toArray(".text");
-
-
-textElements.forEach((text:HTMLElement) => {
-
-  gsap.to(text, {
-    backgroundSize: "100%",
-    ease: "none",
-    scrollTrigger: {
-      trigger: text,
-      start: "center 80%",
-      end: "center 20%",
-      scrub: true,
-    },
-  });
-});
-*/
-/*var spriteSheet = {
-  width: 800,
-  height: 335,
-  total: 11,
-  cols: 1,
-  rows: 11,
-  duration: 3
-};
-
-var tlintro = gsap.timeline({
-  scrollTrigger: {
-    trigger: ".anim-cont",
-    start: "top top",
-    end: "2500",
-    scrub: 0.6,
-    pin: true,
-    markers: true
-  }
-});
-tlintro.fromTo(".intro-anim",{opacity:1},{opacity:1,duration:1})
-
-for (var i = 0; i < spriteSheet.total; i++) {  
-  tlintro.set(".intro-anim", {
-    x: (i % spriteSheet.cols) * -spriteSheet.width,
-    y: Math.floor(i / spriteSheet.cols) * -spriteSheet.height
-  }, i / (spriteSheet.total - 1) * spriteSheet.duration);
-}
-*/
-
 const headersplit = SplitText.create(".intro-head h1");
 const splitintro = SplitText.create(".split-text-intro");
 const tlintro = gsap.timeline({  scrollTrigger: {
-    trigger: ".intro-text",
+    trigger: ".intro-section",
     start: "top top",
     end: "300",
     pin:false,
     scrub: true,
-    markers: true,
+    markers: false,
   }});
-//tlintro.to(".intro-text", {duration: 1, scrambleText: "{original}"});
+
 tlintro.from(headersplit.chars,{
   opacity: 0.2,
   stagger: 0.1,
 })
-
-tlintro.addLabel('start')
- 
- //.to('.cards-anim',{scale:.7})
- //.addLabel('anim 2')
- //.from('.anim-cont',{scale:.8,filter:"blur(0.5rem)"})
- .addLabel('text anim 1')
  .from(splitintro.chars, {
   opacity: 0.2,
   stagger: 0.1,
 })
-.addLabel('anim end')
-/*const highlightText:HTMLElement[] = gsap.utils.toArray(".text-highlight");
 
-highlightText.forEach((highlighttxt:HTMLElement, index) => {
-
-  tlintro.from(highlightText,
-    { scrollTrigger: {
-    trigger: ".intro-text",
-    start: "top 30%",
-    end: "top 20%",
-    scrub: true,
-    markers: true,
-    },opacity:1,  
-    onStart: () => highlighttxt.classList.add("active"),
-    onComplete:() => highlighttxt.classList.remove("active")
-  })
-    
-    });*/
-
-
-
-
-
-const tlsupport = gsap.timeline({
-  defaults:{
-    duration:"2s"
-  }
-});
-
-const split = SplitText.create(".split-text");
-gsap.from(split.chars, {
-  scrollTrigger: {
-    trigger: ".problemdiv p",
-    start: "top 50%",
-    end: "top 20%",
-    scrub: true,
-    markers: false,
-  },
-  opacity: 0.2,
-  stagger: 0.1,
-});
 
 
 const servList:HTMLElement[] = gsap.utils.toArray(".service-list li");
-servList.forEach((servElem:HTMLElement,index)=>{
+const servLength = servList.length;
+let activeIndex = 0;
+const tl = gsap.timeline({defaults:{delay:0.8,ease:"power1.inOut"}})
+tl.to('.problem-text',{opacity:1,xPercent: 0,scrollTrigger:{
+      trigger: '.problem-text',
+      start: "top center",
+      end: 'bottom center',
+      scrub:true,
+      pin:false,
+      markers:false
+    }});
+servList.forEach((index,elem)=>{
 
-  tlsupport.to(servElem,{opacity: 1, delay:.5*index});  
-
+  tl.to(servList[elem],{opacity:1,scrollTrigger:{
+      trigger: index,
+      start: "center center",
+      end: 'bottom center',
+      scrub:true,
+      pin:false,
+      markers:false
+    }});
 })
 
-}
-  
-   
-  )
+
+
+const tlFooter = gsap.timeline({  scrollTrigger: {
+    trigger: ".footer-cta",
+    start: "top top",
+    end: "2000",
+    pin:false,
+    scrub: 1,
+    markers: false,
+    
+  }});
+
+tlFooter.to(".why-head",{'color':'var(--foreground)'})
+.to(".footer-text",{x:-80,'color':'black', opacity:1, filter: "blur(0rem)"})
+.to(".footer-img",{x:100,opacity:0.5,scale:.8,filter:"blur(0.5rem)"})
+  },{dependencies:[siteHeader,siteDesc]})
+
 
   return(
-    <div id="smooth-wrapper">
-  <div id="smooth-content">
+    
 
-  <SiteHead/>
+<>
   
-<section className="intro-section w-dvw h-dvh">
-   <div className="mx-auto px-9 py-9 flex flex-wrap flex-col">
-    <div className="flex-auto md:flex-1/2">
-    <div className="intro-text">
-      <div className="intro-head">
-      <h1 className="mb-12"><span className="text-highlight">Top Rated</span> Freelance Web Developer for <span className="text-highlight">Agencies & Businesses</span> <i>Needing</i> <span className="text-highlight">Reliable</span> Website <span className="text-highlight">Support</span></h1>
+<section className="intro-section w-dvw h-dvh relative" style={backgroundStyle}>
+   <div className="mx-auto relative px-9 py-9">
+  <div className="rating-img">
+      <div className="blog-img absolute scale-50 opacity-50 -z-1" data-speed='.2'>
+        <Image src={'global-map.svg'} width={1400} height={800} alt="map-image"></Image>
       </div>
-      <div className="split-text-intro pb-12">
-      <h2>Eliminate Bottlenecks. Fix Site Downtime. Keep Projects Moving.</h2>
-      </div>
-      <div className="split-text-intro pb-12">
-      <p>Is your agency overloaded with development work and too few hands to deliver on time? Are you a business owner losing sales due to website downtime or poor site performance? You&#39;re not alone. Many teams face resource crunches and tech gaps that slow things down. But you don&#39;t have to.</p>
-      </div>
-      <ul className="grid grid-cols-4">
-        <li><Link href={'/'}>linkedIn</Link></li> 
-        <li>github</li>
-        <li>youtube</li>
-        <li>pinterest</li>
-      </ul>
      
-      </div>
-      
     </div>
+   
+    <div className="intro-text h-dvh">
+      <div className="intro-head mt-25">
+      <h1 className="mb-25 text-center">{siteHeader}</h1>
+      </div>
+      <div className="split-text-intro pb-25 text-center">
+      <h2>{siteDesc}</h2>
+      </div>
+      <div className="w-3xs split-text-intro pb-25">
+        <ul className="grid grid-cols-4">
+         {socialIcon.map((social) => (
+
+             <li key={social.social_key}>
+              <Link href={social.social_link}>
+                <Image className="relative transition-all hover:scale-125 hover:fill-white" src={social.social_icon} height={40} width={40} alt={social.social_name}></Image>
+              </Link>
+              </li> 
+
+         )
+
+
+         )}
+
+         
+          </ul>
+      </div>
+      </div>
     
     </div>
 </section>
-<section className="intro-anim-sec w-dvw h-dvh px-9 py-9" style={backgroundStyle}>
-   
 
-      <AnimComp/>
-
-  
-</section>
-<section className="problemdiv mx-auto w-dvw " style={slidetwoBG}>
-   <div className="prob-text-header px-9">
-      <h2>Get <span className="text-highlight">Expert</span> Web Development <span className="text-highlight">Support</span>, On <i>Demand</i></h2>
+<section className="problemdiv mx-auto w-dvw" style={slidetwoBG}>
+   <div className="prob-text-header px-9 mb-25 mt-25 ">
+      <h2><span className="text-highlight">Why Work With Me?</span></h2>
     </div>
+    <div className="px-9 py-9 pb-25 w-[50%] problem-text opacity-20">
+      <p>{workDesc}</p>
+      </div>
     <div className="px-9 py-9 flex flex-row flex-wrap">
-    <div className="prob-text flex-auto md:flex-1/2 py-15">
-      <div className="split-text pb-12">
-      <p>I help agencies, startups, and small businesses by stepping in exactly where your internal resources hit a wall. Think of me as your go-to freelance web developer — ready to deliver clean, scalable solutions without the delays, learning curves, or overheads.</p>
-      </div>
-       <div className="split-text pb-12">
-      <p>Here&#39;s how I can help:</p>
-      </div>
+    <div className="prob-text relative flex-auto md:flex-1/2">
+      
+      
       <div className="service-cont">
         <ul className="service-list">
-          <li className="split-text">Clear your project backlog</li>
-          <li className="split-text">Keep your website online and optimized</li>
-          <li className="split-text">Keep your website online and optimized</li>
-          <li className="split-text">Solve recurring technical issues</li>
-          <li className="split-text">Free up your in-house team</li>
-          <li className="split-text">Meet deadlines and impress your clients</li>
-          </ul> 
-           
-      </div>
-    </div>
-    <div className="rating-img flex-1/2">
-      <RatingComp/>
-    </div>
-    </div>
-    </section>
-    <section className="offer-sec mx-auto w-dvw" style={slidethreeBG}>
+          {workList.map((works) => (
+             <li key={works.work_key} className="ml-1 opacity-20">{works.why_work_list_text}</li>
 
-    <div className="mx-auto px-9 py-9 flex flex-row flex-nowrap">
-     
-    <div className="flex-auto md:flex-3/5 pr-16  bg-white overflow-hidden">
-        <div className="split-prob-text pb-12">
-              <h2>What I Offer</h2>
-         </div>
-      <div className="offer-slide-cont">
-          <ul>
-        <li className="px-10 py-10 shadow-2xs">
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-              <div className="offer-head pb-12">
-                  <h3>Website Development & Customization</h3>
-              </div>
-              <div className="offer-txt">
-                   <p>I build custom, responsive, and scalable websites using modern technologies that match your business goals and brand identity. Whether you&#39;re launching a new project or refreshing an old one, I deliver clean, maintainable code and visually polished UI/UX.</p>
-              </div>
-             
-            </div>
-          </div>
-        </li>
-         <li className="px-10 py-10 shadow-2xs">
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-              <div className="offer-head pb-12">
-                  <h3>Website Maintenance & Technical Support</h3>
-              </div>
-              <div className="offer-txt">
-                   <p>Your website needs more than just a launch — it needs ongoing care. I provide monthly website maintenance, performance optimisation, bug fixes, plugin/theme updates, and emergency troubleshooting to keep your site secure, fast, and fully operational.</p>
-              </div>
-             
-            </div>
-          </div>
-        </li>
-         <li className="px-10 py-10 shadow-2xs">
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-                <div className="offer-head pb-12">
-                    <h3>Reliable White-Label Partnership for Agencies</h3>
-                </div>
-              <div className="offer-txt">
-                   <p>I offer white-label web development services to digital agencies and design studios who need extra development bandwidth without hiring full-time staff. I communicate clearly, meet deadlines, and work under your branding - making you look good in front of your clients.</p>
-              </div>
-             
-            </div>
-          </div>
-        </li>
-      </ul>
+
+          )
+          )}
+
+         
+          
+          </ul> 
+      <p className="py-25">
+        <Link href="/quote">Let's discuss your project</Link>
+      </p>  
       </div>
       
     </div>
-    <div className="intro-text flex-auto md:flex-2/5 z-10 align-middle items-center-safe" >
-      <div className="logo-cont px-10 h-dvh">
-       <p>
-           <Image src={'/service_logos.png'} width={619} height={470} alt="Logo of stack" />
-       </p>
-           
-
-      </div>
+    <div className="flex-auto md:flex-1/2 justify-end-safe">
+          
     </div>
     </div>
-    </section>
- <section className="offer-sec mx-auto w-dvw " style={slidefourBG}>
    
-    <div className="mx-auto px-9 py-9">
+    </section>
+    <OfferSlider />
+<section>
+  <div className="mx-auto px-9 py-9">
+    <div className="why-head pb-25">
+          <h2 className="mb-25">Portfolio / Case Studies</h2>
+          <p>Over the years, I've collaborated with global agencies and direct clients, building more than 50+ websites across industries.</p>
+       </div>
+  </div>
+  
+</section>
+   <Portfolio />
+
+  
     
+      <ReviewSlider />
+
+
+
+      <WordPressBlogPostsSimple />
+  
+ <section className="footer-cta h-dvh overflow-hidden" style={slidethreeBG}>
+
+       <div className="mx-auto px-9 py-9 relative">
+    <div className="footer-img absolute  right-0" data-lag='.2'>
+    <Image src={'onetime.svg'} width={800} height={800} alt="contact-image"></Image>
+  </div>
     <div className="why-head pb-12">
-       <h2>Who & Why</h2>
-    </div>
-     <div className="who-text relative">
-      <ul>
-        <li>
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-              <div className="why-head pb-12">
-                <h3>Digital Agencies with Overflowing Development Work</h3>
-              </div>
-              <div className="why-cont">
-                <p>When your in-house dev team is at capacity and deadlines are looming, I step in to keep projects on track. As a white-label freelance web developer, I integrate seamlessly with your workflow, helping you deliver polished websites faster — without hiring full-time staff.</p>
-              </div>
-            </div>
-          </div>
-        </li>
-         <li className="">
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-              <div className="why-head pb-12">
-                  <h3>Business Owners with Ongoing Website Support Needs</h3>
-              </div>
-              <div className="why-cont">
-                   <p>If you run a small business, you know how critical a reliable website is. I provide recurring website maintenance, quick updates, and performance fixes — so you can focus on your business while I keep your site live, secure, and updated.</p>
-              </div>
-             
-            </div>
-          </div>
-        </li>
-         <li>
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-               <div className="why-head pb-12">
-                 <h3>Startups Needing a Flexible, Cost-Effective Developer</h3>
-               </div>
-             <div className="why-cont">
-                 <p>Startups move fast — and I do too. Whether you need help building an MVP, adding new features, or iterating quickly, I offer flexible freelance development services that adapt to your growth, tech stack, and deadlines.</p>
-             </div>
-             
-            </div>
-          </div>
-        </li>
-         <li>
-          <div className="offer-sec pb-12">
-            <div className="icon"></div>
-            <div className="offer-text">
-               <div className="why-head pb-12">
-                  <h3>E-Commerce Brands Requiring High-Performance Websites </h3>
-               </div>
-               <div className="why-cont">
-                   <p>From Shopify to WooCommerce, I help online stores stay fast, secure, and bug-free. Whether you&#39;re launching a product, optimizing checkout, or fixing downtime issues - I bring the tech skills to keep your ecommerce site running smoothly.</p>
-               </div>
-             
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div className="intro-text">
-      <div className="why-cont  px-20 py-20">
-       
-            <div className="why-points">
-              <p>Direct Communication. Fast Response.</p>
-            </div>
-             <div className="why-points">
-              <p>Trusted by Global Agencies for Ongoing Development Work</p>
-            </div>
-             <div className="why-points">
-                <p>Clean, Scalable Code Built for Performance and Maintainability</p>
-             </div>
-           
-
-
-
+    <h2>Let's Build Something Great Together</h2>
+    <p>Whether you're an agency with overflow work or a business owner needing a reliable developer,<br/> I'm here to help. I focus on results, not excuses.</p>
       </div>
-    </div>
-    </div>
-    </section>
-    <section className="" style={slidefiveBG}>
-      <div>
+      <div className="footer-social w-50">
+        <ul className="grid grid-cols-4">
+         {socialIcon.map((social) => (
+
+             <li key={social.social_key}>
+              <Link href={social.social_link}>
+                <Image className="relative transition-all hover:scale-125 hover:fill-white" src={social.social_icon} height={40} width={40} alt={social.social_name}></Image>
+              </Link>
+              </li> 
+
+         )
+
+
+         )}
+
+         
+          </ul>
+      </div>
+        <div className="footer-text w-dvw blur-xl">
+    <p className="relative text-[15rem] text-[var(--foreground)] left-20">I'm Online</p>
+  </div>
+  
+      </div>
      
-      </div>
     </section>
-
-
   <footer className="w-dvw text-right text-sm py-6">
     <div className="container mx-auto">
        <span>© 2025 Pradipta Das. All rights reserved.</span>
     </div>
    
   </footer>
-</div>
-</div>
+</>  
   )
 
 }
