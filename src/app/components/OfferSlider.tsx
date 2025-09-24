@@ -6,7 +6,6 @@ import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { fetchSiteOptions } from '../lib/wordpress';
 import { useGSAP } from "@gsap/react";
-import Link from "next/link";
 
 interface OfferList {
   offer_id: number;

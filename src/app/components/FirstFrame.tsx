@@ -243,7 +243,7 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
     </div>
     <div className="prob-text px-9 py-9">
      
-          <h3 className="text1 text-8xl transition-all leading-24 opacity-100 scale-100">Because... I'm not</h3>
+          <h3 className="text1 text-8xl transition-all leading-24 opacity-100 scale-100">Because... I&apos;m not</h3>
           <Image className="brain-img p-4 scale-50 opacity-100" src="alien-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
           <h3 className="text2 mt-20 text-9xl transition-all opacity-100 scale-100">.....and I use </h3>
           <Image className="time-img2 p-4 scale-50 opacity-100" src="hourglass-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
