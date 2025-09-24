@@ -195,9 +195,9 @@ export default function WordPressBlogPostsSimple() {
         </div>
       )}
     </div>
-    <div className="blog-img absolute -left-60 -z-1" data-lag='.1'>
+    <div className="blog-img absolute bottom-0 -left-60 -rotate-5 -z-1">
           <Image src={'chart-up.svg'} width={800} height={800} alt="blog-image"></Image>
-        </div>
+        </div>  
     </section>
   );
 }

@@ -46,6 +46,26 @@ export default function OfferSlider() {
   useGSAP(() => {
     if (offersList.length > 0 && offerSlideRef.current && offerListRef.current) {
       // Wait for images to load
+
+
+      const offertl = gsap.timeline({scrollTrigger: {
+        trigger: ".offer-text-anim",
+        start: "top top",
+        end: "+=300",
+        pin:false,
+        scrub: true,
+        markers: true,
+    }});
+
+      offertl.to('.text1',{opacity:1})
+             .to('.brain-img',{opacity:1,scale:.75},('<'))
+             .to('.text2',{opacity:1},('<'))
+             .to('.time-img2',{opacity:1,scale:.75},('<'))
+             .to('.text3',{opacity:1},('<'))
+
+      
+
+
      
         const slideContainer = offerSlideRef.current;
         const slideList = offerListRef.current;
@@ -61,7 +81,7 @@ export default function OfferSlider() {
           console.log(listWidth +" "+ containerWidth+" "+maxScroll);
 
           // Only create scroll trigger if maxScroll > 0
-          if (maxScroll > 0) {
+         /* if (maxScroll > 0) {
             // Create the scroll trigger
             ScrollTrigger.create({
               trigger: slideContainer,
@@ -85,7 +105,7 @@ export default function OfferSlider() {
                 gsap.to(slideList, { filter: "blur(0rem)", scale: 1 });
               }
             });
-          }
+          }*/
         }
      
 
@@ -94,40 +114,51 @@ export default function OfferSlider() {
   },{dependencies: [offersList]});
 
   return (
-    <section className="offer-sec mx-auto w-dvw overflow-hidden" style={{
+    <section className="offer-sec mx-auto w-dvw mt-25" style={{
       backgroundImage: 'url("/slide_bg_2.png")',
       backgroundSize: "100%",
       backgroundPosition: "top center",
       backgroundRepeat: "repeat",
       backgroundAttachment: "fixed"
     }}>
-      <div className="mx-auto flex flex-row flex-nowrap">
-        <div className="flex-auto overflow-hidden">
-          <div className="split-prob-text px-9 pr-9 pb-25">
+      <div className="mx-auto px-9 pr-9 pb-25">
+        <div className="relative w-dvw">
+          <div className="split-prob-text">
             <h2 className="mb-25">What I Offer</h2>
             <p>{offerDesc}</p>
           </div>
 
-          <div className="offer-slide-cont w-dvw h-dvh overflow-hidden" ref={offerSlideRef}>
-            <div className="relative h-screen" ref={offerListRef}>
-              <ul>
-                {offersList.map((offer) => (
-                  <li key={offer.offer_id} className="relative w-2xl h-dvh justify-center-safe">
-                    <Image src={offer.offer_image} width={800} height={600} alt={`${offer.offer_name}`} className="block blur-xs w-auto object-cover" />
-                    <div className="absolute bg-white inset-0 p-8 w-xl text-center top-auto bottom-0 left-0 right-0 m-auto h-1/4 shadow-2xl">
-                        <span><div className=" w-4 h-4 rounded-2xl bg-lime-300"></div></span>
-                        <h3>Wordpress</h3>
-                        <p>Lorem Ipsum dolor summit</p>
+          
+        </div>
 
-                        <Link href={'#'}>Learn More</Link>
-                    </div>
+        <div className="offer-slide-cont w-dvw flex-nowrap pt-50" ref={offerSlideRef}>
+            <div className="relative md:w-2/3 w-3/3 offer-text-block">
+                <div className="offer-text-anim py-14">
+                    <h3 className="text1 mt-50 text-8xl transition-all leading-24 opacity-0 scale-100">Apart from my</h3>
+                    <Image className="brain-img p-4 scale-50 opacity-0" src="brain-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
+                    <h3 className="text2 mt-20 text-9xl transition-all opacity-0 scale-100">.....and my</h3>
+                    <Image className="time-img2 p-4 scale-50 opacity-0" src="hourglass-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
+                    <h3 className="text3 mt-20 text-8xl transition-all opacity-0 scale-100">.....I offer impactful solutions for your business.</h3>
+                </div>
+           
+
+            </div>
+            <div className="relative md:w-1/3 w-3/3 mb-20" ref={offerListRef}>
+             
+              <ul className="relative">
+                {offersList.map((offer) => (
+                    
+                  <li key={offer.offer_id} className="relative">
+                    <Image src={offer.offer_image} width={100} height={100} alt={`${offer.offer_name}`} className="block w-auto object-cover" />
                   </li>
+                 
+                  
                 ))}
               </ul>
-             
+            <Image className="mt-40 mr-10" src="onetime.svg" width={800} height={600} alt="offer image"></Image>
             </div>
+            
           </div>
-        </div>
       </div>
     </section>
   );

@@ -13,7 +13,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 import {fetchSiteOptions} from '../lib/wordpress';
 import WordPressBlogPostsSimple from "./WordPressBlogPostsSimple";
-
+import RatingComp from "./RatingComp";
 import Portfolio from "./Portfolio";
 import ReviewSlider from "./ReviewSlider";
 import OfferSlider from "./OfferSlider";
@@ -111,11 +111,12 @@ const splitintro = SplitText.create(".split-text-intro");
 const tlintro = gsap.timeline({  scrollTrigger: {
     trigger: ".intro-section",
     start: "top top",
-    end: "300",
+    end: "500",
     pin:false,
     scrub: true,
     markers: false,
   }});
+
 
 tlintro.from(headersplit.chars,{
   opacity: 0.2,
@@ -164,7 +165,6 @@ const tlFooter = gsap.timeline({  scrollTrigger: {
 
 tlFooter.to(".why-head",{'color':'var(--foreground)'})
 .to(".footer-text",{x:-80,'color':'black', opacity:1, filter: "blur(0rem)"})
-.to(".footer-img",{x:100,opacity:0.5,scale:.8,filter:"blur(0.5rem)"})
   },{dependencies:[siteHeader,siteDesc]})
 
 
@@ -176,8 +176,8 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
 <section className="intro-section w-dvw h-dvh relative" style={backgroundStyle}>
    <div className="mx-auto relative px-9 py-9">
   <div className="rating-img">
-      <div className="blog-img absolute scale-50 opacity-50 -z-1" data-speed='.2'>
-        <Image src={'global-map.svg'} width={1400} height={800} alt="map-image"></Image>
+      <div className="blog-img absolute grayscale-100 opacity-50 -z-1" data-speed='.2'>
+        <Image src={'global-map.svg'} width={1920} height={1080} alt="map-image"></Image>
       </div>
      
     </div>
@@ -213,14 +213,14 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
 </section>
 
 <section className="problemdiv mx-auto w-dvw" style={slidetwoBG}>
-   <div className="prob-text-header px-9 mb-25 mt-25 ">
+  <div className="prob-text-header px-9 mb-25 mt-25 ">
       <h2><span className="text-highlight">Why Work With Me?</span></h2>
     </div>
-    <div className="px-9 py-9 pb-25 w-[50%] problem-text opacity-20">
+    <div className="px-9 py-9 pb-25 problem-text opacity-20">
       <p>{workDesc}</p>
       </div>
-    <div className="px-9 py-9 flex flex-row flex-wrap">
-    <div className="prob-text relative flex-auto md:flex-1/2">
+  <div className="grid md:grid-cols-2 sm:grid-cols-1">
+    <div className="prob-text px-9 py-9">
       
       
       <div className="service-cont">
@@ -241,10 +241,21 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
       </div>
       
     </div>
-    <div className="flex-auto md:flex-1/2 justify-end-safe">
-          
+    <div className="prob-text px-9 py-9">
+     
+          <h3 className="text1 text-8xl transition-all leading-24 opacity-100 scale-100">Because... I'm not</h3>
+          <Image className="brain-img p-4 scale-50 opacity-100" src="alien-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
+          <h3 className="text2 mt-20 text-9xl transition-all opacity-100 scale-100">.....and I use </h3>
+          <Image className="time-img2 p-4 scale-50 opacity-100" src="hourglass-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
+          <h3 className="text3 mt-20 text-8xl transition-all opacity-100 scale-100">...and I build useful things .</h3>
     </div>
-    </div>
+  </div>
+   
+    
+
+    
+   
+    
    
     </section>
     <OfferSlider />
@@ -252,7 +263,7 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
   <div className="mx-auto px-9 py-9">
     <div className="why-head pb-25">
           <h2 className="mb-25">Portfolio / Case Studies</h2>
-          <p>Over the years, I&apos;ve collaborated with global agencies and direct clients, building more than 50+ websites across industries.</p>
+          <p>Over the years, I&apos;ve collaborated with global agencies and direct clients, building websites across industries.</p>
        </div>
   </div>
   
@@ -267,17 +278,14 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
 
       <WordPressBlogPostsSimple />
   
- <section className="footer-cta h-dvh overflow-hidden" style={slidethreeBG}>
+ <section className="footer-cta" style={slidethreeBG}>
 
        <div className="mx-auto px-9 py-9 relative">
-    <div className="footer-img absolute  right-0" data-lag='.2'>
-    <Image src={'onetime.svg'} width={800} height={800} alt="contact-image"></Image>
-  </div>
-    <div className="why-head pb-12">
-    <h2>Let&apos;s Build Something Great Together</h2>
-    <p>Whether you&apos;re an agency with overflow work or a business owner needing a reliable developer,<br/> I&apos;m here to help. I focus on results, not excuses.</p>
+    <div className="why-head">
+    <h2 className="mb-20">Let&apos;s Build Something Great Together</h2>
+    <p className="mb-20">Whether you&apos;re an agency with overflow work or a business owner needing a reliable developer,<br/> I&apos;m here to help. I focus on results, not excuses.</p>
       </div>
-      <div className="footer-social w-50">
+      <div className="footer-social w-50 mb-20">
         <ul className="grid grid-cols-4">
          {socialIcon.map((social) => (
 
@@ -295,12 +303,16 @@ tlFooter.to(".why-head",{'color':'var(--foreground)'})
          
           </ul>
       </div>
-        <div className="footer-text w-dvw blur-xl">
-    <p className="relative text-[15rem] text-[var(--foreground)] left-20">I&apos;m Online</p>
-  </div>
   
+  <div className="footer-img w-xl right-0" data-lag='.2'>
+      
+      <RatingComp/>
+      
+    </div>
       </div>
-     
+     <div className="footer-text absolute py-10 right-0 bottom-25">
+    <p className="relative text-[15rem] leading-34 text-[var(--foreground)]">I&apos;m<br/>Online</p>
+  </div>
     </section>
   <footer className="w-dvw text-right text-sm py-6">
     <div className="container mx-auto">
