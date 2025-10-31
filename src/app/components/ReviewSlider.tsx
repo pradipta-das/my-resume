@@ -3,9 +3,6 @@
 import React, { useRef } from 'react';
 import Slider from 'react-slick';
 import Image from 'next/image';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import ScrollTrigger from 'gsap/dist/ScrollTrigger';
 
 
 
@@ -40,7 +37,7 @@ export default function ReviewSlider() {
 
 
 
-  var settings = {
+  const settings = {
     dots: true,
     infinite: false,
     speed: 500,

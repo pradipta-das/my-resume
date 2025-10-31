@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from "gsap";
-import Slider from 'react-slick';
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { fetchBlogPosts } from '../lib/wordpress';
@@ -31,8 +30,6 @@ export default function WordPressBlogPostsSimple() {
   const [error, setError] = useState<string | null>(null);
   const blogSlideRef = useRef<HTMLDivElement>(null);
   const blogListRef = useRef<HTMLUListElement>(null);
-
-  const [blogClick, setblogClick] = useState<BlogPost>();
 
 
   useEffect(() => {
@@ -62,14 +59,13 @@ export default function WordPressBlogPostsSimple() {
     
 
     const blogListInit:HTMLElement[] = gsap.utils.toArray(".blog-cont li");
-    const spacer = 5;
     const minScale = 0.5;
 
     const distributor = gsap.utils.distribute({ base: minScale, amount: 0.2 });
 
     blogListInit.forEach((servElem:HTMLElement,index)=>{
       
-    const scaleVal = distributor(index, blogListInit[index], blogListInit);
+
   
    
 
@@ -84,7 +80,7 @@ export default function WordPressBlogPostsSimple() {
       // Get the container height
       //const containerHeight = blogContainer.offsetHeight;
       // Calculate the maximum scroll distance
-      const maxScroll = listHeight;
+     
 
       // Create the scroll trigger
     

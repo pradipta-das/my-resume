@@ -2,8 +2,6 @@ import React, {useState, useEffect} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
-import  ScrollTrigger from "gsap/dist/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import {fetchSiteOptions} from '../lib/wordpress';
 
 

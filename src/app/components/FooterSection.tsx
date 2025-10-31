@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import RatingComp from "./RatingComp";
+import SocialIcons from "./SocialIcons";
 
 export default function FooterSection(){
     const slidethreeBG = {
@@ -53,14 +54,7 @@ export default function FooterSection(){
     <p className="mb-20">Whether you&apos;re an agency with overflow work or a business owner needing a reliable developer,<br/> I&apos;m here to help. I focus on results, not excuses.</p>
       </div>
       <div className="footer-social w-50 mb-20">
-        <ul className="grid grid-cols-4">
-        
-
-
-        
-         
-          </ul>
-           <button className="w-80 p-8 text-center  align-middle border border-black cta-btn">Connect with me</button>
+       <SocialIcons></SocialIcons>
       </div>
   <div className="grid md:grid-cols-2 grid-cols-1 grid-rows-1 gap-4">
   <div className="footer-img" data-lag="0.6">

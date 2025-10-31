@@ -170,22 +170,17 @@ export default function OfferSlider() {
     }
 
     const sections = document.querySelectorAll(".portfolio-tile");
-    const portfolioNav = document.querySelector("#portfolio-path");
 if(pfolioItem.current && sections.length > 0){
 
-      const sectionHeight = pfolioItem.current;
-      let navProgressdisp = document.querySelector('.progressCount');
-      let navText = document.querySelector('.slideCount');
+     
+      const navProgressdisp = document.querySelector('.progressCount');
+      const navText = document.querySelector('.slideCount');
           if (navText) navText.innerHTML = sections.length.toString();
 
 
-            const pItems:PortfolioItem[] = gsap.utils.toArray('.portfolio-tile');
+            //const pItems:PortfolioItem[] = gsap.utils.toArray('.portfolio-tile');
             const images:HTMLDivElement[] = gsap.utils.toArray(".bg");
             const thumbimages:HTMLUListElement[] = gsap.utils.toArray(".bg-thumb");
-            
-
-            const totalCards = pItems.length;
-            let navProgress = 0;
             let navIndex=1;
 
             const tlPortfolio = gsap.timeline({
@@ -195,11 +190,7 @@ if(pfolioItem.current && sections.length > 0){
                 end: () => "+=" + (sections.length - 1) * window.innerHeight,
                 pin: true,
                 scrub: 1,
-                markers: false,
-                onUpdate: (self) => {
-                 
-                  
-                }
+                markers: false
               }
             });
 
@@ -222,7 +213,7 @@ if(pfolioItem.current && sections.length > 0){
                 zIndex: 9999 - index,
                 duration: 1,
                 onStart:()=>{
-                  console.log(thumbimages[index])
+                  //console.log(thumbimages[index])
                   navIndex++;
                   if (navProgressdisp) navProgressdisp.innerHTML = navIndex.toString();
                 },

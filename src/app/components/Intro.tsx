@@ -8,6 +8,7 @@ import MotionPathPlugin from "gsap/dist/MotionPathPlugin";
 import DrawSVGPlugin from "gsap/dist/DrawSVGPlugin";
 import SplitText from "gsap/dist/SplitText";
 import {fetchSiteOptions} from '../lib/wordpress';
+import SocialIcons from "./SocialIcons";
 
 
 export function ArrowMessage(){
@@ -58,7 +59,6 @@ export default function Intro(){
 
 const [siteHeader, setSiteheader] = useState('');
 const [siteDesc, setSitedesc] = useState('');
-const [socialIcon, setSocialicon] = useState<SocialLink[]>([]);
 const introcntxt = useRef<HTMLHtmlElement>(null);
 
 
@@ -70,7 +70,7 @@ useEffect(() => {
       const data = await fetchSiteOptions();
       setSiteheader(data.header_text || '');
       setSitedesc(data.header_description || '');
-      setSocialicon(data.social_links || []);
+      
 
 
 
@@ -81,7 +81,7 @@ useEffect(() => {
       // Set default values or handle error
       setSiteheader('Welcome');
       setSitedesc('Default description');
-      setSocialicon([]);
+     
      
     }
 
@@ -245,22 +245,7 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
           <ArrowMessage/>
         </div>
         <p className="pb-10">Connect with me</p>
-        <ul className="grid social-icons grid-cols-4">
-         {socialIcon.map((social) => (
-
-             <li key={social.social_key}>
-              <Link href={social.social_link}>
-                <Image className="relative transition-all hover:scale-125 hover:fill-white" src={social.social_icon} height={40} width={40} alt={social.social_name}></Image>
-              </Link>
-              </li> 
-
-         )
-
-
-         )}
-
-         
-          </ul>
+        <SocialIcons></SocialIcons>
       </div>
        <div id="about" className="split-text-intro pt-15 pb-15 text-left">
         <h2><span className="text-highlight mb-10">How I Bring Ideas to Life</span></h2>

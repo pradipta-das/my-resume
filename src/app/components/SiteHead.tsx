@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import gsap from 'gsap';
 import ScrollToPlugin from 'gsap/dist/ScrollToPlugin';
-import { useGSAP } from '@gsap/react';
 
 export default function SiteHead(){
 

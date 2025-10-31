@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState, useEffect, Suspense } from "react";
+import React, {Suspense } from "react";
 import gsap from "gsap";
 import ScrollSmoother from "gsap/ScrollSmoother";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
@@ -9,10 +9,6 @@ import { useGSAP } from "@gsap/react";
 
 
 import Intro from "./Intro";
-import WordPressBlogPostsSimple from "./WordPressBlogPostsSimple";
-import RatingComp from "./RatingComp";
-import WhyWork from "./WhyWork";
-import Portfolio from "./Portfolio";
 import ReviewSlider from "./ReviewSlider";
 import OfferSlider from "./OfferSlider";
 import FooterSection from "./FooterSection";
@@ -29,7 +25,7 @@ useGSAP(()=>{
 
   gsap.set(".cursoranim", {xPercent: -50, yPercent: -50});
 
-let xTo = gsap.quickTo(".cursoranim", "x", {duration: 0.6, ease: "power3"}),
+const xTo = gsap.quickTo(".cursoranim", "x", {duration: 0.6, ease: "power3"}),
     yTo = gsap.quickTo(".cursoranim", "y", {duration: 0.6, ease: "power3"});
 
 window.addEventListener("mousemove", e => {
