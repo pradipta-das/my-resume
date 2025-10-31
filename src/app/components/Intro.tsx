@@ -205,8 +205,8 @@ numStack.forEach((elem)=>{
       each: 1.0,  
       onUpdate: function() {
         
-        elem.innerHTML = elem.textContent.toString()+'+';
-        //this.targets()[0].innerHTML = this.targets()[0].textContent;
+        if (elem.innerHTML) elem.innerHTML = elem.textContent.toString()+'+';
+        
       },
     }
   });
