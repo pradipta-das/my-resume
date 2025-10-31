@@ -1,319 +1,66 @@
 "use client";
 
-import React, {useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import React, {useState, useEffect, Suspense } from "react";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import ScrollSmoother from "gsap/ScrollSmoother";
-import SplitText from "gsap/dist/SplitText";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
-import {fetchSiteOptions} from '../lib/wordpress';
+
+
+import Intro from "./Intro";
 import WordPressBlogPostsSimple from "./WordPressBlogPostsSimple";
 import RatingComp from "./RatingComp";
+import WhyWork from "./WhyWork";
 import Portfolio from "./Portfolio";
 import ReviewSlider from "./ReviewSlider";
 import OfferSlider from "./OfferSlider";
+import FooterSection from "./FooterSection";
 
-interface SocialLink {
-  social_key: number;
-  social_name: string;
-  social_link: string;
-  social_icon: string;
-}
 
-interface WorkList{
-  work_key: number;
-  why_work_list_text: string;
-  why_work_list_icon: string;
 
-}
 
 
 export default function FirstFrame(){
-const backgroundStyle = {
-        backgroundImage: 'url("/slide_1_bg.png")',
-        backgroundSize: "100%", // Optional: Adjust as needed
-        backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "no-repeat", 
-        
-      };
-const slidetwoBG = {
-        backgroundImage: 'url("/slide_bg_2.png")',
-        backgroundSize: "100%", // Optional: Adjust as needed
-        backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "no-repeat", 
-        
-      };
-const slidethreeBG = {
-        backgroundImage: 'url("/slide_bg_2.png")',
-        backgroundSize: "100%", // Optional: Adjust as needed
-        backgroundPosition: "top center", // Optional: Adjust as needed
-        backgroundRepeat: "no-repeat", 
-        
-      };
 
-
-
-gsap.registerPlugin(ScrollTrigger,ScrollSmoother,SplitText);
-
-
-
-const [siteHeader, setSiteheader] = useState('');
-const [siteDesc, setSitedesc] = useState('');
-const [socialIcon, setSocialicon] = useState<SocialLink[]>([]);
-const [workDesc, setWorkdesc] = useState('');
-const [workList, setWorklist] = useState<WorkList[]>([]);
-
-
-useEffect(() => {
-
-  const fetchSettings = async () =>{
-
-    try {
-      const data = await fetchSiteOptions();
-      setSiteheader(data.header_text || '');
-      setSitedesc(data.header_description || '');
-      setSocialicon(data.social_links || []);
-      setWorkdesc(data.why_work_description || '');
-      setWorklist(data.why_work_list || []);
-    } catch (error) {
-      console.error('Failed to fetch site settings:', error);
-      // Set default values or handle error
-      setSiteheader('Welcome');
-      setSitedesc('Default description');
-      setSocialicon([]);
-      setWorkdesc('Default work description');
-      setWorklist([]);
-    }
-
-  }
-
-  fetchSettings();
-
-},[])
-
+gsap.registerPlugin(ScrollSmoother,ScrollTrigger);
  
-/* GSAP animation codes */
+useGSAP(()=>{
 
- useGSAP(()=>{
+  gsap.set(".cursoranim", {xPercent: -50, yPercent: -50});
 
-   ScrollSmoother.create({
-    smooth: 1,
-    effects: true,
-  });
+let xTo = gsap.quickTo(".cursoranim", "x", {duration: 0.6, ease: "power3"}),
+    yTo = gsap.quickTo(".cursoranim", "y", {duration: 0.6, ease: "power3"});
 
-const headersplit = SplitText.create(".intro-head h1");
-const splitintro = SplitText.create(".split-text-intro");
-const tlintro = gsap.timeline({  scrollTrigger: {
-    trigger: ".intro-section",
-    start: "top top",
-    end: "500",
-    pin:false,
-    scrub: true,
-    markers: false,
-  }});
+window.addEventListener("mousemove", e => {
+  xTo(e.clientX);
+  yTo(e.clientY);
+});
 
-
-tlintro.from(headersplit.chars,{
-  opacity: 0.2,
-  stagger: 0.1,
-})
- .from(splitintro.chars, {
-  opacity: 0.2,
-  stagger: 0.1,
+gsap.to('progress', {
+  value: 100,
+  ease: 'none',
+  scrollTrigger: { scrub: 0.3 }
+});
 })
 
-
-
-const servList:HTMLElement[] = gsap.utils.toArray(".service-list li");
-const tl = gsap.timeline({defaults:{delay:0.8,ease:"power1.inOut"}})
-tl.to('.problem-text',{opacity:1,xPercent: 0,scrollTrigger:{
-      trigger: '.problem-text',
-      start: "top center",
-      end: 'bottom center',
-      scrub:true,
-      pin:false,
-      markers:false
-    }});
-servList.forEach((index,elem)=>{
-
-  tl.to(servList[elem],{opacity:1,scrollTrigger:{
-      trigger: index,
-      start: "center center",
-      end: 'bottom center',
-      scrub:true,
-      pin:false,
-      markers:false
-    }});
-})
-
-
-
-const tlFooter = gsap.timeline({  scrollTrigger: {
-    trigger: ".footer-cta",
-    start: "top top",
-    end: "2000",
-    pin:false,
-    scrub: 1,
-    markers: false,
-    
-  }});
-
-tlFooter.to(".why-head",{'color':'var(--foreground)'})
-.to(".footer-text",{x:-80,'color':'black', opacity:1, filter: "blur(0rem)"})
-  },{dependencies:[siteHeader,siteDesc]})
 
 
   return(
     
 
 <>
-  
-<section className="intro-section w-dvw h-dvh relative" style={backgroundStyle}>
-   <div className="mx-auto relative px-9 py-9">
-  <div className="rating-img">
-      <div className="blog-img absolute grayscale-100 opacity-50 -z-1" data-speed='.2'>
-        <Image src={'global-map.svg'} width={1920} height={1080} alt="map-image"></Image>
-      </div>
-     
-    </div>
-   
-    <div className="intro-text h-dvh">
-      <div className="intro-head mt-25">
-      <h1 className="mb-25 text-center">{siteHeader}</h1>
-      </div>
-      <div className="split-text-intro pb-25 text-center">
-      <h2>{siteDesc}</h2>
-      </div>
-      <div className="w-3xs split-text-intro pb-25">
-        <ul className="grid grid-cols-4">
-         {socialIcon.map((social) => (
+  <div className="cursoranim"></div>
+  <progress max="100" value="0"></progress>
+<Intro/>
+<Suspense fallback={<div className="w-dvw h-dvh">Loading</div>}>
+<OfferSlider/>
+</Suspense>
 
-             <li key={social.social_key}>
-              <Link href={social.social_link}>
-                <Image className="relative transition-all hover:scale-125 hover:fill-white" src={social.social_icon} height={40} width={40} alt={social.social_name}></Image>
-              </Link>
-              </li> 
-
-         )
-
-
-         )}
-
-         
-          </ul>
-      </div>
-      </div>
-    
-    </div>
-</section>
-
-<section className="problemdiv mx-auto w-dvw" style={slidetwoBG}>
-  <div className="prob-text-header px-9 mb-25 mt-25 ">
-      <h2><span className="text-highlight">Why Work With Me?</span></h2>
-    </div>
-    <div className="px-9 py-9 pb-25 problem-text opacity-20">
-      <p>{workDesc}</p>
-      </div>
-  <div className="grid md:grid-cols-2 sm:grid-cols-1">
-    <div className="prob-text px-9 py-9">
-      
-      
-      <div className="service-cont">
-        <ul className="service-list">
-          {workList.map((works) => (
-             <li key={works.work_key} className="ml-1 opacity-20">{works.why_work_list_text}</li>
-
-
-          )
-          )}
-
-         
-          
-          </ul> 
-      <p className="py-25">
-        <Link href="/quote">Let&apos;s discuss your project</Link>
-      </p>  
-      </div>
-      
-    </div>
-    <div className="prob-text px-9 py-9">
-     
-          <h3 className="text1 text-8xl transition-all leading-24 opacity-100 scale-100">Because... I&apos;m not</h3>
-          <Image className="brain-img p-4 scale-50 opacity-100" src="alien-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
-          <h3 className="text2 mt-20 text-9xl transition-all opacity-100 scale-100">.....and I use </h3>
-          <Image className="time-img2 p-4 scale-50 opacity-100" src="hourglass-svgrepo-com.svg" width={400} height={400} alt="brain-img"></Image>
-          <h3 className="text3 mt-20 text-8xl transition-all opacity-100 scale-100">...and I build useful things .</h3>
-    </div>
-  </div>
-   
-    
-
-    
-   
-    
-   
-    </section>
-    <OfferSlider />
-<section>
-  <div className="mx-auto px-9 py-9">
-    <div className="why-head pb-25">
-          <h2 className="mb-25">Portfolio / Case Studies</h2>
-          <p>Over the years, I&apos;ve collaborated with global agencies and direct clients, building websites across industries.</p>
-       </div>
-  </div>
-  
-</section>
-   <Portfolio />
-
-  
-    
-      <ReviewSlider />
-
-
-
-      <WordPressBlogPostsSimple />
-  
- <section className="footer-cta" style={slidethreeBG}>
-
-       <div className="mx-auto px-9 py-9 relative">
-    <div className="why-head">
-    <h2 className="mb-20">Let&apos;s Build Something Great Together</h2>
-    <p className="mb-20">Whether you&apos;re an agency with overflow work or a business owner needing a reliable developer,<br/> I&apos;m here to help. I focus on results, not excuses.</p>
-      </div>
-      <div className="footer-social w-50 mb-20">
-        <ul className="grid grid-cols-4">
-         {socialIcon.map((social) => (
-
-             <li key={social.social_key}>
-              <Link href={social.social_link}>
-                <Image className="relative transition-all hover:scale-125 hover:fill-white" src={social.social_icon} height={40} width={40} alt={social.social_name}></Image>
-              </Link>
-              </li> 
-
-         )
-
-
-         )}
-
-         
-          </ul>
-      </div>
-  
-  <div className="footer-img w-xl right-0" data-lag='.2'>
-      
-      <RatingComp/>
-      
-    </div>
-      </div>
-     <div className="footer-text absolute py-10 right-0 bottom-25">
-    <p className="relative text-[15rem] leading-34 text-[var(--foreground)]">I&apos;m<br/>Online</p>
-  </div>
-    </section>
+<Suspense fallback={<div className="w-dvw h-dvh">Loading</div>}>
+<ReviewSlider/>
+</Suspense>
+<FooterSection/>
   <footer className="w-dvw text-right text-sm py-6">
     <div className="container mx-auto">
        <span>© 2025 Pradipta Das. All rights reserved.</span>

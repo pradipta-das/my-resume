@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import SplitText from "gsap/dist/SplitText";
 import { fetchPortfolios } from '../lib/wordpress';
 
 interface PortfolioItem {
@@ -15,6 +16,45 @@ interface PortfolioItem {
   featured_image_url: string;
 }
 
+export function PortfolioItem({ item }: { item: PortfolioItem }) {
+
+  return(
+  <div
+            className="portfolio-tile h-dvh w-dvw opacity-100 flex-shrink-0"
+          >
+
+            <div className="outer z-1">
+              <div className="inner">
+                <div className="bg one">
+                   <Image
+                      src={item.featured_image_url || "/global-map.svg"}
+                      alt={item.title}
+                      width={1920}
+                      height={800}
+                      className="pfolio-img"
+
+                    />
+                  <h2 className="section-heading">{item.title}</h2>
+                  <p>{item.content}</p>
+                  <Link
+                  href={'#'}
+                  className="inline-block bg-white text-black px-4 py-2 hover:bg-gray-200 transition-colors"
+                >
+                  View Details
+                </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+  )
+}
+
+export function PortfolioSkeleton(){
+  return(
+    <div className="w-dvw h-dvh">Loading</div>
+  );
+
+}
 
 export default function Portfolio() {
     const [portfolios, setPortfolios] = useState<PortfolioItem[]>([]);
@@ -46,186 +86,57 @@ export default function Portfolio() {
 
     useGSAP(() =>{
 
-        gsap.registerPlugin(ScrollTrigger);
+        gsap.registerPlugin(ScrollTrigger,SplitText);
 
-        
+        const sections = document.querySelectorAll(".portfolio-tile");
+        console.log(sections.length);
 
-        const pfItems:HTMLDivElement[] = gsap.utils.toArray('.pfolio-img');
-        const pfItemsText:HTMLDivElement[] = gsap.utils.toArray('.pfolio-text');
+        sections.forEach((value,key)=>{
 
-        pfItems.forEach((elem)=>{
+       
 
-
-          gsap.to(elem, {
-            scrollTrigger: {
-              trigger: elem,
-              start: 'top center',
-              end: '1200',
-              scrub: true,
-              markers: false,
-              invalidateOnRefresh: true
-            },
-            ease: "power1.inOut",
-            scale: '.8',
-            filter:"blur(0rem)"
-            });
-          
-
-
-        })
-
-        pfItemsText.forEach((txtelem)=>{
-
-         gsap.to(txtelem, {
-            scrollTrigger: {
-              trigger: txtelem,
-              start: 'top center',
-              end: '1200',
-              scrub: true,
-              markers: false,
-              invalidateOnRefresh: true
-            },
-            ease: "power1.inOut",
-            y:20,
-            duration:'2s'
-          
-         
-
-            
-            });
-          
-
-
-        })
-
-        
-
-      },{dependencies: [portfolios]})
-
-
-  /*
-
-    if (pfolioCont.current && pfolioItem.current) {
-        const pfolioContainer = pfolioCont.current;
-        const pfolioList = pfolioItem.current;
-
-
-      // Get the total height of the list
-      const pfolioWidth = pfolioList.scrollWidth;
-      // Get the container height
-      const pfoliocontWidth = pfolioContainer.offsetWidth;
-      // Calculate the maximum scroll distance
-      const maxScroll = pfolioWidth-pfoliocontWidth;
-
-        const portfolioItemArr:HTMLElement[] = gsap.utils.toArray(".masonry-grid li");
-
-         portfolioItemArr.forEach((pfolioElem:HTMLElement,index) =>{
-
-            const scaleVal = distributor(index, portfolioItemArr[index], portfolioItemArr);
-            const tween = gsap.to(pfolioElem, {
-            scrollTrigger: {
-            trigger: pfolioElem,
-            start: 'top top',
-            scrub: true,
-            markers: false,
-            invalidateOnRefresh: true
-            },
-            ease: "none",
-            opacity:1
-            
-            });
-
-            ScrollTrigger.create({
-            trigger: pfolioElem,
-            start: `top-=${index * spacer} top`,
-            endTrigger: '.portfolio-sec',
-            end: `bottom bottom+=${100 + (portfolioItemArr.length * spacer)}`,
+        gsap.to(value, {
+          xPercent: -100 * (sections.length - 1),
+          ease: "none",
+          scrollTrigger: {
+            trigger: sections[key],
             pin: true,
-            pinSpacing: false,
-            markers: false,
-            id: 'pin',
-            invalidateOnRefresh: true,
-            });
-          
+            scrub: 1,
+            //snap: 1 / (sections.length - 1),
+            end: "3000",//() => "+=" + (sections.length - 1) * window.innerWidth,
+            markers: true
+          }
+        });
 
          })
-     
 
-      // Create the scroll trigger
-      ScrollTrigger.create({
-        trigger: '.portfolio-sec',
-        start: "top top",
-        end: () => `+=${maxScroll}`,
-        markers: false,
-        pin: true,
-        scrub: 1,
-        onUpdate: (self) => {
-
-          // Move the list based on scroll progress
-          const x = -self.progress * maxScroll;
-          gsap.set(pfolioList, { x });
-        },
-        onLeave:()=>{
-            gsap.to(pfolioList, { filter:"blur(0.5rem)",scale:0.95 });
-        },
-        onEnter:()=>{
-             gsap.to(pfolioList, { filter:"blur(0rem)",scale:1  });
-        },
-         onEnterBack:()=>{
-             gsap.to(pfolioList, { filter:"blur(0rem)",scale:1  });
-        }
-      });
-    }
-
-        
-
-    })
-    */
+  },{dependencies:[portfolios]});   
 
 
   return (
-     <section className="portfolio-sec" style={slidethreeBG}>
-    
-       <div className="mx-auto">
-    
-       
-    
-    <div className="portfolio-container justify-center-safe" ref={pfolioCont}>
-      <div className="masonry-grid">
-        <div className="relative">
-        <div ref={pfolioItem}>
+
+    <div className="w-screen">
+    <section className="">
+      <div className="mx-auto px-9 py-9">
+        <div className="why-head pb-15">
+              <h2 className="mb-25">Portfolio / Case Studies</h2>
+           </div>
+      </div>
+      
+    </section>
+    <section className="portfolio-sec w-dvw h-dvh" style={slidethreeBG}>
+      <div className="portfolio-container h-dvh overflow-hidden" ref={pfolioCont}>
+        <div className="pitems flex h-full" ref={pfolioItem}>
         {portfolios.map((item) => (
-          <div
-            key={item.id}
-            className="portfolio-tile mb-20 block overflow-visible" 
-          >
-            <Image
-              src={item.featured_image_url}
-              alt={item.title}
-              width={1920}
-              height={800}
-              className="pfolio-img object-cover blur-xs"
-              
-            />
-            <div className="pfolio-text absolute inset-0 bg-white flex items-center justify-center-safe shadow-2xl  transition-all duration-300">
-              <div className="text-[--var(--foreground)] text-center p-6">
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <div className="text-sm mb-4">{item.content}</div>
-                <Link
-                  href={'#'}
-                  className="inline-block bg-white text-black px-4 py-2 hover:bg-gray-200 transition-colors"
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
-          </div>
+
+          <Suspense fallback={<PortfolioSkeleton />} key={item.id}>
+            <PortfolioItem item={item} />
+          </Suspense>
+
         ))}
         </div>
-        </div>
-      </div>
-    </div>
-     </div>
+       </div>
    </section>
+   </div>
   );
 }

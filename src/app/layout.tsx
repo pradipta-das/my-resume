@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import {Inter, Josefin_Sans, Playfair, Ubuntu_Mono} from "next/font/google";
 import "./globals.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const ubuntu = Ubuntu_Mono({
   variable: '--font-ubuntu-mono',

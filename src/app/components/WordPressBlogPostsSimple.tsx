@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from "gsap";
+import Slider from 'react-slick';
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { fetchBlogPosts } from '../lib/wordpress';
@@ -30,6 +31,9 @@ export default function WordPressBlogPostsSimple() {
   const [error, setError] = useState<string | null>(null);
   const blogSlideRef = useRef<HTMLDivElement>(null);
   const blogListRef = useRef<HTMLUListElement>(null);
+
+  const [blogClick, setblogClick] = useState<BlogPost>();
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -67,30 +71,7 @@ export default function WordPressBlogPostsSimple() {
       
     const scaleVal = distributor(index, blogListInit[index], blogListInit);
   
-     gsap.to(servElem, {
-      scrollTrigger: {
-        trigger: servElem,
-        start: 'top top',
-        scrub: true,
-        markers: false,
-        invalidateOnRefresh: true
-      },
-      ease: "none",
-      scale: scaleVal,
-      filter:"blur(0.5rem)"
-      });
-
-      ScrollTrigger.create({
-        trigger: servElem,
-        start: `top-=${index * spacer} top`,
-        endTrigger: '.blog-list-cont',
-        end: `bottom top+=${250 + (blogListInit.length * spacer)}`,
-        pin: false,
-        pinSpacing: false,
-        markers: false,
-        id: 'pin',
-        invalidateOnRefresh: true,
-      });
+   
 
     })
 
@@ -106,20 +87,7 @@ export default function WordPressBlogPostsSimple() {
       const maxScroll = listHeight;
 
       // Create the scroll trigger
-      ScrollTrigger.create({
-        trigger: '.blog-cont',
-        start: "top top",
-        end: () => `+=${maxScroll}`,
-        markers: false,
-        pin: true,
-        scrub: 1,
-        onUpdate: (self) => {
-
-          // Move the list based on scroll progress
-          const y = -self.progress * maxScroll;
-          gsap.set(blogList, { y });
-        }
-      });
+    
     }
   }, { dependencies: [posts] });
 
@@ -148,21 +116,24 @@ export default function WordPressBlogPostsSimple() {
      
 
   return (
-     <section className="blog-cont h-dvh" style={slidethreeBGFixed}> 
-           <div className="px-9">
+     <section className="blog-cont" style={slidethreeBGFixed}> 
+           <div className="max-w-7xl px-9">
         
         <div className="why-head mb-25 mt-20">
         <h2 className='w-full block'>Insights</h2>
           </div>
           </div>
-    <div className="blog-list-cont py-20" ref={blogSlideRef}>
-      <div className="relative h-screen">
-        <ul ref={blogListRef} className="absolute top-0 left-0 w-full">
-          {posts.map((post) => (
-            <li key={post.id} className="mb-4">
+    <div className="blog-list-cont px-9 py-20" ref={blogSlideRef}>
+      <div className="max-w-7xl mx-auto relative">
+      
+        <ul ref={blogListRef} className="grid grid-cols-2 justify-center-safe align-middle">
+          {posts.map((post,index) => (
+            (index==0) ? (
+
+              <li key={post.id} className="mb-4 col-start-1" data-speed='.2'>
               <Link
                 href={`/blog/${post.slug}`}
-                className="why-points relative overflow-hidden transition-all duration-300 scale-75 block"
+                className="relative overflow-hidden transition-all duration-300 block"
               >
                 {post.featured_image_url ? (
                   <div className="h-dvh w-full">
@@ -179,12 +150,33 @@ export default function WordPressBlogPostsSimple() {
                     </div>
                   </div>
                 ) : (
-                  <div className="h-64 w-full bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-end">
+                  <div className="w-full p-4 items-end">
                     <h3 className="font-bold text-gray-800 text-sm line-clamp-3">{post.title}</h3>
                   </div>
                 )}
               </Link>
             </li>
+
+            )
+            :
+            (
+
+            <li key={post.id} className="pl-4 col-start-2" data-speed='.2'>
+              <Link
+                href={`/blog/${post.slug}`} 
+                className="relative overflow-hidden transition-all duration-300 block">
+                 <div className="w-full p-4 flex items-end">
+                    <h3 className="font-bold text-gray-800 text-3xl line-clamp-3">{post.title}</h3>
+                  </div>
+              </Link>
+            </li>
+
+
+            )
+
+            
+              
+            
           ))}
         </ul>
       </div>
@@ -195,9 +187,7 @@ export default function WordPressBlogPostsSimple() {
         </div>
       )}
     </div>
-    <div className="blog-img absolute bottom-0 -left-60 -rotate-5 -z-1">
-          <Image src={'chart-up.svg'} width={800} height={800} alt="blog-image"></Image>
-        </div>  
+    
     </section>
   );
 }

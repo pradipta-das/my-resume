@@ -38,80 +38,55 @@ export default function ReviewSlider() {
         
       };
 
-  gsap.registerPlugin(ScrollTrigger);
 
-  useGSAP(() => {
-   
-     const tlReview = gsap.timeline({
-        defaults:{
-            duration:"2s"
-        }
-        });
-        tlReview.to(".rating-cont canvas",{scale:1.2,
-          scrollTrigger:{
-            trigger: ".reviews-cont",
-            start: 'top top',
-            scrub: true,
-            markers: false,
-            pin: false,
-            
-          }
-        })
 
-  }, []);
-
-  const settings = {
+  var settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 3,
-    autoplay: true,
-    fade: true,
-    autoplaySpeed: 3000,
-    arrows: true,
-    pauseOnHover: true,
+    slidesToShow: 4,
+    slidesToScroll: 4,
+    initialSlide: 0,
     responsive: [
       {
-        breakpoint: 350,
+        breakpoint: 1024,
         settings: {
-           slidesToShow: 1,
-           slidesToScroll: 1,
-          arrows: false,
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          infinite: true,
           dots: true
         }
       },
       {
-        breakpoint: 768,
+        breakpoint: 600,
         settings: {
-           slidesToShow: 2,
-           slidesToScroll: 1,
-          arrows: false,
-          dots: true
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          initialSlide: 2
         }
       },
       {
-        breakpoint: 1440,
+        breakpoint: 480,
         settings: {
-           slidesToShow: 2,
-           slidesToScroll: 1,
-          arrows: false,
-          dots: true
+          slidesToShow: 1,
+          slidesToScroll: 1
         }
       }
     ]
   };
 
   return (
-    <section className="reviews-cont pb-25" style={slidethreeBG}>
-    <div ref={sliderRef} className="review-slider-container relative mx-auto px-9 py-9">
+    <section className="reviews-cont w-dvw pb-25 mt-15 overflow-hidden relative" style={slidethreeBG}>
+    <div ref={sliderRef} className="slider-container max-w-7xl review-slider-container relative mx-auto px-9 py-9">
        
       <div className="why-head pb-13">
         <h2 className="mb-12">What Clients Say</h2>
       </div>
-       <div className='w-screen container'>
+     
 
-      <Slider {...settings} className="review-slider pb-25">
+      <div className="review-slider flex-1/2 pb-25">
+      
+      <Slider {...settings}>
         {reviews.map((review, index) => (
           <div key={index} className="review-slide px-4 pb-25">
             <div className="review-card bg-white shadow-2xl rounded-xl p-6 max-w-lg mx-auto">
@@ -122,10 +97,11 @@ export default function ReviewSlider() {
         ))}
       </Slider>
       </div>
-      <div className="h-80 overflow-hidden w-full mask-b-from-1 absolute bottom-0 -z-1">
+     </div>
+      <div className="h-120 overflow-hidden max-w-7xl mask-b-from-1 absolute bottom-40 left-0 right-0 m-auto -z-1">
           <Image src={'globe-bg.svg'} width={1920} height={800} alt="blog-image"></Image>
         </div>  
-        </div>
+         <div className="w-80 p-8 text-center m-auto  align-middle border border-black cta-btn">Connect with me</div>
       </section>
   );
 }
