@@ -1,6 +1,5 @@
 import React,{useState, useEffect, useRef} from "react";
 import Image from "next/image";
-import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
@@ -40,13 +39,6 @@ export function LocationIcon(){
 }
 
 export default function Intro(){
-
-    interface SocialLink {
-    social_key: number;
-    social_name: string;
-    social_link: string;
-    social_icon: string;
-    }
 
 
     const backgroundStyle = {

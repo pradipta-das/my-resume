@@ -55,36 +55,8 @@ export default function WordPressBlogPostsSimple() {
 
     gsap.registerPlugin(ScrollTrigger);
 
-    
-    
 
-    const blogListInit:HTMLElement[] = gsap.utils.toArray(".blog-cont li");
-    const minScale = 0.5;
 
-    const distributor = gsap.utils.distribute({ base: minScale, amount: 0.2 });
-
-    blogListInit.forEach((servElem:HTMLElement,index)=>{
-      
-
-  
-   
-
-    })
-
-    if (blogSlideRef.current && blogListRef.current) {
-      //const blogContainer = blogSlideRef.current;
-      const blogList = blogListRef.current;
-     
-      // Get the total height of the list
-      const listHeight = blogList.scrollHeight;
-      // Get the container height
-      //const containerHeight = blogContainer.offsetHeight;
-      // Calculate the maximum scroll distance
-     
-
-      // Create the scroll trigger
-    
-    }
   }, { dependencies: [posts] });
 
   if (loading) {
