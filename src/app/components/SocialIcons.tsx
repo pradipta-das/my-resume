@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {fetchSiteOptions} from '../lib/wordpress';
@@ -13,6 +13,9 @@ interface SocialLink {
 
 export default function SocialIcons(){
 const [socialIcon, setSocialicon] = useState<SocialLink[]>([]);
+
+
+useEffect(()=>{
 
 const fetchSettings = async () =>{
 
@@ -34,9 +37,12 @@ const fetchSettings = async () =>{
   }
 
   fetchSettings();
-
+},[]);
     return(
-     <ul className="grid social-icons grid-cols-4">
+      <>
+         <p className="pb-10">Connect with me</p>
+        <ul className="grid social-icons grid-cols-4">
+
          {socialIcon.map((social) => (
 
              <li key={social.social_key}>
@@ -52,6 +58,8 @@ const fetchSettings = async () =>{
 
          
           </ul>
+      </>
+     
 
 
     );

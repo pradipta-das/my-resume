@@ -142,7 +142,7 @@ export default function OfferSlider() {
             // Create the scroll trigger
             ScrollTrigger.create({
               trigger: '.offer-sec',
-              start: "50% 20%",
+              start: "50% 10%",
               end: () => `+=${maxScroll}`,
               pin: true,
               scrub: 1,
@@ -245,16 +245,22 @@ if(pfolioItem.current && sections.length > 0){
       backgroundAttachment: "fixed"
     }}>
       <div className="mx-auto">
+       
+       
         <div className="offer-slide-cont overflow-hidden flex-nowrap px-9 py-9" ref={offerSlideRef}>
-          
-            <div className="relative mt-20 mb-20" ref={offerListRef}>
+           <div className="max-w-7xl mx-auto">
+            <p>
+              <em>your website is your best salesperson.</em>
+            </p> 
+            </div>
+            <div className="relative mt-15 mb-15" ref={offerListRef}>
              
               <ul className="relative">
                 {offersList.map((offer) => (
                     
-                  <li key={offer.offer_id} className="box relative block w-25 h-25">
+                  <li key={offer.offer_id} className="box relative block w-15 h-15">
                     <Image src= {offer.offer_image || "/global-map.svg"}
-                     width={100} height={100} alt={`${offer.offer_name}`} className="block w-auto object-cover" />
+                     width={60} height={60} alt={`${offer.offer_name}`} className="block w-auto object-cover" />
                   </li>
                  
                   

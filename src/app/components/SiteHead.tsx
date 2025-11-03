@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import gsap from 'gsap';
 import ScrollToPlugin from 'gsap/dist/ScrollToPlugin';
@@ -7,6 +7,9 @@ import ScrollToPlugin from 'gsap/dist/ScrollToPlugin';
 export default function SiteHead(){
 
     const [isToggled,setIsToggled] = useState(false);
+    const [isLogoSwitched, setLogoSwitch] =useState(false);
+
+    
 
     const menuRef = useRef<HTMLUListElement>(null);
 
@@ -19,6 +22,18 @@ export default function SiteHead(){
 
     }
 
+    useEffect(()=>{
+
+      window.addEventListener('scroll',()=>{
+
+        setLogoSwitch(!isLogoSwitched);
+
+        })
+
+
+    })
+
+    
 
     return(
 
@@ -27,11 +42,12 @@ export default function SiteHead(){
     <div className="relative grid grid-cols-3 mx-auto px-9 py-3">
         
         <Link className="site-logo justify-center-safe font-[--font-playfair] font-bold text-[1rem]" href="#" aria-label="logo">
-        <div className='p-2'><Image src="logo.svg" alt="pradipta online logo" width={150} height={100}></Image></div></Link>
+        <div className={!isLogoSwitched ?'p-2': 'active p-2'}><Image src="logo.svg" alt="pradipta online logo" width={150} height={100}></Image></div></Link>
         <div className='menu-cont-up'>
-        <button className="absolute menu-btn right-9 z-[999] top-0 bottom-0 m-auto p-5" onClick={() => setIsToggled(!isToggled)} aria-label="Menu"><span className='block w-6 h-0.5 bg-black'></span>
-        <span className='block w-6 h-0.5 bg-black mt-1 mb-1'></span>
-        <span className='block w-6 h-0.5 bg-black'></span></button>
+        <button className="absolute menu-btn right-9 z-[999] top-0 bottom-0 m-auto p-3" onClick={() => setIsToggled(!isToggled)} aria-label="Menu">
+        <span className='block w-10 h-0.5 bg-black'></span>
+        <span className='block w-10 h-0.5 bg-black mt-3 mb-3'></span>
+        <span className='block w-10 h-0.5 bg-black'></span></button>
       
              
         

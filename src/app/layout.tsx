@@ -28,8 +28,8 @@ const playfair = Playfair({
 
 
 export const metadata: Metadata = {
-  title: "Pradipta Das - Freelance Web Developer | WordPress & Shopify Expert | Pradipta online",
-  description: "Hire an experienced freelance web developer with 10+ years of expertise in WordPress, Shopify, and custom web solutions. Scalable, fast, and SEO-optimized websites for agencies, startups, and businesses worldwide.",
+  title: "Freelance Web Developer | Pradipta Das – Frontend, E-Commerce & Integrations",
+  description: "Frontend developer specializing in HTML, CSS, React, and E-Commerce. I help agencies and businesses build fast, scalable, and conversion-driven websites.",
 };
 
 export default function RootLayout({

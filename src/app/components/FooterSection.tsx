@@ -8,10 +8,10 @@ import SocialIcons from "./SocialIcons";
 export default function FooterSection(){
     const slidethreeBG = {
         backgroundImage: 'url("/global-map.svg")',
-        backgroundSize: "50%", // Optional: Adjust as needed
-        backgroundPosition: "center right", // Optional: Adjust as needed
+        backgroundSize: "60%", // Optional: Adjust as needed
+        backgroundPosition: "bottom right", // Optional: Adjust as needed
         backgroundRepeat: "no-repeat", 
-        
+
       };
       gsap.registerPlugin(ScrollTrigger);
       /* GSAP animation codes */
@@ -46,7 +46,7 @@ export default function FooterSection(){
     return(
 
 
-         <section className="footer-cta relative" style={slidethreeBG}>
+         <section className="footer-cta relative backdrop-blur-3xl" style={slidethreeBG}>
 
        <div className="max-w-7xl mx-auto px-9 py-9 relative">
     <div className="why-head">
@@ -63,7 +63,7 @@ export default function FooterSection(){
       
     </div>
      <div className="footer-text" data-lag="0.6">
-    <p className="footertxt text-[8rem] leading-24 text-[var(--foreground)]">I&apos;m<br/>Online</p>
+    <p className="footertxt text-[8rem] text-[var(--bg-color-highlight)] leading-8">I&apos;m<br/>Online</p>
   </div>
   </div>
       </div>

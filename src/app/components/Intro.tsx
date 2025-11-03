@@ -123,31 +123,40 @@ tlintro.from(headersplit.chars,{
   stagger: 0.1,
 },'>')
 
+ const tlservices = gsap.timeline({ scrollTrigger: {
+        trigger: ".why_graphics",
+        start: "top center",
+        end: "1500",
+        pin:false,
+        invalidateOnRefresh:false,
+        scrub: 1,
+        markers: false,
+    } });
 skillItems.forEach((elem,index)=>{
 
       
 const startTime = index === 0 ? "-=0.5" : "-=0.5"; // Stagger animations
 
-              tlintro.fromTo(elem, {
+              tlservices.fromTo(elem, {
                 clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
                 zIndex: 9999 - index
               }, {
                 clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
                 
                 zIndex: 9999 - index,
-                duration: 2,
+                duration: 5,
                 stagger:{
                   each: 1.0
                 }
                 
               }, startTime);
-              tlintro.fromTo(skillTrigs[index], {
+              tlservices.fromTo(skillTrigs[index], {
                 clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
                 zIndex: 9999 - index
               }, {
                  clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
                 zIndex: 9999 - index,
-                duration: 2
+                duration: 5
                 
               }, '<');
           
@@ -224,19 +233,19 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
     <div className="intro-text">
       <div className="intro-head mt-10">
      
-        <h1 className="mb-10 text-center">Hi, I am Pradipta - Web Developer & Creative Technologist based in India.</h1>
+        <h1 className="mb-10 text-8xl text-center">Building websites that don&apos;t just look good — they work beautifully.</h1>
       
       
       </div>
       <div className="split-text-intro pb-10 text-left">
-      <p>I build solutions for businesses across the globe.<br/>Want to know more? <br/>Visit my socials below or Scroll down.<br/>Send me a message, I would love to connect.</p>
+      <p>I&apos;m Pradipta, a freelance web developer helping agencies and small businesses build responsive, high-performing websites with React, Shopify, WordPress, Shopify and Framer.<br/>Want to know more? <br/>Visit my socials below or Scroll down.<br/>Send me a message, I would love to connect.</p>
       </div>
       <div className="w-3xs split-text-intro pb-10">
         <div className="message w-3 h-3 z-20">
           
           <ArrowMessage/>
         </div>
-        <p className="pb-10">Connect with me</p>
+       
         <SocialIcons></SocialIcons>
       </div>
        <div id="about" className="split-text-intro pt-15 pb-15 text-left">
@@ -247,43 +256,37 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
         <p>I offer big agency experience at small agency cost. If you are looking for a problem solver dedicated to make things better for your users, check my creds below.</p>
         </div>
         <div className="why_graphics px-7">
-   <ul className="grid grid-cols-2 grid-rows-4 gap-7 service-list">
+   <ul className="grid grid-cols-2 grid-rows-4 gap-10 service-list">
     <li>
-        <div className="px-3 py-3 border-black border-r-1">
+        <div className="px-3 py-6 border-black border-r-1">
          
           <div className="service-details">
-            <p>Frontend that feels natural, loads lightning-fast, and scales easily.</p>
+            <p>Fast, accessible, and pixel-perfect — I create responsive websites using HTML, CSS, JavaScript, React, and Tailwind that look great on every screen and perform even better.</p>
           </div>
         </div>
       </li>
       <li> <div data-id="1" className="service-trigger absolute text-2xl leading-20 py-2 cursor-pointer ">Frontend</div></li>
         <li><div data-id="2" className="service-trigger absolute text-2xl py-2 cursor-pointer ">E-Commerce</div></li> 
       <li>
-        <div className="px-3 py-3 border-black border-l-1">
+        <div className="px-3 py-6 border-black border-l-1">
           
           <div className="service-details">
-            <p>Your store deserves speed, stability, and style — I deliver all three.</p>
+            <p>From Shopify stores to WooCommerce setups, I build online experiences that convert visitors into loyal customers. Secure, scalable, and simple to manage.</p>
           </div>
         </div>
       </li>
    
-      <li><div className="px-3 py-3 border-black border-r-1">
+      <li><div className="px-3 py-6 border-black border-r-1">
           
           <div className="service-details">
-            <p>Integrations that save time, reduce chaos, and boost workflow.</p>
+            <p>I connect your favorite platforms — Framer, WordPress, Sanity, Shopify — so your website and business tools work together without friction.</p>
           </div>
         </div></li>
      <li><div data-id="3" className="service-trigger absolute text-2xl py-2 cursor-pointer">Integrations</div></li>
-     <li> <div data-id="4" className="service-trigger absolute text-3xl py-2 cursor-pointer">Tools</div></li>
-      <li><div className="px-3 py-3 border-black border-l-1">
-         
-         <div className="service-details ">
-            <p className="text-black">I work with modern tech stack — choosing the right tools to fit each project&apos;s goals.</p>
-          </div>
-        </div></li>
+    
         
     </ul>
-   
+     
 
   </div>
       </div>
@@ -293,6 +296,7 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
         <Image src={'global-map.svg'} width={1920} height={1080} alt="map-image"></Image>
       </div>
   <div className="stack justify-center px-10 py-10">
+  
     <ul className="flex flex-row flex-wrap mb-12">
     <li className="p-10 flex-1/2 border-r-black border-r-[1px]"><span className="text-5xl">15+ </span><br/>Years of development</li>
     
@@ -310,12 +314,12 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
     
   </div>
   
-  <Image className="responsive-img translate-y-[5rem] -translate-x-[50%] " src="onetime.svg" width={800} height={600} alt="offer image"></Image>
+  <Image className="responsive-img " src="onetime.svg" width={800} height={600} alt="offer image"></Image>
    
    </div>
-   
+  
     </div>
-    
+   
 </section>
 
 
