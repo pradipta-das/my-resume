@@ -9,7 +9,7 @@ export default function FooterSection(){
     const slidethreeBG = {
         backgroundImage: 'url("/global-map.svg")',
         backgroundSize: "50%", // Optional: Adjust as needed
-        backgroundPosition: "40% 70%", // Optional: Adjust as needed
+        backgroundPosition: "70% 60%", // Optional: Adjust as needed
         backgroundRepeat: "no-repeat", 
 
       };
