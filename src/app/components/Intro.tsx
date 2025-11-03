@@ -175,7 +175,7 @@ const tlmessage = gsap.timeline({ scrollTrigger: {
 
 tlmessage.to("#message", {
   motionPath: {
-    path: [{x:200, y:0}, {x:320, y:220}, {x:230, y:15}, {x:130, y:1400}],
+    path: [{x:200, y:0}, {x:320, y:220}, {x:230, y:15}, {x:30, y:1500}],
     type: "cubic",
     autoRotate: true,
   },
@@ -258,7 +258,7 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
         <div className="why_graphics px-7">
    <ul className="grid grid-cols-2 grid-rows-4 gap-10 service-list">
     <li>
-        <div className="px-3 py-6 border-black border-r-1">
+        <div className="px-3 py-6 border-black border-r-10">
          
           <div className="service-details">
             <p>Fast, accessible, and pixel-perfect — I create responsive websites using HTML, CSS, JavaScript, React, and Tailwind that look great on every screen and perform even better.</p>
@@ -268,7 +268,7 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
       <li> <div data-id="1" className="service-trigger absolute text-2xl leading-20 py-2 cursor-pointer ">Frontend</div></li>
         <li><div data-id="2" className="service-trigger absolute text-2xl py-2 cursor-pointer ">E-Commerce</div></li> 
       <li>
-        <div className="px-3 py-6 border-black border-l-1">
+        <div className="px-3 py-6 border-black border-l-10">
           
           <div className="service-details">
             <p>From Shopify stores to WooCommerce setups, I build online experiences that convert visitors into loyal customers. Secure, scalable, and simple to manage.</p>
@@ -276,7 +276,7 @@ introGrphcs.fromTo(".responsive-img", {duration:1,scale:0.7},{scale:1},'+=5')
         </div>
       </li>
    
-      <li><div className="px-3 py-6 border-black border-r-1">
+      <li><div className="px-3 py-6 border-black border-r-10">
           
           <div className="service-details">
             <p>I connect your favorite platforms — Framer, WordPress, Sanity, Shopify — so your website and business tools work together without friction.</p>

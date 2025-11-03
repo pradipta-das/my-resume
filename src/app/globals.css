@@ -152,11 +152,7 @@ progress::-moz-progress-bar {
     }
   }
 .active{
-  .site-logo{
-    img{
-      transform:scale(0.7);
-    }
-  }
+  
   .cursoranim{ display: none;}
   .menu-btn{
     span{
