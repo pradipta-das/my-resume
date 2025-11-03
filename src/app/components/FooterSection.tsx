@@ -8,8 +8,8 @@ import SocialIcons from "./SocialIcons";
 export default function FooterSection(){
     const slidethreeBG = {
         backgroundImage: 'url("/global-map.svg")',
-        backgroundSize: "60%", // Optional: Adjust as needed
-        backgroundPosition: "bottom right", // Optional: Adjust as needed
+        backgroundSize: "50%", // Optional: Adjust as needed
+        backgroundPosition: "40% 70%", // Optional: Adjust as needed
         backgroundRepeat: "no-repeat", 
 
       };
@@ -46,7 +46,7 @@ export default function FooterSection(){
     return(
 
 
-         <section className="footer-cta relative backdrop-blur-3xl" style={slidethreeBG}>
+         <section className="footer-cta relative" style={slidethreeBG}>
 
        <div className="max-w-7xl mx-auto px-9 py-9 relative">
     <div className="why-head">

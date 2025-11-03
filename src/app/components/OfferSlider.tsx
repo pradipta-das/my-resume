@@ -142,7 +142,7 @@ export default function OfferSlider() {
             // Create the scroll trigger
             ScrollTrigger.create({
               trigger: '.offer-sec',
-              start: "50% 10%",
+              start: "top top",
               end: () => `+=${maxScroll}`,
               pin: true,
               scrub: 1,
@@ -248,11 +248,7 @@ if(pfolioItem.current && sections.length > 0){
        
        
         <div className="offer-slide-cont overflow-hidden flex-nowrap px-9 py-9" ref={offerSlideRef}>
-           <div className="max-w-7xl mx-auto">
-            <p>
-              <em>your website is your best salesperson.</em>
-            </p> 
-            </div>
+           
             <div className="relative mt-25 mb-25" ref={offerListRef}>
              
               <ul className="relative">
@@ -270,6 +266,11 @@ if(pfolioItem.current && sections.length > 0){
             </div>
             
           </div>
+          <div className="max-w-7xl mb-15 mx-auto">
+            <p>
+              <em>your website is your best salesperson.</em>
+            </p> 
+            </div>
          <div className="w-80 p-8 text-center m-auto  align-middle border border-black cta-btn">Connect with me</div>
       </div>
     </section>
