@@ -237,7 +237,7 @@ if(pfolioItem.current && sections.length > 0){
 
   return (
     <>
-    <section className="offer-sec h-50" style={{
+    <section className="offer-sec" style={{
       backgroundImage: 'url("/slide_bg_2.png")',
       backgroundSize: "100%",
       backgroundPosition: "top center",
@@ -253,7 +253,7 @@ if(pfolioItem.current && sections.length > 0){
               <em>your website is your best salesperson.</em>
             </p> 
             </div>
-            <div className="relative mt-15 mb-15" ref={offerListRef}>
+            <div className="relative mt-25 mb-25" ref={offerListRef}>
              
               <ul className="relative">
                 {offersList.map((offer) => (
