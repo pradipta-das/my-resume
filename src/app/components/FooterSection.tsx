@@ -63,7 +63,7 @@ export default function FooterSection(){
       
     </div>
      <div className="footer-text" data-lag="0.6">
-    <p className="footertxt text-[8rem] text-[var(--bg-color-highlight)] leading-8">I&apos;m<br/>Online</p>
+    <p className="footertxt float-right mr-15 text-[8rem] text-[var(--bg-color-highlight)] leading-8">I&apos;m<br/>Online</p>
   </div>
   </div>
       </div>
