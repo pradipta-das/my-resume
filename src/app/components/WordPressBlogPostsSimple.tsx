@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { fetchBlogPosts } from '../lib/wordpress';
 
@@ -50,14 +49,7 @@ export default function WordPressBlogPostsSimple() {
     fetchPosts();
   }, []);
 
-  useGSAP(() => {
-    if (posts.length === 0) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-
-
-  }, { dependencies: [posts] });
+  
 
   if (loading) {
     return (
