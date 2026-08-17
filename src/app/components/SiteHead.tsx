@@ -40,33 +40,20 @@ export default function SiteHead(){
     return(
 
   <header className= {isToggled ? 'header-sec fixed top-0 w-dvw z-50 active': 'header-sec fixed top-0 w-dvw z-50'}>
-    <div className="cursoranim"></div>
-    <div className={!isLogoSwitched ?'relative transition grid grid-cols-3 mx-auto px-9 py-3  h-30 ' : 'relative transition grid grid-cols-3 mx-auto px-9 py-0 scrolled  h-25 '}>
+    
+    <div className={!isLogoSwitched ?'w-dvw flex flex-row justify-between align-middle transition transition-height duration-500 ' : 'w-dvw flex flex-row justify-between align-middle transition transition-height duration-500  scrolled '}>
         
-        <Link className="site-logo justify-center-safe font-[--font-playfair] font-bold text-[1rem]" href="#" aria-label="logo">
-        <div className={!isLogoSwitched ?'p-2 transition scale-100': 'transition scale-75 p-2'}><Image src="logo.svg" alt="pradipta online logo" width={150} height={100}></Image></div></Link>
-        <div className='menu-cont-up'>
-        <button className="absolute menu-btn right-9 z-[999] top-0 bottom-0 m-auto p-3" onClick={() => setIsToggled(!isToggled)} aria-label="Menu">
-        <span className='block w-10 h-0.5 bg-black'></span>
-        <span className='block w-10 h-0.5 bg-black mt-3 mb-3'></span>
-        <span className='block w-10 h-0.5 bg-black'></span></button>
-      
-             
-        
-      </div>  
-    </div>
-    <div className={!isLogoSwitched ?'menu-cont transition h-auto fixed overflow-hidden w-dvw backdrop-blur-2xl top-0 left-0 px-4 pt-30 bg-[#ffffff3d] text-[--foreground] -z-10': 'menu-cont transition h-auto fixed overflow-hidden w-dvw backdrop-blur-2xl top-0 left-0 px-4 pt-25 bg-[#ffffff3d] text-[--foreground] -z-10'}>
-      <div className='menu-cont-inner clear-both'>
-           <ul className='flex flex-row border-black border-t-1 border-b-1 flex-nowrap gap-8 mt-4 justify-self-stretch justify-center-safe' ref={menuRef}>
-                    <li className='py-3'><Link href={'#'} onClick={()=>{scrollToSection('about')}}>Know Me</Link></li>
-                    <li className='py-3'><Link href={'#'}>My Services</Link></li>
-                    <li className='py-3'><Link href={'#'}>My Work</Link></li>
-                    <li className='py-3'><Link href={'#'}>Contact Me</Link></li>
-
-                </ul>
-                
-      </div>
-    </div>
+        <Link className="site-logo flex justify-start font-[--font-playfair] font-bold text-[1rem]" href="#" aria-label="logo">
+        <div className={!isLogoSwitched ?'p-2 transition duration-1000 scale-100': 'transition duration-1000 scale-75 p-2'}><Image src="logo.svg" alt="pradipta online logo" width={123} height={40}></Image></div>
+        </Link>
+       <nav className='menu-cont flex justify-end items-center'>
+        <ul className="flex flex-row gap-4 h-12 pr-6 align-middle justify-center" ref={menuRef}>
+            <li className='menu-item flex align-middle flex-col justify-center'><Link href="#" onClick={()=>scrollToSection('projects')}>Book Free Consultation</Link></li>
+            <li className='menu-item flex align-middle flex-col justify-center'><Link href="#" onClick={()=>scrollToSection('about')}>Cost Estimator</Link></li>
+            <li className='menu-item flex align-middle flex-col justify-center'><Link href="https://www.designlnc.dev">visit designlnc.lab</Link></li>
+        </ul>
+       </nav>
+       </div>
   </header>
 
     )

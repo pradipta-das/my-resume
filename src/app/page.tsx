@@ -1,9 +1,12 @@
 'use client'
 
 import { Suspense } from "react";
-import FirstFrame from "./components/FirstFrame";
 import SiteHead from "./components/SiteHead";
-import Loading from "./loading";
+import FooterSection from "./components/FooterSection";
+import BlendedHomepage from "./components/BlendedHomepage";
+
+
+
 
 export default function Page() {
   
@@ -12,11 +15,12 @@ export default function Page() {
 
 
      
-      <Suspense fallback={<Loading/>}>
+      <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white font-sans">Loading...</div>}  >
         <div id="smooth-wrapper">
         <div id="smooth-content">
-         <SiteHead/>
-        <FirstFrame/>
+        <SiteHead />
+        <BlendedHomepage />
+        <FooterSection />
         </div>
         </div>
       </Suspense>

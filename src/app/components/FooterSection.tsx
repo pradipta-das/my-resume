@@ -1,74 +1,61 @@
 import React from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import ScrollTrigger from "gsap/dist/ScrollTrigger";
-import RatingComp from "./RatingComp";
-import SocialIcons from "./SocialIcons";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function FooterSection(){
-    const slidethreeBG = {
-        backgroundImage: 'url("/global-map.svg")',
-        backgroundSize: "50%", // Optional: Adjust as needed
-        backgroundPosition: "70% 60%", // Optional: Adjust as needed
-        backgroundRepeat: "no-repeat", 
-
-      };
-      gsap.registerPlugin(ScrollTrigger);
-      /* GSAP animation codes */
-      
-       useGSAP(()=>{
-      
-      const tlFooter = gsap.timeline({  scrollTrigger: {
-          start: "top top",
-          end: "3000",
-          pin:false,
-          scrub: 1,
-          markers: false,
-          
-        }});
-      
-      tlFooter.to(".footer-text",{'color':'var(--maincolor)',duration:2})
-      .fromTo(".footer-text",{clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)"
-              }, {
-                clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-                onComplete: () => {
-                  
-                },
-                onStart: ()=>{
-                   //tlPortfolio.to('#portfolionav-path', { stroke:"#ffffff"});
-                   console.log();
-                }
-                 
-                })
-                
-        })
+   
 
     return(
 
 
-         <section className="footer-cta relative" style={slidethreeBG}>
+        <footer className="relative z-40 bg-[#0D0829] text-[#f8f6f2] h-[70vh] flex flex-col items-center justify-around text-left px-4 font-[--font-cormorant-garamond]">
+        <div className="max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-10 mb-4">
+        <div className="flex flex-col gap-12">
+            <Link href="/">
+            <Image src="footer-logo.svg" alt="pradipta online logo" width={123} height={40}></Image>
+            </Link>
+        <h2 className="text-5xl text-[#f8f6f2]  font-semibold mb-2 ">Ready to start?</h2>
+        <p>Whether you have a brief ready or just an idea you want to talk through, get in touch. No obligations, no agency pitch - just a conversation. Whether you have a brief ready or just an idea you want to talk through, get in touch. No obligations, no agency pitch - just a conversation.</p>
+        <ul className="w-full flex flex-row gap-2 justify-between">
+            <li><Link href="/contact" className="underline hover:text-[#f8f6f2]">Book A Free Consultation Call</Link></li>
+            <li><Link href="/projects" className="underline hover:text-[#f8f6f2]">Try Free Cost Calculator</Link></li>
+            <li><Link href="/about" className="underline hover:text-[#f8f6f2]">Visit designlnc.lab</Link></li>
+        </ul>
+        </div>
+        <div className="flex flex-col items-start justify-bottom gap-12">
+          <div className="flex flex-col gap-12">
+        <div className="h-10"></div>
+        <h2 className="text-5xl font-semibold mb-2">Trending topics</h2>
 
-       <div className="max-w-7xl mx-auto px-9 py-9 relative">
-    <div className="why-head">
-    <h2 className="mb-20">Let&apos;s Build Something Great Together</h2>
-    <p className="mb-20">Whether you&apos;re an agency with overflow work or a business owner needing a reliable developer,<br/> I&apos;m here to help. I focus on results, not excuses.</p>
-      </div>
-      <div className="footer-social w-50 mb-20">
-       <SocialIcons></SocialIcons>
-      </div>
-  <div className="grid md:grid-cols-2 grid-cols-1 grid-rows-1 gap-4">
-  <div className="footer-img" data-lag="0.6">
+          <ul className="flex flex-row flex-wrap gap-4">
+            <li><Link href="/blog/seo" className="underline hover:text-[#f8f6f2]">SEO for E-Commerce</Link></li>
+            <li><Link href="/blog/react" className="underline hover:text-[#f8f6f2]">React Best Practices</Link></li>
+            <li><Link href="/blog/integrations" className="underline hover:text-[#f8f6f2]">Integrations & APIs</Link></li>
+            <li><Link href="/blog/seo" className="underline hover:text-[#f8f6f2]">SEO for E-Commerce</Link></li>
+            <li><Link href="/blog/react" className="underline hover:text-[#f8f6f2]">React Best Practices</Link></li>
+            <li><Link href="/blog/integrations" className="underline hover:text-[#f8f6f2]">Integrations & APIs</Link></li>
+            <li><Link href="/blog/seo" className="underline hover:text-[#f8f6f2]">SEO for E-Commerce</Link></li>
+            <li><Link href="/blog/react" className="underline hover:text-[#f8f6f2]">React Best Practices</Link></li>
+            <li><Link href="/blog/integrations" className="underline hover:text-[#f8f6f2]">Integrations & APIs</Link></li>
+             <li><Link href="/blog/seo" className="underline hover:text-[#f8f6f2]">SEO for E-Commerce</Link></li>
+            <li><Link href="/blog/react" className="underline hover:text-[#f8f6f2]">React Best Practices</Link></li>
+            <li><Link href="/blog/integrations" className="underline hover:text-[#f8f6f2]">Integrations & APIs</Link></li>
+            <li><Link href="/blog/seo" className="underline hover:text-[#f8f6f2]">SEO for E-Commerce</Link></li>
+            <li><Link href="/blog/react" className="underline hover:text-[#f8f6f2]">React Best Practices</Link></li>
+            <li><Link href="/blog/integrations" className="underline hover:text-[#f8f6f2]">Integrations & APIs</Link></li>
+            <li><Link href="/blog/seo" className="underline hover:text-[#f8f6f2]">SEO for E-Commerce</Link></li>
+            <li><Link href="/blog/react" className="underline hover:text-[#f8f6f2]">React Best Practices</Link></li>
+            <li><Link href="/blog/integrations" className="underline hover:text-[#f8f6f2]">Integrations & APIs</Link></li>
+          </ul>
       
-      <RatingComp/>
-      
-    </div>
-     <div className="footer-text" data-lag="0.6">
-    <p className="footertxt float-right mr-15 text-[8rem] text-[var(--bg-color-highlight)] leading-8">I&apos;m<br/>Online</p>
-  </div>
-  </div>
-      </div>
-    
-    </section>
+        </div>
+        </div>
+        </div>
+        <div className="max-w-7xl flex flex-row w-dvw items-center justify-between gap-2">
+        <p className="text-[.75rem]">© 2026 Pradipta Das. All rights reserved.</p>
+        <p className="text-[.75rem]">Follow me on <a href="#" className="underline hover:text-[#f8f6f2]">LinkedIn</a> | <a href="#" className="underline hover:text-[#f8f6f2]">Twitter</a> | <a href="#" className="underline hover:text-[#f8f6f2]">GitHub</a></p>
+        </div>
+      </footer>
 
 
     );

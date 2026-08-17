@@ -17,10 +17,12 @@
 
 
 :root {
-  --background: #ffffff;
+  --background: #0D0829;
+  --section-background: #f8f6f2;
   --backgroundimage: none;
   --foreground: #010101;
   --font-sans: var(--font-inter);
+  --font-header: var(--font-cormorant-garamond);
   --font-body: 1.125rem;
   --maincolor: #B9EE00;
   --animate-scroll: scroll .3s ease infinite;
@@ -30,7 +32,7 @@
   --bg-color-translucent: hsla(var(--bg-color-hsl), 0.95);
   --bg-color-highlight: #010101;
   --color-text: hsl(192, 14%, 20%);
-  --color-text-highlight:#f4ae32;
+  --color-text-highlight:#0D0829;
   --duration: 10s;
   --ease: cubic-bezier(0.25, 1, 0.5, 1);
   --size: calc(var(--spacing) * 80);
@@ -43,44 +45,56 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ffffff;
-    --foreground: #161616;
+    --background: #0D0829;
+    --foreground: #0D0829;
   }
 }
 
 body {
   background: var(--background);
-  background-image: var(--backgroundimage);
   background-repeat: repeat;
   color: var(--foreground);
-  font-family: var(--font-playfair);
-  font-size: clamp(0.75rem, 1.125rem, 2rem);
-  line-height:  clamp(0.75rem, 1.5rem, 2rem);
+  font-family: var(--font-manrope);
+  font-size: clamp(0.75rem, 1rem, .85rem);
+  line-height:  clamp(0.75rem, 1.5rem, 1rem);
 }
 
 h1{
-  font-size: clamp(0.75rem, 2rem, 3rem);
-  line-height: clamp(0.75rem, 3rem, 3rem);
-  text-align: left;
+  font-family: var(--font-cormorant-garamond);
+  font-size: clamp(0.75rem, 2rem, 5rem);
+  line-height: clamp(0.75rem, 2rem, 5rem);
+  text-align: center;
+ 
+
+  span{
+    font-family: var(--font-cormorant-garamond);
+  
+    text-align: center;
+    color: var(--color-text-highlight); 
+  }
 }
 h2{
-  font-size: clamp(0.75rem, 2rem, 3rem);
-  line-height: clamp(0.75rem, 3rem, 3rem);
+  font-size: clamp(0.75rem, 2rem, 4rem);
+  line-height: clamp(0.75rem, 3rem, 4rem);
   text-align: left;
-  font-family: var(--font-playfair);
+  font-family: var(--font-cormorant-garamond);
+
 }
 h3{
-  font-family: var(--font-playfair);
+  font-family: var(--font-manrope);
+  font-weight: 200;
   font-size: clamp(0.75rem, 1.5rem, 3rem);
   line-height: clamp(0.75rem, 2rem, 3rem);
 }
-li,p{
-    font-family: var(--font-inter);
-    font-weight: 300;
+li,p,a{
+    font-family: var(--font-manrope);
     line-height: 1.5;
 
  }
-
+span{
+  font-family: var(--font-manrope);
+  line-height: 1.5;
+}
 em{
    border-left: var(--bg-color-highlight) 1rem solid;
    padding: 3rem;
@@ -100,6 +114,15 @@ em{
   background-color: black;
   z-index: 1009;
   pointer-events: none;
+  &::after {
+    content: '';
+    position: relative;
+    width: 100%;
+    height: 1px;
+
+
+    background-color: black;
+  }
 }
 progress {
   position: fixed;
@@ -273,11 +296,15 @@ progress::-moz-progress-bar {
   }
 }
 
-footer { background-color: #ffffff; }
+/*footer { background-color: #ffffff; }*/
 footer span{
   font-size: 0.9rem;
   line-height: 0.9rem;
-  font-family: var(--font-inter);
+ 
+}
+footer h2{
+  
+  font-family: var(--font-cormorant-garamond);
 }
 .menu span{
   font-size: 1rem;
@@ -527,15 +554,15 @@ a {
 
 @media screen and (min-width:1440px) {
     h1,h2{
-      font-size: clamp(0.75rem, 3rem, 4rem);
-      line-height: clamp(0.75rem, 4rem, 6rem);
+      font-size: clamp(0.75rem, 2rem, 3rem);
+      line-height: clamp(0.75rem, 2rem, 3rem);
     }
 }
 
 @media screen and (min-width:1600px) {
     h1,h2{
-      font-size: clamp(0.75rem, 3rem, 6rem);
-      line-height: clamp(0.75rem, 3rem, 6rem);
+      font-size: clamp(0.75rem, 2rem, 3rem);
+      line-height: clamp(0.75rem, 2rem, 3rem);
     }
 }
 

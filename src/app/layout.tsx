@@ -1,29 +1,23 @@
 import type { Metadata } from "next";
-import {Inter, Josefin_Sans, Playfair, Ubuntu_Mono} from "next/font/google";
+import {Cormorant_Garamond,Inter, Josefin_Sans, Playfair, Ubuntu_Mono, Manrope} from "next/font/google";
 import "./globals.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant-garamond',
+  subsets: ['latin'],
+  weight: ["400","500","600","700"]
+})
+
+const manrope = Manrope({
+  variable: '--font-manrope',
+  subsets: ['latin'],
+  weight: ["200","300","400","500","600","700"]
+})
 
 const ubuntu = Ubuntu_Mono({
   variable: '--font-ubuntu-mono',
   subsets: ['latin'],
   weight: "400"
-})
-
-const inter = Inter({
-    variable: '--font-inter',
-    subsets: ['latin'],
-    weight: ["100","200"]
-})
-
-const josefin = Josefin_Sans({
-      variable: '--font-josefin',
-      subsets: ['latin'],
-})
-
-const playfair = Playfair({
-  variable: '--font-playfair',
-      subsets: ['latin'],
 })
 
 
@@ -40,7 +34,7 @@ export default function RootLayout({
   
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${josefin.variable} ${playfair.variable} ${ubuntu.variable}`}>
+      <body className={`${ubuntu.variable} ${cormorant.variable} ${manrope.variable}`}>
        {children}
       </body>
     </html>
