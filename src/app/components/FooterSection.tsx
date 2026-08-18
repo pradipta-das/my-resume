@@ -19,7 +19,7 @@ export default function FooterSection(){
         <ul className="w-full flex flex-row gap-2 justify-between">
             <li><Link href="/contact" className="underline hover:text-[#f8f6f2]">Book A Free Consultation Call</Link></li>
             <li><Link href="/projects" className="underline hover:text-[#f8f6f2]">Try Free Cost Calculator</Link></li>
-            <li><Link href="/about" className="underline hover:text-[#f8f6f2]">Visit designlnc.lab</Link></li>
+            <li><Link href="/about" className="underline hover:text-[#f8f6f2]">Visit studiolnc.dev</Link></li>
         </ul>
         </div>
         <div className="flex flex-col items-start justify-bottom gap-12">

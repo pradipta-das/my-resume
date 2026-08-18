@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import {siteConfig} from "./lib/seo";
 import {Cormorant_Garamond,Inter, Josefin_Sans, Playfair, Ubuntu_Mono, Manrope} from "next/font/google";
 import "./globals.css";
 
@@ -22,8 +23,32 @@ const ubuntu = Ubuntu_Mono({
 
 
 export const metadata: Metadata = {
-  title: "Freelance Web Developer | Pradipta Das – Frontend, E-Commerce & Integrations",
-  description: "Frontend developer specializing in HTML, CSS, React, and E-Commerce. I help agencies and businesses build fast, scalable, and conversion-driven websites.",
+  metadataBase: new URL(siteConfig.url),
+
+  title: {
+    default: siteConfig.title,
+    template: "%s | Pradipta Das",
+  },
+
+  description: siteConfig.description,
+
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

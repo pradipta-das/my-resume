@@ -152,6 +152,26 @@ export default function FinalSnappingHomepage() {
       }
     });
 
+    const SECTION_TIMES = [
+    { section: 1, time: 0 },
+    { section: 2, time: 5 },
+    { section: 3, time: 10 },
+    { section: 4, time: 15 },
+    { section: 5, time: 20 },
+    { section: 6, time: 25 },
+    { section: 7, time: 30 },
+    ];
+
+    function getSectionFromTimeline(time) {
+        for (let i = SECTION_TIMES.length - 1; i >= 0; i--) {
+            if (time >= SECTION_TIMES[i].time) {
+            return SECTION_TIMES[i].section;
+            }
+        }
+
+        return 1;
+    }
+
     const mm = gsap.matchMedia(masterContainerRef);
     mm.add(
       { isDesktop: "(min-width: 1024px)", isMobile: "(max-width: 1023px)" },
@@ -165,7 +185,19 @@ export default function FinalSnappingHomepage() {
             scrub: 0.5,
             pin: true,
             //markers: true,
-            onUpdate: render,
+            onUpdate: () => {
+                const section = getSectionFromTimeline(mainTl.time());
+
+                setActiveSectionId((prev) => {
+                    if (prev === section) {
+                        return prev;
+                    }
+
+                    return section;
+                });
+
+                render();
+            },
             //enabled: isLoaded,
             // 🚀 INTEGRATED NATIVE SCROLL SNAPPING
             // Array dictates incremental timeline decimal break snap thresholds (0% -> 25% -> 50% -> 75% -> 100% Footer)

@@ -50,7 +50,7 @@ export default function SiteHead(){
         <ul className="flex flex-row gap-4 h-12 pr-6 align-middle justify-center" ref={menuRef}>
             <li className='menu-item flex align-middle flex-col justify-center'><Link href="#" onClick={()=>scrollToSection('projects')}>Book Free Consultation</Link></li>
             <li className='menu-item flex align-middle flex-col justify-center'><Link href="#" onClick={()=>scrollToSection('about')}>Cost Estimator</Link></li>
-            <li className='menu-item flex align-middle flex-col justify-center'><Link href="https://www.designlnc.dev">visit designlnc.lab</Link></li>
+            <li className='menu-item flex align-middle flex-col justify-center'><Link href="https://www.studiolnc.dev">visit studiolnc.lab</Link></li>
         </ul>
        </nav>
        </div>
