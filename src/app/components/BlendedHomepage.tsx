@@ -162,7 +162,7 @@ export default function FinalSnappingHomepage() {
     { section: 7, time: 30 },
     ];
 
-    function getSectionFromTimeline(time) {
+    function getSectionFromTimeline(time:number): number {
         for (let i = SECTION_TIMES.length - 1; i >= 0; i--) {
             if (time >= SECTION_TIMES[i].time) {
             return SECTION_TIMES[i].section;
