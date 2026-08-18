@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const blogPages = posts.map((post) => ({
     url: `https://pradipta.online/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
+    lastModified: new Date(post.modified),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
