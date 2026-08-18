@@ -6,14 +6,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await fetchAllPosts();
 
   const staticPages = [
-   /* {
+   {
       url: "https://pradipta.online",
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 1,
     },
 
-    {
+    /* {
       url: "https://pradipta.online/about",
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
