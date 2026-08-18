@@ -6,7 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await fetchAllPosts();
 
   const staticPages = [
-    {
+   /* {
       url: "https://pradipta.online",
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
@@ -25,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.9,
-    },
+    },*/
   ];
 
   const blogPages = posts.map((post) => ({
