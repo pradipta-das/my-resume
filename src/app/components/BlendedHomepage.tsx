@@ -96,17 +96,7 @@ export default function FinalSnappingHomepage() {
           if (section.aspectRatio === "16:9") {
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
           } else {
-           /* const size = Math.min(img.width, img.height);
-            const sourceX = (img.width - size) / 2;
-            const sourceY = (img.height - size) / 2;
-
-            const targetHeight = isDesktop ? canvas.height : canvas.width;
-            const targetWidth = isDesktop ? canvas.height : canvas.width;
-            const targetX = (canvas.width - targetWidth) / 2;
-            const targetY = (canvas.height - targetHeight) / 2;
-
-            context.drawImage(img, sourceX, sourceY, size, size, targetX, targetY, targetWidth, targetHeight);
-            */
+          
            
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -176,7 +166,7 @@ export default function FinalSnappingHomepage() {
         }
       });
 
-      console.log(sequenceTween);
+      //console.log(sequenceTween);
 
       if (!sequenceTween) return;
 
@@ -274,11 +264,11 @@ export default function FinalSnappingHomepage() {
         {SECTIONS_CONFIG.map((section, idx) => (
           <button
             key={section.id}
-            onClick={() => handleNavClick(idx)}
-            className={`w-10 h-5 bg-transparent ${activeSectionId === idx ? '' : ' relative transition-all duration-300'}`}
+            onClick={() => handleNavClick(section.id - 1)}
+            className={`w-10 h-5 bg-transparent ${activeSectionId === section.id ? '' : ' relative transition-all duration-300'}`}
           ><div className="flex flex-col text-left justify-between text-[.7rem] font-bold relative w-full h-full">
             {activeSectionId === section.id && '0' + section.id}
-           
+
             <div className={`absolute  h-[1px] top-0 right-0 transition-all duration-300 ${activeSectionId === section.id ? "bg-black w-10" : "w-5 bg-black"}`}></div>
           </div>
           </button>
