@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { imageSequence } from "../utils/imageSequence";
 import LoadingScreen from "./LoadingScreen";
 
 if (typeof window !== "undefined") {
@@ -18,13 +19,13 @@ interface SectionData {
 }
 
 const SECTIONS_CONFIG: SectionData[] = [
-  { id: 1, folderName: "hero", frameCount: 10, aspectRatio: "16:9" },
-  { id: 2, folderName: "hero", frameCount: 10, aspectRatio: "1:1" },
-  { id: 3, folderName: "hero", frameCount: 10, aspectRatio: "1:1" },
-  { id: 4, folderName: "hero", frameCount: 10, aspectRatio: "1:1" },
-   { id: 5, folderName: "hero", frameCount: 10, aspectRatio: "1:1" },
-    { id: 6, folderName: "hero", frameCount: 10, aspectRatio: "1:1" },
-     { id: 7, folderName: "hero", frameCount: 10, aspectRatio: "1:1" }
+  { id: 1, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" },
+  { id: 2, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" },
+  { id: 3, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" },
+  { id: 4, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" },
+   { id: 5, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" },
+    { id: 6, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" },
+     { id: 7, folderName: "timeline-1", frameCount: 148, aspectRatio: "1:1" }
 ];
 
 export default function FinalSnappingHomepage() {
@@ -49,284 +50,203 @@ export default function FinalSnappingHomepage() {
   const sectionStartIndices = useRef<number[]>([]);
 
   useEffect(() => {
-    if (!masterContainerRef.current || !canvasRef.current) return;
+  if (!masterContainerRef.current || !canvasRef.current) return;
 
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    if (!context) return;
+  const canvas = canvasRef.current;
+  const context = canvas.getContext("2d");
+  if (!context) return;
 
-    canvas.width = 1000;
-    canvas.height = 400;
+  canvas.width = 600;
+  canvas.height = 600;
 
-    const masterImagePool: HTMLImageElement[] = [];
-    let absoluteIndex = 0;
-    const totalFrames = SECTIONS_CONFIG.reduce((acc, s) => acc + s.frameCount, 0);
-    let loadedCount = 0;
+  const urls: string[] = [];
+  let absoluteIndex = 0;
 
-    const render = () => {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      const currentIndex = globalTrack.current.frameIndex;
-      const currentImg = masterImagePool[currentIndex];
-      const currentSection = frameToSectionMap.current[currentIndex];
+  SECTIONS_CONFIG.forEach((section) => {
+    sectionStartIndices.current.push(absoluteIndex);
+    for (let i = 1; i <= section.frameCount; i++) {
+      urls.push(`/sequences/${section.folderName}/Timeline 1_${i.toString().padStart(4, "0")}.webp`);
+      frameToSectionMap.current[absoluteIndex] = section;
+      absoluteIndex++;
+    }
+  });
 
+  const totalFrames = urls.length;
+  const totalTimelineDuration = 50;
+  const mm = gsap.matchMedia(masterContainerRef);
 
+  let sequenceTween: gsap.core.Tween | null = null;
 
-      if (!currentImg || !currentImg.complete || !currentSection) return;
+  mm.add(
+    { isDesktop: "(min-width: 1024px)", isMobile: "(max-width: 1023px)" },
+    (contextData) => {
+      const { isDesktop } = contextData.conditions as { isDesktop: boolean };
 
-      //console.log(currentIndex, currentImg.src);
+      
+      const drawEngine = (frame: number, activeImg: HTMLImageElement) => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        const currentSection = frameToSectionMap.current[frame];
+        //console.log(frame, activeImg.src, currentSection?.id);
+        if (!activeImg || !currentSection) return;
 
-      const drawFrameToCanvas = (img: HTMLImageElement, section: SectionData, alpha: number) => {
-        context.save();
-        context.globalAlpha = alpha;
-        const isDesktopWindow = window.innerWidth >= 1024;
-        //console.log(img.src);
+        const drawFrame = (img: HTMLImageElement, section: SectionData, alpha: number) => {
+          context.save();
+          context.globalAlpha = alpha;
 
-        if (section.aspectRatio === "16:9") {
-          context.drawImage(img, 0, 0, canvas.width, canvas.height);
+          if (section.aspectRatio === "16:9") {
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+          } else {
+           /* const size = Math.min(img.width, img.height);
+            const sourceX = (img.width - size) / 2;
+            const sourceY = (img.height - size) / 2;
+
+            const targetHeight = isDesktop ? canvas.height : canvas.width;
+            const targetWidth = isDesktop ? canvas.height : canvas.width;
+            const targetX = (canvas.width - targetWidth) / 2;
+            const targetY = (canvas.height - targetHeight) / 2;
+
+            context.drawImage(img, sourceX, sourceY, size, size, targetX, targetY, targetWidth, targetHeight);
+            */
+           
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          }
+
+          context.restore();
+          
+        };
+
+        const currentSectionConfigIndex = SECTIONS_CONFIG.findIndex(s => s.id === currentSection.id);
+        const currentSectionStart = sectionStartIndices.current[currentSectionConfigIndex];
+        const currentSectionEnd = currentSectionStart + currentSection.frameCount - 1;
+        const fadeWindow = 8;
+
+        if (frame >= currentSectionEnd - fadeWindow && currentSectionConfigIndex < SECTIONS_CONFIG.length - 1) {
+          const mixProgress = (frame - (currentSectionEnd - fadeWindow)) / fadeWindow;
+          drawFrame(activeImg, currentSection, 1 - mixProgress);
         } else {
-          
-          
-          const size = Math.min(img.width, img.height);
-          console.log(`Drawing ${img.src} with size ${size} and alpha ${alpha}`);
-          const sourceX = (img.width - size) / 2;
-          const sourceY = (img.height - size) / 2;
-
-          const targetHeight = isDesktopWindow ? canvas.height : canvas.width;
-          const targetWidth = isDesktopWindow ? canvas.height : canvas.width;
-          const targetX = (canvas.width - targetWidth) / 2;
-          const targetY = (canvas.height - targetHeight) / 2;
-
-          context.drawImage(img, sourceX, sourceY, size, size, targetX, targetY, targetWidth, targetHeight);
+          drawFrame(activeImg, currentSection, 1.0);
         }
-        context.restore();
       };
 
-      const currentSectionConfigIndex = SECTIONS_CONFIG.findIndex(s => s.id === currentSection.id);
-      const currentSectionStart = sectionStartIndices.current[currentSectionConfigIndex];
-      const currentSectionEnd = currentSectionStart + currentSection.frameCount - 1;
-      const fadeWindow = 0; 
-
-      //drawFrameToCanvas(currentImg, currentSection, 1.0);
-
-      if (currentIndex >= currentSectionEnd - fadeWindow && currentSectionConfigIndex < SECTIONS_CONFIG.length - 1) {
-        const framesIntoFade = currentIndex - (currentSectionEnd - fadeWindow);
-        const mixProgress = framesIntoFade / fadeWindow;
-        const nextImg = masterImagePool[currentSectionEnd + 1];
-        const nextSection = SECTIONS_CONFIG[currentSectionConfigIndex + 1];
-
-        drawFrameToCanvas(currentImg, currentSection, 1 - mixProgress);
-        if (nextImg && nextImg.complete) {
-          drawFrameToCanvas(nextImg, nextSection, mixProgress);
-        }
-      } else {
-        drawFrameToCanvas(currentImg, currentSection, 1.0);
-      }
-    };
-
-    const handleImageLoad = () => {
-      loadedCount++;
-      setLoadingProgress(Math.round((loadedCount / totalFrames) * 100));
-
-      if (loadedCount === totalFrames) {
-        gsap.to("#loading-screen", {
-          opacity: 0,
-          duration: 0.5,
-          onComplete: () => {
-            setIsLoaded(true);
-            render();
+      // 🚀 1. CREATE A TRUE, NATIVE MASTER TIMELINE
+      const masterTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: masterContainerRef.current,
+          start: "top top",
+          end: "+=4000",
+          scrub: 0.5,
+          pin: true,
+          onUpdate: ()=>{
+            //console.log('works');
           }
-        });
-      }
-    };
-
-    SECTIONS_CONFIG.forEach((section) => {
-      sectionStartIndices.current.push(absoluteIndex);
-      for (let i = 1; i <= section.frameCount; i++) {
-        const img = new Image();
-        img.src = `/sequences/${section.folderName}/Timeline 1_${i.toString().padStart(4, "0")}.webp`;
-        img.onload = handleImageLoad;
-        img.onerror = handleImageLoad;
-        masterImagePool.push(img);
-        frameToSectionMap.current[absoluteIndex] = section;
-        absoluteIndex++;
-      }
-    });
-
-    const SECTION_TIMES = [
-    { section: 1, time: 0 },
-    { section: 2, time: 5 },
-    { section: 3, time: 10 },
-    { section: 4, time: 15 },
-    { section: 5, time: 20 },
-    { section: 6, time: 25 },
-    { section: 7, time: 30 },
-    ];
-
-    function getSectionFromTimeline(time:number): number {
-        for (let i = SECTION_TIMES.length - 1; i >= 0; i--) {
-            if (time >= SECTION_TIMES[i].time) {
-            return SECTION_TIMES[i].section;
-            }
+         /* enabled: isLoaded,
+          snap: {
+            snapTo: [0, 0.25, 0.50, 0.75, 1.0],
+            duration: { min: 0.2, max: 0.5 },
+            delay: 0.1,
+            ease: "power1.out"
+          }*/
         }
+      });
 
-        return 1;
+      // 🚀 2. CALL IMAGESEQUENCE WITHOUT ITS OWN SCROLLTRIGGER
+      // We pass the scrollTrigger as null so it doesn't try to pin independently
+      sequenceTween = imageSequence({
+        canvas: canvas,
+        urls: urls,
+        clear: false,
+        paused: false,
+        scrollTrigger: null, // Left to the master timeline instead
+        onImageLoad: (loaded, total) => {
+          const currentPercent = Math.round((loaded / total) * 100);
+          setLoadingProgress(currentPercent);
+
+          if (loaded === total) {
+            gsap.to("#loading-screen", {
+              opacity: 0,
+              duration: 0.5,
+              onComplete: () => setIsLoaded(true)
+            });
+          }
+        },
+        onUpdate: (frame, img) => {
+            
+          drawEngine(frame, img);
+        }
+      });
+
+      console.log(sequenceTween);
+
+      if (!sequenceTween) return;
+
+      // 🚀 3. ADD THE IMAGE TWEEN TO THE MASTER TIMELINE
+      // This maps the image scrubbing cleanly from time 0 to 10
+      masterTimeline.add(sequenceTween, 0);
+      // ensure the sequence tween spans the same logical duration
+      // as the master timeline so scrubbing maps correctly
+      try {
+        sequenceTween.duration(totalTimelineDuration);
+      } catch (e) {
+        // ignore if tween can't be resized
+      }
+
+      // 🚀 4. ALL .fromTo(), .set(), and .to() METHODS WORK PERFECTLY NOW
+      if (isDesktop) {
+        masterTimeline.fromTo(canvas, { xPercent: 0, yPercent:0 }, { xPercent: -100, yPercent: -35, duration: 1.5, ease: "power2.inOut" },6);
+      }
+
+      let accumulatedFrames = 0;
+      SECTIONS_CONFIG.forEach((section, index) => {
+        const sectionStartPos = (accumulatedFrames / totalFrames) * totalTimelineDuration;
+        accumulatedFrames += section.frameCount;
+        const sectionEndPos = (accumulatedFrames / totalFrames) * totalTimelineDuration;
+        const sectionDuration = sectionEndPos - sectionStartPos;
+
+        const targetRef = [sec1Ref, sec2Ref, sec3Ref, sec4Ref, sec5Ref,sec6Ref, sec7Ref][index].current;
+        if (!targetRef) return;
+
+        const elements = targetRef.querySelectorAll("h1, h2, p, button, span");
+
+        if (index === 0) {
+          masterTimeline.to(elements, {
+            opacity: 0,
+            y: -60,
+            stagger: 0.1,
+            duration: sectionDuration * 0.4,
+            ease: "power2.in"
+          }, sectionEndPos - (sectionDuration * 0.4));
+          masterTimeline.call(() => setActiveSectionId(1), [], 0);
+        } else {
+          masterTimeline.set(targetRef, { opacity: 1 }, sectionStartPos);
+          masterTimeline.fromTo(elements,
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, stagger: 0.15, duration: sectionDuration * 0.3, ease: "power2.out" },
+            sectionStartPos
+          );
+
+          if (index < SECTIONS_CONFIG.length - 1) {
+            masterTimeline.to(targetRef, {
+              opacity: 0,
+              y: -60,
+              duration: sectionDuration * 0.3,
+              ease: "power2.in"
+            }, sectionEndPos - (sectionDuration * 0.3));
+          }
+          masterTimeline.call(() => setActiveSectionId(index + 1), [], sectionStartPos);
+        }
+      });
     }
+  );
 
-    const mm = gsap.matchMedia(masterContainerRef);
-    mm.add(
-      { isDesktop: "(min-width: 1024px)", isMobile: "(max-width: 1023px)" },
-      (contextData) => {
-        const { isDesktop } = contextData.conditions as { isDesktop: boolean };
-        const mainTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: masterContainerRef.current,
-            start: "top top",
-            end: "+=4000",
-            scrub: 0.5,
-            pin: true,
-            //markers: true,
-            onUpdate: () => {
-                const section = getSectionFromTimeline(mainTl.time());
+  return () => {
+    mm.revert();
+    if (sequenceTween) {
+      sequenceTween.kill();
+    }
+  };
 
-                setActiveSectionId((prev) => {
-                    if (prev === section) {
-                        return prev;
-                    }
-
-                    return section;
-                });
-
-                render();
-            },
-            //enabled: isLoaded,
-            // 🚀 INTEGRATED NATIVE SCROLL SNAPPING
-            // Array dictates incremental timeline decimal break snap thresholds (0% -> 25% -> 50% -> 75% -> 100% Footer)
-           /* snap: {
-              snapTo: [0, 0.25, 0.50, 0.75, 1.0],
-              duration: { min: 0.3, max: 0.7 }, // How fast it snaps into place
-              delay: 0.15,                     // Delay in seconds after scrolling stops before snap activates
-              ease: "power2.out"               // Smooth slowdown easing
-            }*/
-          }
-        });
-
-        mainTl.to(globalTrack.current, {
-          frameIndex: totalFrames - 1,
-          snap: "frameIndex",
-          ease: "none",
-          duration: 35,
-          onUpdate: () => {
-            //console.log(totalFrames, globalTrack.current.frameIndex, Math.round(totalFrames/30));
-          }
-        }, 0);
-
-        // As Section 1 rolls out and Section 2 rolls in (between timeline marks 1.5 and 2.5),
-        // we smoothly slide the entire canvas element left by 25% of its width.
-        if (isDesktop) {
-        mainTl.fromTo(canvasRef.current, 
-            { xPercent: 0 }, 
-            { xPercent: -25, duration: 1, ease: "power2.inOut" }, 
-           2.5
-        );
-        }
-
-       // --- HERO TEXT 1 (Appears immediately at 0, exits at 0.6) ---
-      mainTl.to(".hero-phrase-1", { opacity: 0, y: -40, duration: 0.1, ease: "power2.in" }, 2);
-
-        /*  // --- HERO TEXT 2 (Enters at 0.8, exits at 1.4) ---
-        mainTl.fromTo(".hero-phrase-2", 
-        { opacity: 0, y: 40 }, 
-        { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 
-        .2
-        ).to(".hero-phrase-2", 
-        { opacity: 0, y: -40, duration: 0.4, ease: "power2.in" }, 
-        .4
-        );
-
-        // --- HERO TEXT 3 (Enters at 1.6, exits at 2.2) ---
-        mainTl.fromTo(".hero-phrase-3", 
-        { opacity: 0, y: 40 }, 
-        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 
-        .6
-        ).to(".hero-phrase-3", 
-        { opacity: 0, y: -40, duration: 0.4, ease: "power2.in" }, 
-        .8
-        );
-
-        mainTl.fromTo(".hero-phrase-4", 
-        { opacity: 0, y: 40 }, 
-        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 
-        1
-        ).to(".hero-phrase-4", 
-        { opacity: 0, y: -40, duration: 0.4, ease: "power2.in" }, 
-        1.2
-        );
-
-        mainTl.fromTo(".hero-phrase-5", 
-        { opacity: 0, y: 40 }, 
-        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 
-       1.4
-        ).to(".hero-phrase-5", 
-        { opacity: 0, y: -40, duration: 0.4, ease: "power2.in" }, 
-        1.6
-        );
-*/
-        // Maintain active section state trackers
-        mainTl.call(() => setActiveSectionId(1), [], 0);
-
-        
-        mainTl.set(sec2Ref.current, { opacity: 1 }, 5);
-        mainTl.fromTo(sec2Ref.current?.querySelectorAll("span,h2,h3, p,a") || [],
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, stagger: 0.1, duration: .5, ease: "power2.out" },
-        5.5
-        ).to(sec2Ref.current, { opacity: 0, y: -60, duration: .3, ease: "power2.in" }, 10)
-        .call(() => setActiveSectionId(2), [], 5);
-
-        mainTl.set(sec3Ref.current, { opacity: 1 }, 10);
-        mainTl.fromTo(sec3Ref.current?.querySelectorAll("span,h2,h3, p,a") || [],
-        { opacity: 0, y: 60 },
-        { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" },
-        10.5
-        ).to(sec3Ref.current, { opacity: 0, y: -60, duration: 1, ease: "power2.in" }, 15)
-        .call(() => setActiveSectionId(3), [], 10);
-
-        mainTl.set(sec4Ref.current, { opacity: 1 }, 15);
-        mainTl.fromTo(sec4Ref.current?.querySelectorAll("span,h2,h3, p,a") || [],
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, stagger: 0.18, duration: 1.2, ease: "power2.out" },
-        15.5
-        ).to(sec4Ref.current, { opacity: 0, y: -60, duration: 1, ease: "power2.in" }, 20)
-        .call(() => setActiveSectionId(4), [], 15);
-
-        mainTl.set(sec5Ref.current, { opacity: 1 }, 20);
-        mainTl.fromTo(sec5Ref.current?.querySelectorAll("span,h2,h3, p,a") || [],
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, stagger: 0.18, duration: 1.2, ease: "power2.out" },
-        20.5
-        ).to(sec5Ref.current, { opacity: 0, y: -60, duration: 1, ease: "power2.in" }, 25)
-        .call(() => setActiveSectionId(5), [], 20);
-
-        mainTl.set(sec6Ref.current, { opacity: 1 }, 25);
-        mainTl.fromTo(sec6Ref.current?.querySelectorAll("span,h2,h3, p,a") || [],
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, stagger: 0.18, duration: 1.2, ease: "power2.out" },
-        25.5
-        ).to(sec6Ref.current, { opacity: 0, y: -60, duration: 1, ease: "power2.in" }, 30)
-        .call(() => setActiveSectionId(6), [], 25);
-
-        mainTl.set(sec7Ref.current, { opacity: 1 }, 30);
-        mainTl.fromTo(sec7Ref.current?.querySelectorAll("span,h2,h3, p,a") || [],
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, stagger: 0.18, duration: 1.2, ease: "power2.out" },
-        30.5
-        )
-        .call(() => setActiveSectionId(7), [], 30);
-
-      }
-    );
-
-    return () => mm.revert();
+  
   }, [isLoaded]);
 
   const handleNavClick = (sectionIndex: number) => {
@@ -370,7 +290,7 @@ export default function FinalSnappingHomepage() {
       <div ref={masterContainerRef} className="relative bg-[#f8f6f2] h-auto overflow-hidden">
         <div className="sticky top-0 flex h-screen w-screen items-center justify-center overflow-hidden px-4 md:px-12">
           
-          <canvas ref={canvasRef} className="absolute z-10 bottom-10 max-h-screen max-w-screen object-contain" />
+          <canvas ref={canvasRef} className="absolute z-10 bottom-10 max-h-1/2 max-w-screen object-contain" />
 
           {/* SECTION 1: HERO LAYOUT (1 Col, 2 Rows) */}
           <div 
