@@ -568,7 +568,7 @@
     ====================================================== */
 
     .human-ai {
-        @apply relative flex min-h-[195px] items-center justify-center overflow-hidden border-t border-black p-3 bg-[url(/img-3.png)] bg-no-repeat bg-contain bg-bottom;
+        @apply relative flex min-h-[195px] items-center justify-center overflow-hidden border-t border-black p-3 bg-[url(/img-3.webp)] bg-no-repeat bg-contain bg-bottom;
         @apply sm:min-h-[270px] sm:p-5;
         @apply md:min-h-[390px] md:p-7;
         @apply lg:min-h-[600px] lg:p-10;

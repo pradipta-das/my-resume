@@ -407,7 +407,8 @@ export default function HomeBody() {
               alt="UX planning"
               width={1119}
               height={1049}
-              sizes="(min-width: 640px) 50vw, 100vw"
+              // Contained in a 195px-tall box on phones, so it's drawn about 210px wide.
+              sizes="(min-width: 640px) 50vw, 210px"
               className="image-contain"
             />
           </div>

@@ -29,6 +29,11 @@ if (typeof window !== "undefined") {
  * Call inside a gsap.matchMedia callback guarded by prefers-reduced-motion,
  * and return the result from it so the DOM changes are undone on revert.
  */
+// SplitText labels the element with its text so screen readers skip the
+// fragments; aria-label is only valid on headings, though, so anything else
+// (a <p> tagline) keeps its text as-is for screen readers instead.
+const ariaFor = (el: Element) => (/^H[1-6]$/.test(el.tagName) ? "auto" : "none");
+
 export function animateSections(root: HTMLElement): () => void {
   const undoBorders = drawBorders(root);
   const all = (selector: string) => gsap.utils.toArray<HTMLElement>(selector, root);
@@ -90,6 +95,7 @@ export function animateSections(root: HTMLElement): () => void {
   all("[data-split='words']").forEach((el) => {
     SplitText.create(el, {
       type: "lines,words",
+      aria: ariaFor(el),
       mask: "lines",
       linesClass: "split-line",
       wordsClass: "split-word",
@@ -109,6 +115,7 @@ export function animateSections(root: HTMLElement): () => void {
   all("[data-split='scrub']").forEach((el) => {
     SplitText.create(el, {
       type: "lines",
+      aria: ariaFor(el),
       linesClass: "split-line",
       autoSplit: true,
       onSplit: (self) =>
