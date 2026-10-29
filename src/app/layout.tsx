@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import {siteConfig} from "./lib/seo";
-import {Cormorant_Garamond,Inter, Josefin_Sans, Playfair, Ubuntu_Mono, Manrope} from "next/font/google";
-import "./globals.css";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
+import "./input.css";
+import CookieConsent from "./components/CookieConsent";
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant-garamond',
   subsets: ['latin'],
-  weight: ["400","500","600","700"]
+  weight: ["300","400","500","600","700"],
+  style: ["normal","italic"]
 })
 
 const manrope = Manrope({
@@ -15,11 +17,7 @@ const manrope = Manrope({
   weight: ["200","300","400","500","600","700"]
 })
 
-const ubuntu = Ubuntu_Mono({
-  variable: '--font-ubuntu-mono',
-  subsets: ['latin'],
-  weight: "400"
-})
+
 
 
 export const metadata: Metadata = {
@@ -49,6 +47,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+
+  // Domain verification for Meta Business (needed for ad conversion events).
+  verification: {
+    other: { "facebook-domain-verification": "xdwn8od8y9n4yynr7xvo1fbtlikkwf" },
+  },
 };
 
 export default function RootLayout({
@@ -58,9 +61,12 @@ export default function RootLayout({
 }>) {
   
   return (
-    <html lang="en">
-      <body className={`${ubuntu.variable} ${cormorant.variable} ${manrope.variable}`}>
+    // The font variables sit on <html> so the theme's --font-primary and
+    // --font-secondary (input.css) can use them from the root down.
+    <html lang="en" className={`${cormorant.variable} ${manrope.variable}`}>
+      <body>
        {children}
+       <CookieConsent />
       </body>
     </html>
   );

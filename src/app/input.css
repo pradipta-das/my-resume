@@ -1,0 +1,2173 @@
+@import "tailwindcss";
+
+/* =========================================================
+   TAILWIND
+========================================================= */
+
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+@theme {
+    /* -----------------------------------------------------
+       FONTS
+    ----------------------------------------------------- */
+
+    /* Self-hosted by next/font (see layout.tsx, which sets these variables on
+       <html>), so visitors' browsers never connect to Google for fonts. */
+    --font-primary: var(--font-cormorant-garamond), "Cormorant Garamond", serif;
+
+    --font-secondary: var(--font-manrope), "Manrope", sans-serif;
+
+    /* -----------------------------------------------------
+       COLORS
+    ----------------------------------------------------- */
+
+    --color-black: #000000;
+
+    --color-blue: #0813ef;
+
+    --color-white: #ffffff;
+}
+
+/* =========================================================
+   BASE
+========================================================= */
+
+@layer base {
+    html {
+        scroll-behavior: auto;
+    }
+
+    body {
+        margin: 0;
+        background-color: var(--color-white);
+        color: var(--color-black);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-family: var(--font-secondary);
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        font: inherit;
+    }
+
+    ::selection {
+        background-color: #000;
+        color: #fff;
+    }
+}
+
+/* =========================================================
+   MOBILE NAV COMPONENT
+========================================================= */
+
+@layer components {
+    /* -----------------------------------------------------
+       Mobile Menu Toggle
+    ----------------------------------------------------- */
+
+    .mobile-menu-toggle {
+        position: fixed;
+        right: 0.875rem; /* right-3.5 */
+        top: 0.875rem; /* top-3.5 */
+        z-index: 999;
+        display: flex;
+        height: 2.5rem; /* h-10 */
+        width: 2.5rem; /* w-10 */
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px; /* rounded-full */
+        background-color: #000;
+        color: #fff;
+        transform: scale(.75); /* scale-75 */
+    }
+
+    @media (min-width: 1024px) {
+        .mobile-menu-toggle {
+            display: none; /* lg:hidden */
+        }
+    }
+
+    /* -----------------------------------------------------
+       Hamburger
+    ----------------------------------------------------- */
+
+    .mobile-menu-icon {
+        display: flex;
+        width: 1.25rem; /* w-5 */
+        flex-direction: column; /* flex-col */
+        gap: 0.375rem; /* gap-1.5 */
+    }
+
+    .mobile-menu-line {
+        display: block;
+        height: 0.125rem; /* h-0.5 */
+        width: 1.25rem; /* w-5 */
+        transform-origin: center; /* origin-center */
+        background-color: #fff; /* bg-white */
+        transition-property: all;
+        transition-duration: 300ms; /* duration-300 */
+        transition-timing-function: ease-in-out; /* ease-in-out */
+    }
+
+    /* -----------------------------------------------------
+       Overlay
+    ----------------------------------------------------- */
+
+    .mobile-menu-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        pointer-events: none;
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 300ms ease-in-out;
+    }
+
+    @media (min-width: 1024px) {
+        .mobile-menu-overlay {
+            display: none;
+        }
+    }
+
+    .mobile-menu-overlay.is-open {
+        pointer-events: auto;
+        opacity: 1;
+    }
+
+    /* -----------------------------------------------------
+       Mobile Navigation
+    ----------------------------------------------------- */
+
+    .mobile-menu {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 999;
+        display: flex;
+        height: 100dvh;
+        width: 85%;
+        max-width: 24rem; /* equivalent to max-w-sm */
+        transform: translateX(-100%);
+        flex-direction: column;
+        justify-content: center;
+        background: #ffffff;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        transition-property: transform;
+        transition-duration: 500ms;
+        transition-timing-function: cubic-bezier(0.77,0,0.175,1);
+    }
+
+    @media (min-width: 1024px) {
+        .mobile-menu {
+            display: none;
+        }
+    }
+
+    .mobile-menu.is-open {
+        transform: translateX(0);
+    }
+
+    /* -----------------------------------------------------
+       Navigation Links
+    ----------------------------------------------------- */
+
+    .mobile-menu-link {
+        display: block;
+        border-bottom: 1px solid rgba(0,0,0,0.10);
+        padding-top: 1.25rem;
+        padding-bottom: 1.25rem;
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #000000;
+        transition: color 200ms;
+    }
+
+    .mobile-menu-link:hover {
+        color: rgba(0,0,0,0.5);
+    }
+
+    .mobile-menu-link:last-child {
+        border-bottom: 0;
+    }
+
+    /* -----------------------------------------------------
+       Hamburger → Close Animation
+    ----------------------------------------------------- */
+
+    .mobile-menu-toggle.is-open .mobile-menu-line:nth-child(1) {
+        transform: translateY(0.5rem) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.is-open .mobile-menu-line:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-toggle.is-open .mobile-menu-line:nth-child(3) {
+        transform: translateY(-0.5rem) rotate(-45deg);
+    }
+}
+
+/* =========================================================
+   COMPONENTS
+========================================================= */
+
+@layer components {
+    /* =====================================================
+       PAGE
+    ====================================================== */
+
+    .page {
+        width: 100%;
+        /* clip (not hidden) so the page doesn't become a scroll container —
+           keeps position: sticky and ScrollTrigger pinning working inside it. */
+        overflow-x: clip;
+    }
+
+    /* =====================================================
+       HEADER
+    ====================================================== */
+
+    .site-header {
+        @apply flex min-h-[64px] items-center justify-between px-2;
+        @apply sm:min-h-[64px] sm:px-3;
+        @apply md:min-h-[74px] md:px-5;
+        @apply lg:min-h-[74px] lg:px-7;
+    }
+
+    /* logo.svg has its own underline. */
+    .site-logo {
+        @apply inline-block shrink-0 transition-opacity hover:opacity-70;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue;
+
+        img {
+            @apply h-[clamp(1.625rem,2.1vw,2.125rem)] w-auto;
+        }
+    }
+
+    /* Six links need the room of a desktop screen; below that the menu
+       button takes over (see the mobile menu above). */
+    .site-nav {
+        @apply hidden items-center;
+        @apply lg:flex lg:gap-7;
+        @apply xl:gap-10;
+    }
+
+    .site-nav a {
+        @apply font-secondary font-normal capitalize tracking-[0.08em];
+        @apply text-[clamp(0.75rem,0.75vw,0.875rem)];
+    }
+
+    /* =====================================================
+       TYPOGRAPHY
+    ====================================================== */
+
+    .font-primary {
+        font-family: var(--font-primary);
+    }
+
+    .font-secondary {
+        font-family: var(--font-secondary);
+    }
+
+    .display-title {
+        @apply font-primary font-normal leading-[1.15] tracking-[0.015em];
+    }
+
+    .purpose-title {
+        @apply font-primary font-normal leading-[1.15] tracking-[0.015em];
+    }
+
+    .body-copy {
+        @apply font-secondary font-light leading-[1.5];
+        @apply text-[clamp(0.875rem,0.9vw,1rem)];
+    }
+
+    .eyebrow {
+        @apply font-secondary font-bold capitalize mb-5 block;
+        @apply text-[clamp(0.75rem,0.7vw,0.75rem)];
+    }
+
+    .display-heading {
+        @apply font-light capitalize block mb-4;
+        @apply text-[clamp(1.125rem,1.45vw,1.5rem)];
+    }
+
+    .section-caption {
+        @apply font-primary italic font-light leading-none;
+        @apply text-[clamp(2.25rem,4.1vw,4.125rem)];
+    }
+
+    /* SplitText pieces must not change line height, or the heading jumps when
+       the split is reverted. Top-aligned word boxes match plain text, and the
+       clip margin gives descenders room without affecting layout. */
+    .split-word {
+        vertical-align: top;
+    }
+
+    .split-line-mask {
+        overflow-clip-margin: 0.2em;
+    }
+
+    .display-link {
+        @apply capitalize font-light table;
+        @apply text-[clamp(0.875rem,1vw,1rem)];
+    }
+
+    /* =====================================================
+       LINK UNDERLINES
+       link-sweep: hidden; draws in from the left on hover and
+       leaves to the right. link-redraw: always shown; on hover it
+       leaves to the right and draws back in from the left. A span
+       inside a padded link or button responds to hovering it.
+    ====================================================== */
+
+    .link-sweep,
+    .link-redraw {
+        background-image: linear-gradient(currentColor, currentColor);
+        background-repeat: no-repeat;
+        background-position: 100% 100%;
+        background-size: 0% 1px;
+        text-decoration: none;
+        transition: background-size 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .link-sweep:hover,
+    :is(a, button):hover > .link-sweep {
+        background-position: 0% 100%;
+        background-size: 100% 1px;
+    }
+
+    .link-redraw {
+        background-position: 0% 100%;
+        background-size: 100% 1px;
+    }
+
+    .link-redraw:hover,
+    :is(a, button):hover > .link-redraw {
+        animation: link-redraw 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    /* =====================================================
+       COLOR
+    ====================================================== */
+
+    .text-brand {
+        @apply text-blue;
+    }
+
+    /* =====================================================
+       IMAGE
+    ====================================================== */
+
+    .image-cover {
+        @apply h-full w-full object-cover;
+    }
+
+    .image-contain {
+        @apply h-full w-full object-contain;
+    }
+
+    /* =====================================================
+       HERO
+    ====================================================== */
+
+    .hero {
+        @apply relative h-[500px] border-b border-black;
+        @apply sm:h-[600px];
+        @apply md:h-[700px];
+        @apply lg:h-[800px];
+        @apply xl:h-[1000px];
+    }
+
+    .hero-overlay {
+        @apply absolute inset-0 bg-white/5;
+    }
+
+    .hero-letter {
+        @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -mt-[140px];
+        @apply font-primary font-normal capitalize leading-none;
+        @apply text-[clamp(2.125rem,4vw,4rem)];
+    }
+
+    /* =====================================================
+       INTRO GRID
+    ====================================================== */
+
+    .intro-grid {
+        @apply grid grid-cols-1 auto-cols-max border-b border-black;
+        @apply sm:grid-cols-2 sm:grid-cols-[4fr_6fr];
+    }
+
+    /* Mobile: the content wrapper dissolves so the title can sit above the
+       image instead of the image stacking straight under the hero. */
+    .intro-image {
+        @apply h-[280px] overflow-hidden border-b border-black;
+        @apply sm:h-full sm:border-b-0 sm:border-r;
+    }
+
+    .intro-content {
+        @apply contents sm:flex sm:flex-col;
+    }
+
+    .intro-title {
+        @apply order-first flex min-h-[160px] items-center border-b border-black p-3;
+        @apply sm:min-h-[220px] sm:p-5;
+        @apply md:min-h-[300px] md:p-8;
+        @apply lg:min-h-[320px] lg:p-12;
+    }
+
+    .intro-title > .display-title {
+        @apply text-[clamp(2.375rem,4.25vw,4.25rem)];
+    }
+
+    .content-block {
+        @apply p-3;
+        @apply sm:p-4;
+        @apply md:p-6;
+        @apply lg:p-8;
+    }
+
+    .content-block-large {
+        @apply p-3;
+        @apply sm:p-4;
+        @apply md:p-8;
+        @apply lg:p-12;
+    }
+
+    /* =====================================================
+       STATEMENT
+    ====================================================== */
+
+    .statement {
+        @apply border-b border-black px-2 py-3 text-center;
+        @apply sm:px-4 sm:py-5;
+        @apply md:px-8 md:py-7;
+        @apply lg:px-10 lg:py-10;
+    }
+
+    /* "Ideas become BLUEPRINTS" / "BLUEPRINTS become Experiences." Without
+       motion the two lines stack; when animated (.is-sequenced, added by
+       HomeBody) they share one grid cell and the slot only marks where
+       BLUEPRINTS travels to. */
+    .statement-line {
+        @apply block;
+    }
+
+    .statement-sequence.is-sequenced {
+        @apply grid;
+
+        /* Centred vertically, so a line that wraps less than the other (on
+           phones) sits in the middle of the block rather than at the top. */
+        > .statement-line {
+            @apply col-start-1 row-start-1 self-center;
+        }
+
+        [data-seq="slot"] {
+            @apply invisible;
+        }
+    }
+
+    /* =====================================================
+       BLUEPRINT GRID
+    ====================================================== */
+
+    .blueprint-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 items-end;
+    }
+
+    /* Mobile: both columns dissolve into one flow, re-ordered in HomeBody so
+       each image follows the copy it illustrates. */
+    .blueprint-left {
+        @apply contents sm:block sm:border-r border-black;
+    }
+
+    .blueprint-right {
+        @apply contents sm:block min-w-0;
+    }
+
+    /* Mobile: caption and image share a row. */
+    .purpose-row {
+        @apply grid grid-cols-2 sm:block;
+    }
+
+    /* =====================================================
+       STRATEGY
+    ====================================================== */
+
+    .strategy-block {
+        @apply min-h-[135px] border-b border-black p-3;
+        @apply sm:min-h-[190px] sm:p-4;
+        @apply md:min-h-[270px] md:p-7;
+        @apply lg:min-h-[280px] lg:p-8;
+    }
+
+    /* =====================================================
+       PURPOSE
+    ====================================================== */
+
+    .purpose-block {
+        @apply flex min-h-[105px] text-center items-center justify-center sm:justify-start border-b border-r border-black p-3;
+        @apply sm:min-h-[150px] sm:p-4 sm:text-left sm:border-r-0;
+        @apply md:min-h-[220px] md:p-7;
+        @apply lg:min-h-[240px] lg:p-8;
+    }
+
+    .purpose-title {
+        @apply text-[clamp(1.875rem,3.75vw,3.75rem)];
+    }
+
+    /* =====================================================
+       IMAGE BLOCK
+    ====================================================== */
+
+    .image-block {
+        @apply h-[200px] overflow-hidden border-b border-black;
+        @apply sm:h-[220px];
+        @apply md:h-[350px];
+        @apply lg:h-[730px];
+    }
+
+    /* =====================================================
+       BLUEPRINT IMAGE
+    ====================================================== */
+
+    .blueprint-image {
+        @apply h-[195px] border-b border-black;
+        @apply sm:h-[280px];
+        @apply md:h-[450px];
+        @apply lg:h-[650px];
+    }
+
+    /* =====================================================
+       HUMAN + AI
+    ====================================================== */
+
+    .human-ai {
+        @apply relative flex min-h-[195px] items-center justify-center overflow-hidden border-t border-black p-3 bg-[url(/img-3.png)] bg-no-repeat bg-contain bg-bottom;
+        @apply sm:min-h-[270px] sm:p-5;
+        @apply md:min-h-[390px] md:p-7;
+        @apply lg:min-h-[600px] lg:p-10;
+    }
+
+    .human-ai-title {
+        @apply relative z-10 text-center font-primary font-normal leading-[0.94] tracking-[0.01em] pb-[230px];
+        @apply text-[clamp(1.985rem,3.75vw,3.75rem)];
+        @apply sm:pb-[330px];
+    }
+
+    /* =====================================================
+       SUCCESS
+    ====================================================== */
+
+    .success-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 items-end border-b border-black;
+    }
+
+    .success-people {
+        @apply grid grid-cols-[96px_1fr] sm:border-r border-t border-black;
+        @apply sm:grid-cols-[105px_1fr];
+        @apply md:grid-cols-[140px_1fr];
+        @apply lg:grid-cols-[180px_1fr];
+    }
+
+    .people-list {
+        @apply pl-3 sm:pl-5;
+    }
+
+    /* Clips the looping track to the sizer image's footprint. */
+    .people-frame {
+        @apply relative h-full overflow-hidden;
+    }
+
+    .people-track {
+        @apply absolute inset-x-0 top-0;
+    }
+
+    /* img-4.png is 232x730 and ends with a partly cut-off face below the
+       separator at rows 675-678. Each copy shows rows 0-678 only, so it ends
+       on that separator and the next copy starts cleanly at the top face. */
+    .people-copy {
+        @apply aspect-[232/679] w-full overflow-hidden;
+
+        img {
+            @apply block h-auto w-full;
+        }
+    }
+
+    .person {
+        @apply h-[45px] border-b border-black;
+        @apply sm:h-[60px];
+        @apply md:h-[82px];
+        @apply lg:h-[90px];
+    }
+
+    .person:last-child {
+        @apply border-b-0;
+    }
+
+    .success-title {
+        @apply flex items-center p-3;
+        @apply sm:p-4;
+        @apply md:p-7;
+        @apply lg:p-10;
+    }
+
+    .success-title h3 {
+        @apply font-primary font-normal leading-[1.15] tracking-[0.015em];
+        @apply text-[2.375rem] sm:text-[clamp(3.1rem,4.75vw,4.75rem)];
+    }
+
+    .partnership {
+        @apply p-3 border-t border-black;
+        @apply sm:p-4;
+        @apply md:p-7;
+        @apply lg:p-10;
+    }
+
+    /* =====================================================
+       METRICS
+    ====================================================== */
+
+    .metrics-grid {
+        @apply grid grid-cols-1;
+        @apply sm:grid-cols-2
+    }
+
+    .metrics-content {
+        @apply flex min-h-[195px] flex-col sm:border-r border-black;
+        @apply sm:min-h-[270px];
+        @apply md:min-h-[390px];
+        @apply lg:min-h-[500px];
+    }
+
+    .metrics-image {
+        @apply h-[195px] overflow-hidden;
+        @apply sm:h-[270px];
+        @apply md:h-[390px];
+        @apply lg:h-[590px];
+    }
+
+    /* =====================================================
+       STATISTICS
+    ====================================================== */
+
+    .stats {
+        @apply mt-auto grid grid-cols-3;
+    }
+
+    /* --divider is the divider's height (0-1), animated with the counters. */
+    .stat {
+        --divider: 1;
+        @apply p-3 relative;
+        @apply before:absolute before:content-[''] before:w-[1px] before:h-1/2 before:bg-black before:right-0 before:left-auto;
+        @apply before:origin-top before:scale-y-(--divider);
+        @apply sm:p-4;
+        @apply md:p-6;
+        @apply lg:p-8;
+    }
+
+    .stat:last-child {
+        @apply border-r-0;
+    }
+
+    .stat-number {
+        @apply font-secondary font-extralight leading-none tracking-[0.018em];
+        @apply text-[clamp(2.65rem,5.4vw,5.375rem)];
+    }
+
+    .stat-number sup {
+        @apply font-extralight;
+        @apply text-[clamp(2.125rem,3.4vw,4rem)];
+    }
+
+    .stat-label {
+        @apply mt-1 font-primary capitalize flex justify-end;
+        @apply text-[clamp(1.125rem,1.5vw,1.5rem)];
+    }
+
+    /* =====================================================
+       FOOTER
+    ====================================================== */
+
+    .site-footer {
+        @apply bg-black text-white;
+    }
+
+    /* Free resources shelf: an intro cell, then a grid of resource cards
+       (listed in lib/resources.ts). Every cell draws its own bottom line;
+       from sm the cards also draw the line between columns, and from lg the
+       intro sits in a column of its own. */
+    .footer-resources {
+        @apply grid grid-cols-1;
+        @apply lg:grid-cols-4;
+    }
+
+    .footer-resources-head {
+        @apply flex flex-col border-b border-white p-4;
+        @apply sm:p-6;
+        @apply lg:p-10;
+    }
+
+    .footer-resources-label {
+        @apply mb-4 font-secondary text-[11px] font-medium uppercase tracking-[0.18em] text-white/60;
+    }
+
+    .footer-resources-title {
+        @apply font-primary font-normal leading-[1.1] text-white;
+        @apply text-[clamp(1.75rem,2.6vw,2.75rem)];
+    }
+
+    .footer-resources-all {
+        @apply mt-6 self-start font-secondary text-[clamp(0.75rem,0.8vw,0.875rem)] capitalize text-white;
+        @apply lg:mt-auto;
+    }
+
+    /* Beside the intro from lg, so every card draws the line on its left. */
+    .footer-resources-grid {
+        @apply lg:col-span-3;
+
+        > li {
+            @apply lg:border-l;
+        }
+    }
+
+    .footer-content {
+        @apply grid grid-cols-1;
+        @apply md:grid-cols-2;
+    }
+
+    .footer-brand {
+        @apply border-b border-white p-4;
+        @apply md:border-b-0 md:border-r md:p-8;
+        @apply lg:p-10 lg:py-14;
+    }
+
+    .footer-title {
+        @apply inline-block transition-opacity hover:opacity-70;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white;
+
+        img {
+            @apply h-[clamp(2.75rem,5vw,4.75rem)] w-auto;
+        }
+    }
+
+    .footer-heading {
+        @apply font-primary font-normal capitalize;
+        @apply text-[clamp(1.25rem,2vw,2rem)];
+    }
+
+    .footer-copy {
+        @apply mt-4 max-w-sm font-secondary font-light leading-[1.6] text-white;
+        @apply text-[clamp(0.75rem,0.8vw,0.875rem)];
+    }
+
+    .footer-social {
+        @apply mt-7 flex gap-6;
+        @apply md:mt-10 md:gap-8;
+    }
+
+    .footer-social a {
+        @apply font-secondary capitalize text-white;
+        @apply text-[clamp(0.75rem,0.8vw,0.875rem)];
+    }
+
+    .footer-contact {
+        @apply p-4;
+        @apply sm:p-12 sm:py-8;
+        @apply md:p-8;
+        @apply lg:p-10 lg:py-14;
+    }
+
+    .footer-label {
+        @apply font-primary font-normal capitalize text-white;
+        @apply text-[clamp(1rem,2.25vw,2.25rem)];
+    }
+
+    /* Brick-style line grid: row 1 holds the topics, rows 2–3 are empty
+       bricks (desktop only). Spans are out of 24 so the joints stagger. */
+    .footer-meta {
+        @apply mt-6 grid grid-cols-24 text-center border-t border-white;
+        @apply md:mt-[38px];
+        @apply lg:mt-[60px];
+        @apply xl:mt-[52px];
+
+        > div {
+            @apply relative flex min-h-[44px] items-center justify-center border-b border-l border-white p-2;
+            @apply md:min-h-[54px];
+        }
+
+        > :nth-child(1) { @apply col-span-7 border-l-0; }
+        > :nth-child(2) { @apply col-span-9; }
+        > :nth-child(3) { @apply col-span-8; }
+        > :nth-child(4) { @apply col-span-11 border-l-0; }
+        > :nth-child(5) { @apply col-span-13; }
+        > :nth-child(6) { @apply col-span-8 border-l-0; }
+        > :nth-child(7) { @apply col-span-9; }
+        > :nth-child(8) { @apply col-span-7; }
+
+        > .footer-brick {
+            @apply hidden md:block;
+        }
+    }
+
+    /* Topic cells fill white from the bottom on hover; the link covers the
+       whole cell. */
+    .footer-topic {
+        background: linear-gradient(#fff, #fff) no-repeat bottom / 100% 0%;
+        transition:
+            background-size 0.45s cubic-bezier(0.65, 0, 0.35, 1),
+            color 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+
+        &:hover {
+            @apply text-black;
+            background-size: 100% 100%;
+        }
+
+        > a {
+            @apply after:absolute after:inset-0 after:content-[''];
+        }
+    }
+
+    .footer-meta-value {
+        @apply font-secondary;
+        @apply text-[clamp(0.65rem,0.8vw,0.875rem)];
+    }
+
+    .footer-bottom {
+        @apply border-t border-white px-3 py-3;
+        @apply md:px-5 md:py-4;
+    }
+
+    .footer-bottom-inner {
+        @apply flex flex-col justify-between gap-2;
+        @apply md:flex-row;
+    }
+
+    .footer-copyright {
+        @apply font-secondary capitalize text-white;
+        @apply text-[clamp(0.75rem,0.8vw,0.875rem)];
+    }
+
+    .footer-follow {
+        @apply font-secondary capitalize text-white font-normal;
+        @apply text-[clamp(0.75rem,0.9vw,0.875rem)];
+    }
+
+    /* Copyright line with the privacy and terms links beside it. */
+    .footer-legal {
+        @apply flex flex-wrap items-baseline gap-x-5 gap-y-1 font-secondary text-white;
+        @apply text-[clamp(0.75rem,0.8vw,0.875rem)];
+    }
+
+    /* =====================================================
+       LEGAL PAGES
+    ====================================================== */
+
+    .legal-toc {
+        @apply lg:sticky lg:top-[110px];
+
+        ol {
+            @apply mt-3 grid grid-cols-1 gap-x-6 gap-y-2 font-secondary text-[13px] font-light leading-5 [counter-reset:toc];
+            @apply sm:grid-cols-2 lg:grid-cols-1;
+        }
+
+        li {
+            @apply relative pl-7 [counter-increment:toc];
+            @apply before:absolute before:left-0 before:font-bold before:content-[counter(toc,decimal-leading-zero)];
+        }
+    }
+
+    .legal-toc-title {
+        @apply font-secondary text-[11px] font-bold uppercase tracking-[0.08em] text-black/50;
+    }
+
+    .legal-toc-related {
+        @apply mt-8 inline-block font-secondary text-[13px];
+    }
+
+    /* Sections clear the fixed header when jumped to from the contents list. */
+    .legal-content section {
+        @apply scroll-mt-[88px] md:scroll-mt-[100px];
+    }
+
+    /* The article spacing (.post-content > * + *) only reaches direct
+       children, so repeat it inside each section. */
+    .legal-content > section:first-child > h2 {
+        @apply mt-0;
+    }
+
+    .legal-content section > * + * {
+        @apply mt-6;
+    }
+
+    .legal-content section > h3 {
+        @apply mt-10;
+    }
+
+    .legal-content section > :is(h2, h3) + * {
+        @apply mt-4;
+    }
+
+    .legal-content li + li {
+        @apply mt-2;
+    }
+
+    /* =====================================================
+       COOKIE BANNER
+       "Accept all" and "Reject all" look identical on purpose:
+       refusing must be as easy as agreeing.
+    ====================================================== */
+
+    .cookie-banner {
+        @apply fixed inset-x-3 bottom-3 z-[1000] flex max-h-[calc(100dvh-1.5rem)] flex-col gap-5 overflow-y-auto border border-black bg-white p-5 text-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)];
+        @apply sm:inset-x-auto sm:left-5 sm:bottom-5 sm:w-[460px];
+        @apply md:p-6;
+    }
+
+    .cookie-banner-title {
+        @apply font-primary font-normal leading-none outline-none;
+        @apply text-[clamp(1.75rem,2.2vw,2.25rem)];
+    }
+
+    .cookie-banner-text {
+        @apply mt-3 font-secondary text-[13px] font-light leading-5;
+    }
+
+    .cookie-options {
+        @apply mt-4 space-y-2;
+    }
+
+    .cookie-option {
+        @apply flex cursor-pointer items-start gap-3 border border-black/20 p-3 font-secondary text-[12px] leading-4 hover:border-black;
+
+        input {
+            @apply mt-0.5 shrink-0;
+        }
+
+        strong {
+            @apply block font-bold;
+        }
+
+        small {
+            @apply mt-0.5 block text-[11px] font-light text-black/60;
+        }
+
+        &.is-locked {
+            @apply cursor-default hover:border-black/20;
+        }
+    }
+
+    .cookie-banner-actions {
+        @apply flex flex-wrap items-center gap-3;
+    }
+
+    .cookie-btn {
+        @apply inline-flex min-w-[118px] flex-1 cursor-pointer items-center justify-center bg-black px-5 py-3 font-secondary text-[12px] uppercase tracking-[0.08em] text-white transition-colors hover:bg-blue;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue;
+    }
+
+    .cookie-btn-link {
+        @apply cursor-pointer px-2 py-3 font-secondary text-[13px] font-light;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue;
+    }
+
+    /* "Cookie settings" in the footer: a button styled like its link siblings. */
+    .footer-cookie-btn {
+        @apply cursor-pointer text-white;
+    }
+}
+
+/* =========================================================
+   COST ESTIMATOR
+========================================================= */
+
+@layer components {
+    /* =====================================================
+       PAGE SECTIONS
+    ====================================================== */
+
+    .estimator-hero {
+        @apply border-b border-black px-3 pb-10 pt-[calc(64px+2.5rem)];
+        @apply sm:px-5;
+        @apply md:px-8 md:pb-14 md:pt-[calc(74px+3.5rem)];
+        @apply lg:px-12 lg:pb-20 lg:pt-[calc(74px+5rem)];
+    }
+
+    .estimator-hero-title {
+        @apply max-w-[18ch] font-primary font-normal leading-[1.05] tracking-[0.015em];
+        @apply text-[clamp(2.75rem,6vw,6rem)];
+    }
+
+    .estimator-grid {
+        @apply grid grid-cols-1 border-b border-black;
+        @apply md:grid-cols-2;
+    }
+
+    .estimator-cell {
+        @apply border-b border-black;
+        @apply md:border-b-0 md:border-r;
+    }
+
+    .estimator-quote {
+        @apply font-primary italic font-light leading-[1.1];
+        @apply text-[clamp(1.75rem,2.75vw,2.75rem)];
+    }
+
+    .estimator-risks {
+        @apply mt-8 grid grid-cols-3 border-y border-black;
+
+        /* --divider is the divider's height (0-1), animated on reveal. */
+        > li {
+            --divider: 1;
+            @apply relative px-2 py-4 text-center font-primary capitalize;
+            @apply text-[clamp(1rem,1.4vw,1.5rem)];
+            @apply before:absolute before:right-0 before:top-1/4 before:h-1/2 before:w-px before:bg-black before:content-[''] last:before:hidden;
+            @apply before:origin-top before:scale-y-(--divider);
+        }
+    }
+
+    .estimator-checklist {
+        @apply mt-6 space-y-2;
+
+        > li {
+            @apply flex items-center gap-3 font-secondary font-light leading-[1.5];
+            @apply text-[clamp(0.875rem,0.9vw,1rem)];
+        }
+
+        > li::before {
+            @apply text-blue content-['✓'];
+        }
+    }
+
+    /* =====================================================
+       FORM SECTION
+    ====================================================== */
+
+    .estimate-section {
+        @apply grid grid-cols-1 border-b border-black scroll-mt-[64px];
+        @apply md:grid-cols-[4fr_6fr] md:scroll-mt-[74px];
+    }
+
+    .estimate-aside {
+        @apply flex flex-col justify-between border-b border-black p-3;
+        @apply sm:p-4;
+        @apply md:border-b-0 md:border-r md:p-8;
+        @apply lg:p-12;
+    }
+
+    .estimate-aside-title {
+        @apply font-primary font-normal leading-[1.05] tracking-[0.015em];
+        @apply text-[clamp(2.375rem,4vw,4rem)];
+    }
+
+    .estimate-side-step {
+        @apply flex items-center gap-3 text-black/45 transition-colors;
+    }
+
+    .estimate-side-step[aria-current="step"] {
+        @apply font-bold text-black;
+    }
+
+    .estimate-side-icon {
+        @apply grid h-8 w-8 shrink-0 place-items-center rounded-full border border-black/30 bg-white text-[12px] font-bold text-black/60 transition-all duration-200;
+    }
+
+    .estimate-side-icon.is-reached {
+        @apply border-black bg-black text-white;
+    }
+
+    /* Estimator: full-width form under an intro and a row of steps, so the
+       options get room to spread out and the form grows with its content
+       instead of scrolling inside a box. */
+    .estimate-layout {
+        @apply border-b border-black scroll-mt-[64px];
+        @apply md:scroll-mt-[74px];
+    }
+
+    .estimate-intro {
+        @apply flex items-end justify-between gap-8 border-b border-black px-3 py-8;
+        @apply sm:px-5;
+        @apply md:px-8 md:py-10;
+        @apply lg:px-12;
+    }
+
+    .estimate-stepper {
+        @apply border-b border-black px-3 py-5 scroll-mt-[64px];
+        @apply sm:px-5;
+        @apply md:px-8 md:py-6 md:scroll-mt-[74px];
+        @apply lg:px-12;
+
+        > ol {
+            @apply relative flex;
+        }
+
+        /* A line from the first circle's centre to the last one's, filled up
+           to the current step. --steps and --progress (0-1) are set inline. */
+        > ol::before,
+        > ol::after {
+            @apply absolute top-4 h-px content-[''];
+            left: calc(50% / var(--steps));
+        }
+
+        > ol::before {
+            @apply bg-black/20;
+            right: calc(50% / var(--steps));
+        }
+
+        > ol::after {
+            @apply bg-black transition-[width] duration-500 ease-out;
+            width: calc((100% - 100% / var(--steps)) * var(--progress));
+        }
+    }
+
+    .estimate-stepper-item {
+        @apply relative z-10 flex flex-1 justify-center;
+    }
+
+    .estimate-stepper-btn {
+        @apply flex cursor-pointer flex-col items-center gap-2 text-black/45 transition-colors hover:text-black;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue;
+        @apply disabled:cursor-default disabled:hover:text-black/45;
+
+        &[aria-current="step"] {
+            @apply font-bold text-black;
+        }
+
+        &:hover .estimate-side-icon:not(.is-reached) {
+            @apply border-black;
+        }
+    }
+
+    /* Labels need the room of a wider screen; on phones the step count above
+       the question names the step. */
+    .estimate-stepper-label {
+        @apply sr-only;
+        @apply md:not-sr-only md:text-center md:font-secondary md:text-[11px] md:leading-4;
+        @apply lg:text-[12px];
+    }
+
+    .estimate-step-count {
+        @apply mb-3 font-secondary text-[11px] uppercase tracking-[0.08em] text-black/50;
+    }
+
+    .estimate-panel {
+        @apply flex flex-col p-3;
+        @apply sm:p-4;
+        @apply md:p-8;
+        @apply lg:p-12;
+    }
+
+    .estimate-card {
+        @apply flex h-[620px] w-full flex-col;
+    }
+
+    .estimate-card-body {
+        @apply min-h-0 flex-1 overflow-y-auto pr-2 [scrollbar-width:thin];
+    }
+
+    /* Step buttons stay pinned to the bottom of their scroll container (the
+       consultation card, or the page for the estimator), so they are always
+       visible however long the step is. The bottom padding leaves room for
+       the buttons' focus outline. */
+    .estimate-step-footer {
+        @apply sticky bottom-0 z-10 mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-black bg-white pt-5 pb-2;
+    }
+
+    /* Progress or error line above the step buttons (full width of the footer). */
+    .estimate-status {
+        @apply basis-full font-secondary text-[12px] font-light leading-5;
+
+        &.is-error {
+            @apply font-normal text-[#b42318];
+        }
+    }
+
+    .estimate-step-number {
+        @apply grid h-8 w-8 shrink-0 place-items-center bg-black text-[13px] font-bold text-white;
+    }
+
+    /* At least as tall as the consultation card it replaces; a long estimate
+       simply makes it taller. */
+    .estimate-thanks {
+        @apply flex min-h-[620px] w-full flex-col items-center py-8 text-center;
+        @apply *:shrink-0;
+    }
+
+    /* =====================================================
+       ESTIMATE RESULT
+    ====================================================== */
+
+    .estimate-result-range {
+        @apply font-primary font-normal leading-[1.05] tracking-[0.01em];
+        @apply text-[clamp(2.25rem,3.75vw,3.75rem)];
+    }
+
+    .estimate-result-meta {
+        @apply mt-3 font-secondary text-[12px] font-bold uppercase tracking-[0.08em] text-black/60;
+    }
+
+    .estimate-breakdown {
+        @apply mt-8 w-full max-w-[520px] border-t border-black text-left font-secondary text-[13px];
+
+        th,
+        td {
+            @apply border-b border-black/15 py-3 align-top;
+        }
+
+        th {
+            @apply pr-4 font-normal;
+        }
+
+        td {
+            @apply text-right whitespace-nowrap font-light;
+        }
+    }
+
+    .estimate-notes {
+        @apply mt-8 grid w-full max-w-[520px] grid-cols-1 gap-6 text-left sm:grid-cols-2;
+
+        ul {
+            @apply space-y-1.5 font-secondary text-[13px] font-light leading-5;
+        }
+
+        li {
+            @apply relative pl-4 before:absolute before:left-0 before:content-['–'];
+        }
+    }
+
+    /* Newsletter opt-in under the email field. */
+    .estimate-consent {
+        @apply mt-5 flex cursor-pointer items-start gap-3 border border-black/20 p-4 font-secondary text-[13px] font-light leading-5 hover:border-black;
+    }
+
+    /* =====================================================
+       TYPOGRAPHY
+    ====================================================== */
+
+    .estimate-section-title {
+        @apply max-w-[600px] font-primary font-normal leading-[1.1] tracking-[0.015em];
+        @apply text-[clamp(1.875rem,2.75vw,2.75rem)];
+    }
+
+    .estimate-helper {
+        @apply mt-3 max-w-[650px] font-secondary font-light leading-[1.5];
+        @apply text-[clamp(0.875rem,0.9vw,1rem)];
+    }
+
+    .estimate-question {
+        @apply mb-3 font-secondary text-[12px] font-bold capitalize;
+    }
+
+    .estimate-label {
+        @apply mb-2 block font-secondary text-[12px] font-bold;
+    }
+
+    .estimate-microcopy {
+        @apply mt-3 font-primary italic leading-5;
+        @apply text-[clamp(0.9375rem,1vw,1.0625rem)];
+    }
+
+    /* =====================================================
+       CHOICES
+    ====================================================== */
+
+    .estimate-option,
+    .estimate-pill {
+        @apply relative block cursor-pointer border border-black/20 bg-white transition-colors duration-200 hover:border-black;
+    }
+
+    .estimate-option:has(input:checked),
+    .estimate-pill:has(input:checked) {
+        @apply border-black bg-black text-white;
+    }
+
+    .estimate-option:has(input:focus-visible),
+    .estimate-pill:has(input:focus-visible) {
+        @apply outline-2 outline-offset-2 outline-blue;
+    }
+
+    .estimate-option-content {
+        @apply flex h-full min-h-[78px] flex-col justify-center px-5 py-4;
+    }
+
+    .estimate-option-title {
+        @apply block font-secondary text-[12px] font-bold;
+    }
+
+    .estimate-option-description {
+        @apply mt-1 font-secondary text-[11px] font-light leading-4 text-black/60;
+    }
+
+    .estimate-option:has(input:checked) .estimate-option-description {
+        @apply text-white/75;
+    }
+
+    .estimate-pill-content {
+        @apply flex min-h-[46px] items-center px-4 py-3 font-secondary text-[12px] leading-5;
+    }
+
+    .estimate-input {
+        @apply w-full border border-black/20 bg-white px-4 py-3 font-secondary text-[13px] text-black outline-none transition-colors placeholder:text-black/40 focus:border-black;
+    }
+
+    /* =====================================================
+       BUTTONS
+    ====================================================== */
+
+    .estimate-primary-btn {
+        @apply inline-flex cursor-pointer items-center justify-center bg-black px-6 py-3 font-secondary text-[12px] uppercase tracking-[0.08em] text-white transition-colors hover:bg-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue;
+        @apply disabled:cursor-wait disabled:bg-black/60 disabled:hover:bg-black/60;
+    }
+
+    /* No text underline: the inner .link-redraw span draws it. */
+    .estimate-back-btn {
+        @apply inline-flex cursor-pointer items-center py-3 font-secondary text-[13px] font-light capitalize no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue;
+    }
+
+    /* =====================================================
+       FREE CONSULTATION
+       Reuses the estimator's sections and form; these are
+       the extras it needs.
+    ====================================================== */
+
+    .consult-hero-body {
+        @apply mt-8 flex flex-col items-start gap-6;
+        @apply md:flex-row md:items-end md:justify-between;
+    }
+
+    .consult-photo {
+        @apply relative aspect-[4/3] overflow-hidden;
+        @apply md:aspect-auto md:min-h-[560px];
+
+        img {
+            @apply absolute inset-0;
+        }
+    }
+
+    .consult-textarea {
+        @apply min-h-[180px] resize-y leading-6;
+    }
+
+    /* "What happens next" note at the foot of the form's sidebar. */
+    .consult-next {
+        @apply mt-10 border-t border-black pt-5;
+
+        ol {
+            @apply space-y-2 font-secondary text-[13px] font-light leading-5 [counter-reset:next];
+        }
+
+        li {
+            @apply relative pl-7 [counter-increment:next];
+            @apply before:absolute before:left-0 before:font-bold before:content-[counter(next,decimal-leading-zero)];
+        }
+    }
+
+    /* Centred while it fits, scrolls from the top when it doesn't (unlike
+       justify-center, which would cut off the top). */
+    .consult-thanks {
+        @apply [&>:first-child]:mt-auto [&>:last-child]:mb-auto;
+    }
+
+    .consult-thanks-links {
+        @apply mt-8 flex w-full max-w-[460px] flex-col items-center gap-3 border-t border-black pt-6;
+    }
+
+    /* =====================================================
+       ABOUT
+    ====================================================== */
+
+    .about-hero-lead {
+        @apply mt-8 max-w-[640px] font-primary italic font-light leading-[1.2];
+        @apply text-[clamp(1.375rem,2.2vw,2.125rem)];
+    }
+
+    /* Tall portrait on phones; on wider screens it fills the height of the
+       story beside it, cropped from the top so the face stays in view. */
+    .about-portrait {
+        @apply relative aspect-[4/5] overflow-hidden;
+        @apply md:aspect-auto md:min-h-[680px];
+
+        img {
+            @apply absolute inset-0 object-[50%_25%];
+        }
+    }
+
+    .about-story {
+        @apply mt-6 max-w-[560px] space-y-4 font-secondary font-light leading-[1.6];
+        @apply text-[clamp(0.9375rem,1vw,1.0625rem)];
+    }
+
+    .about-signature {
+        @apply pt-2 font-primary italic text-[clamp(1.75rem,2.5vw,2.5rem)] leading-none;
+    }
+
+    .about-principles-head {
+        @apply border-b border-black px-3 py-8;
+        @apply sm:px-5;
+        @apply md:px-8 md:py-12;
+        @apply lg:px-12;
+    }
+
+    /* Four cells: one column on phones, two on tablets, four on desktop, with
+       a border only between neighbours. */
+    .about-principles {
+        @apply grid grid-cols-1 border-b border-black;
+        @apply sm:grid-cols-2;
+        @apply lg:grid-cols-4;
+    }
+
+    .about-principle {
+        @apply flex flex-col border-b border-black p-3 last:border-b-0;
+        @apply sm:p-5 sm:nth-[odd]:border-r sm:nth-last-[-n+2]:border-b-0;
+        @apply md:p-8;
+        @apply lg:border-b-0 lg:border-r lg:p-10 lg:last:border-r-0;
+    }
+
+    .about-principle-index {
+        @apply mb-4 font-secondary text-[12px] font-bold tracking-[0.08em];
+        @apply md:mb-10;
+        @apply lg:mb-16;
+    }
+
+    .about-stack {
+        @apply border-b border-black px-3 py-10;
+        @apply sm:px-5;
+        @apply md:px-8 md:py-14;
+        @apply lg:px-12 lg:py-20;
+    }
+
+    /* The stack reads as one long line of type, separated by slashes. */
+    .about-stack-list {
+        @apply mt-6 mb-6 flex flex-wrap gap-x-4 gap-y-1 font-primary font-normal leading-[1.15];
+        @apply text-[clamp(1.875rem,4.25vw,4.25rem)];
+
+        > li:not(:last-child)::after {
+            @apply ml-4 font-light text-black/30 content-['/'];
+        }
+    }
+
+    .about-journal-link {
+        @apply shrink-0 font-secondary text-[13px];
+    }
+
+    /* =====================================================
+       CASE STUDIES: LISTING
+    ====================================================== */
+
+    /* Two projects per row from tablets up, with a rule between them. */
+    .work-grid {
+        @apply grid grid-cols-1;
+        @apply md:grid-cols-2;
+    }
+
+    .work-card {
+        @apply relative flex flex-col border-b border-black;
+        @apply md:odd:border-r;
+
+        /* An odd number of projects: the last one spans the full width. */
+        @apply md:last:odd:col-span-2 md:last:odd:border-r-0;
+
+        &:hover .work-card-title {
+            @apply text-blue;
+        }
+
+        &:hover .work-card-media img {
+            @apply scale-[1.03];
+        }
+
+        &:hover .work-card-cta {
+            background-position: 0% 100%;
+            background-size: 100% 1px;
+        }
+    }
+
+    .work-card-media {
+        @apply relative aspect-[16/10] overflow-hidden border-b border-black bg-black/[0.03];
+
+        img {
+            @apply transition-transform duration-700 ease-out;
+        }
+    }
+
+    .work-card:last-child:nth-child(odd) .work-card-media {
+        @apply md:aspect-[21/9];
+    }
+
+    .work-card-mark {
+        @apply absolute inset-0 grid place-items-center p-6 text-center font-primary italic font-light;
+        @apply text-[clamp(2.25rem,5vw,4.5rem)];
+    }
+
+    .work-card-body {
+        @apply flex flex-1 flex-col p-3;
+        @apply sm:p-5;
+        @apply md:p-8;
+        @apply lg:p-10;
+    }
+
+    .work-card-top {
+        @apply flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2;
+    }
+
+    .work-card-index {
+        @apply font-primary italic font-light leading-none;
+        @apply text-[clamp(2rem,3vw,3rem)];
+    }
+
+    .work-card-title {
+        @apply mt-4 font-primary font-normal leading-[1.1] transition-colors duration-300;
+        @apply text-[clamp(1.75rem,2.6vw,2.75rem)];
+    }
+
+    /* Stretches the title link over the whole card. */
+    .work-card-link {
+        @apply after:absolute after:inset-0 after:content-[''];
+    }
+
+    .work-tags {
+        @apply mt-5 flex flex-wrap gap-2;
+
+        li {
+            @apply border border-black/20 px-3 py-1 font-secondary text-[11px] leading-5;
+        }
+    }
+
+    .work-card-cta {
+        @apply mt-auto self-start pt-6 font-secondary text-[13px] font-light;
+    }
+
+    /* =====================================================
+       CASE STUDIES: SINGLE
+    ====================================================== */
+
+    /* Key facts in a row of ruled cells under the title. */
+    .case-facts {
+        @apply grid grid-cols-2 border-black lg:border-b;
+        @apply sm:grid-cols-3;
+        @apply lg:auto-cols-fr lg:grid-flow-col lg:grid-cols-none;
+
+        > div {
+            @apply border-r border-b border-black p-3 even:border-r-0;
+            @apply sm:p-5 sm:even:border-r sm:[&:nth-child(3n)]:border-r-0;
+            @apply md:px-8;
+            @apply lg:border-b-0 lg:[&:nth-child(3n)]:border-r lg:last:border-r-0;
+            @apply lg:px-12 lg:py-6;
+        }
+
+        dt {
+            @apply font-secondary text-[11px] font-bold uppercase tracking-[0.08em] text-black/50;
+        }
+
+        dd {
+            @apply mt-1 font-primary text-[clamp(1.125rem,1.4vw,1.375rem)];
+        }
+    }
+
+    /* Results: one column per figure (up to four, from --cols). */
+    .case-results {
+        @apply grid grid-cols-2 border-b border-black;
+        @apply md:grid-cols-[repeat(var(--cols),minmax(0,1fr))];
+    }
+
+    .case-result {
+        --divider: 1;
+        @apply relative p-3;
+        @apply sm:p-5;
+        @apply md:p-8;
+        @apply lg:px-12 lg:py-10;
+        @apply before:absolute before:right-0 before:top-1/4 before:h-1/2 before:w-px before:bg-black before:content-[''];
+        @apply before:origin-top before:scale-y-(--divider);
+
+        /* No divider after the last figure, or (two per row on phones)
+           against the screen edge. Of-type, because the border drawing
+           briefly adds spans after the figures. */
+        @apply last-of-type:before:hidden max-md:[&:nth-of-type(even)]:before:hidden;
+    }
+
+    .case-result-value {
+        @apply font-secondary font-extralight leading-none tracking-[0.018em];
+        @apply text-[clamp(2.5rem,4.5vw,4.5rem)];
+    }
+
+    .case-result-label {
+        @apply mt-2 font-primary capitalize;
+        @apply text-[clamp(1.125rem,1.4vw,1.375rem)];
+    }
+
+    .case-story {
+        @apply mt-4 max-w-[600px] space-y-4 font-secondary font-light leading-[1.6];
+        @apply text-[clamp(0.9375rem,1vw,1.0625rem)];
+    }
+
+    .case-list {
+        @apply mt-1 space-y-1;
+    }
+
+    /* Full-width link to the next project. */
+    .case-next {
+        @apply block border-b border-black px-3 py-10 transition-colors;
+        @apply sm:px-5;
+        @apply md:px-8 md:py-14;
+        @apply lg:px-12 lg:py-20;
+        @apply hover:bg-black hover:text-white;
+    }
+
+    .case-next-title {
+        @apply mt-4 block max-w-[22ch] font-primary font-normal leading-[1.05] tracking-[0.015em];
+        @apply text-[clamp(2.375rem,5vw,5rem)];
+    }
+}
+
+/* =========================================================
+   BLOG
+   The journal listing (/blog) and article pages (/blog/[slug]),
+   built from the homepage's pieces: black rules between blocks,
+   Cormorant for display type, Manrope for reading, blue accents.
+========================================================= */
+
+@layer components {
+    /* =====================================================
+       HERO (listing and article)
+    ====================================================== */
+
+    .blog-hero,
+    .post-hero {
+        @apply border-b border-black px-3 pb-10 pt-[calc(64px+2.5rem)];
+        @apply sm:px-5;
+        @apply md:px-8 md:pb-14 md:pt-[calc(74px+3.5rem)];
+        @apply lg:px-12 lg:pb-16 lg:pt-[calc(74px+5rem)];
+    }
+
+    .blog-hero-title {
+        @apply max-w-[18ch] font-primary font-normal leading-[1.05] tracking-[0.015em];
+        @apply text-[clamp(2.75rem,6vw,6rem)];
+    }
+
+    .blog-hero-meta {
+        @apply mt-8 flex flex-col gap-4;
+        @apply sm:flex-row sm:items-end sm:justify-between;
+    }
+
+    .blog-hero-count {
+        @apply font-primary italic font-light;
+        @apply text-[clamp(1.125rem,1.5vw,1.5rem)];
+    }
+
+    /* Category · date · reading time */
+    .blog-meta {
+        @apply flex flex-wrap items-center gap-y-1 font-secondary text-[12px] font-bold capitalize;
+
+        > * + *::before {
+            @apply mx-3 font-normal text-black/40 content-['·'];
+        }
+    }
+
+    /* =====================================================
+       FEATURED POST
+    ====================================================== */
+
+    .blog-feature {
+        @apply grid grid-cols-1 border-b border-black;
+        @apply sm:grid-cols-2;
+    }
+
+    /* The image fills the cell without setting the row's height. */
+    .blog-feature-media {
+        @apply relative h-[260px] overflow-hidden border-b border-black;
+        @apply sm:h-auto sm:min-h-[420px] sm:border-b-0 sm:border-r;
+        @apply lg:min-h-[560px];
+
+        img {
+            @apply absolute inset-0;
+        }
+    }
+
+    /* Stand-in when the post has no image. */
+    .blog-feature-mark {
+        @apply flex items-end bg-black p-5 text-white;
+        @apply md:p-8 lg:p-12;
+
+        span {
+            @apply block font-primary italic font-light leading-none;
+            @apply text-[clamp(4rem,9vw,9rem)];
+        }
+    }
+
+    .blog-feature-body {
+        @apply flex flex-col justify-center p-3;
+        @apply sm:p-5;
+        @apply md:p-8;
+        @apply lg:p-12;
+    }
+
+    .blog-feature-title {
+        @apply mt-5 font-primary font-normal leading-[1.1] tracking-[0.015em];
+        @apply text-[clamp(2.25rem,4vw,4rem)];
+
+        a {
+            @apply transition-colors duration-300 hover:text-blue;
+        }
+    }
+
+    /* =====================================================
+       POST GRID
+    ====================================================== */
+
+    .blog-list-head {
+        @apply flex items-baseline justify-between gap-4 border-b border-black px-3 py-6;
+        @apply sm:px-5;
+        @apply md:px-8 md:py-8;
+        @apply lg:px-12 lg:py-10;
+    }
+
+    .blog-grid {
+        @apply grid grid-cols-1;
+        @apply sm:grid-cols-2;
+        @apply lg:grid-cols-3;
+    }
+
+    /* Rules between cards: a right border except on the last card of each row. */
+    .blog-card {
+        @apply relative flex flex-col border-b border-black;
+        @apply sm:border-r sm:[&:nth-child(2n)]:border-r-0;
+        @apply lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(3n)]:border-r-0;
+
+        &:hover .blog-card-title {
+            @apply text-blue;
+        }
+
+        &:hover .blog-card-more .link-sweep {
+            background-position: 0% 100%;
+            background-size: 100% 1px;
+        }
+    }
+
+    .blog-card-image {
+        @apply h-[220px] overflow-hidden border-b border-black;
+        @apply lg:h-[260px];
+    }
+
+    .blog-card-body {
+        @apply flex flex-1 flex-col p-3;
+        @apply sm:p-5;
+        @apply md:p-8;
+    }
+
+    .blog-card-index {
+        @apply mb-8 block font-primary italic font-light leading-none;
+        @apply text-[clamp(2.5rem,3.5vw,3.5rem)];
+    }
+
+    .blog-card-title {
+        @apply mt-3 font-primary font-normal leading-[1.15] transition-colors duration-300;
+        @apply text-[clamp(1.625rem,2.2vw,2.25rem)];
+    }
+
+    /* Stretches the title link over the whole card. */
+    .blog-card-link {
+        @apply after:absolute after:inset-0 after:content-[''];
+    }
+
+    .blog-card-excerpt {
+        @apply mt-3 line-clamp-3 font-secondary font-light leading-[1.5] text-black/80;
+        @apply text-[clamp(0.875rem,0.9vw,1rem)];
+    }
+
+    .blog-card-more {
+        @apply mt-auto pt-6 font-secondary text-[13px] font-light;
+    }
+
+    /* =====================================================
+       PAGINATION
+    ====================================================== */
+
+    .blog-pagination {
+        @apply flex items-center justify-between border-b border-black px-3 py-5 font-secondary text-[13px] font-light;
+        @apply sm:px-5;
+        @apply md:px-8;
+        @apply lg:px-12;
+    }
+
+    .blog-pagination-count {
+        @apply font-primary italic text-[1.125rem];
+    }
+
+    /* =====================================================
+       CALL TO ACTION
+    ====================================================== */
+
+    .blog-cta {
+        @apply grid grid-cols-1 border-b border-black;
+        @apply md:grid-cols-2;
+    }
+
+    .blog-cta-title {
+        @apply flex items-center border-b border-black p-3;
+        @apply sm:p-5;
+        @apply md:border-b-0 md:border-r md:p-8;
+        @apply lg:p-12;
+
+        .display-title {
+            @apply text-[clamp(2.375rem,4.25vw,4.25rem)];
+        }
+    }
+
+    .blog-cta-body {
+        @apply flex flex-col justify-center p-3;
+        @apply sm:p-5;
+        @apply md:p-8;
+        @apply lg:p-12;
+    }
+
+    .blog-cta-links {
+        @apply mt-6 flex flex-wrap gap-x-8 gap-y-3;
+    }
+
+    /* =====================================================
+       ARTICLE
+    ====================================================== */
+
+    .post-back {
+        @apply mb-10 inline-block font-secondary text-[13px] font-light;
+    }
+
+    .post-title {
+        @apply mt-5 max-w-[22ch] font-primary font-normal leading-[1.08] tracking-[0.01em];
+        @apply text-[clamp(2.5rem,5.5vw,5.5rem)];
+    }
+
+    .post-standfirst {
+        @apply mt-6 max-w-[640px] font-primary italic font-light leading-[1.35];
+        @apply text-[clamp(1.25rem,1.75vw,1.75rem)];
+    }
+
+    .post-image {
+        @apply h-[260px] overflow-hidden border-b border-black;
+        @apply sm:h-[420px];
+        @apply lg:h-[620px];
+    }
+
+    /* Smaller featured images: natural size, centred in a framed band. */
+    .post-image-framed {
+        @apply flex justify-center border-b border-black bg-black/[0.03] px-3 py-10;
+        @apply sm:px-5;
+        @apply md:px-8 md:py-14;
+        @apply lg:px-12 lg:py-16;
+
+        img {
+            @apply h-auto max-w-full;
+        }
+    }
+
+    .post-layout {
+        @apply grid grid-cols-1 border-b border-black;
+        @apply lg:grid-cols-[minmax(240px,1fr)_minmax(0,3fr)];
+    }
+
+    .post-aside {
+        @apply border-b border-black p-3;
+        @apply sm:p-5;
+        @apply md:p-8;
+        @apply lg:border-b-0 lg:border-r lg:p-12;
+    }
+
+    /* Article facts: a row on small screens, a column that follows the
+       reader down the page on large ones. */
+    .post-facts {
+        @apply grid grid-cols-2 gap-6;
+        @apply sm:grid-cols-4;
+        @apply lg:sticky lg:top-[110px] lg:grid-cols-1 lg:gap-8;
+
+        dt {
+            @apply font-secondary text-[11px] font-bold uppercase tracking-[0.08em] text-black/50;
+        }
+
+        dd {
+            @apply mt-1 font-primary text-[1.125rem];
+        }
+    }
+
+    .post-share {
+        @apply flex flex-col items-start gap-1;
+
+        a {
+            @apply font-secondary text-[13px] font-light;
+        }
+    }
+
+    /* WordPress article HTML (paragraphs, headings, lists, rules, quotes,
+       images, code, tables). */
+    .post-content {
+        @apply max-w-[74ch] px-3 py-10 font-secondary font-light leading-[1.75] text-black/90;
+        @apply text-[clamp(1rem,1.05vw,1.125rem)];
+        @apply sm:px-5;
+        @apply md:px-8 md:py-14;
+        @apply lg:px-12 lg:py-20;
+
+        > * + * {
+            @apply mt-6;
+        }
+
+        h2 {
+            @apply mt-14 font-primary font-normal leading-[1.15] tracking-[0.01em] text-black;
+            @apply text-[clamp(1.75rem,2.5vw,2.5rem)];
+        }
+
+        h3 {
+            @apply mt-10 font-primary font-normal leading-[1.2] text-black;
+            @apply text-[clamp(1.375rem,1.8vw,1.75rem)];
+        }
+
+        h2 + *,
+        h3 + * {
+            @apply mt-4;
+        }
+
+        a {
+            @apply underline decoration-1 underline-offset-4 transition-colors hover:text-blue;
+        }
+
+        strong {
+            @apply font-semibold text-black;
+        }
+
+        ul,
+        ol {
+            @apply pl-6;
+        }
+
+        ul {
+            @apply list-disc;
+        }
+
+        ol {
+            @apply list-decimal;
+        }
+
+        li + li {
+            @apply mt-2;
+        }
+
+        li::marker {
+            @apply text-blue;
+        }
+
+        hr {
+            @apply my-12 border-0 border-t border-black/20;
+        }
+
+        blockquote {
+            @apply border-l-2 border-blue pl-6 font-primary italic leading-[1.4] text-black;
+            @apply text-[clamp(1.375rem,1.8vw,1.75rem)];
+        }
+
+        img {
+            @apply h-auto max-w-full;
+        }
+
+        figure {
+            @apply my-10;
+        }
+
+        figcaption {
+            @apply mt-2 text-[12px] text-black/60;
+        }
+
+        code {
+            @apply bg-black/5 px-1 font-mono text-[0.9em];
+        }
+
+        pre {
+            @apply overflow-x-auto bg-black p-5 text-[13px] leading-[1.6] text-white;
+
+            code {
+                @apply bg-transparent p-0;
+            }
+        }
+
+        table {
+            @apply w-full text-[14px];
+        }
+
+        th,
+        td {
+            @apply border-b border-black/15 py-2 pr-4 text-left align-top;
+        }
+    }
+}
+
+/* =========================================================
+   FREE RESOURCES
+   Resource cards (footer shelf and /resources) and the resource
+   pages (/resources/[slug]). Cards take their colours from the
+   surrounding text colour, so the same rules serve the white
+   pages and the black footer.
+========================================================= */
+
+@layer components {
+    .resource-grid {
+        @apply grid grid-cols-1;
+        @apply sm:grid-cols-2;
+        @apply lg:grid-cols-3;
+
+        > li {
+            @apply border-b border-current;
+            @apply sm:max-lg:even:border-l;
+            @apply lg:[&:not(:nth-child(3n+1))]:border-l;
+        }
+    }
+
+    .resource-card {
+        @apply flex h-full flex-col p-4 transition-colors duration-300;
+        @apply sm:p-6;
+        @apply lg:p-8;
+        @apply hover:bg-current/[0.06];
+        @apply focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current;
+
+        &:hover .link-sweep {
+            background-position: 0% 100%;
+            background-size: 100% 1px;
+        }
+
+        &:hover .resource-card-arrow {
+            @apply translate-x-1;
+        }
+    }
+
+    .resource-card-type {
+        @apply font-secondary text-[11px] font-medium uppercase tracking-[0.18em] opacity-60;
+    }
+
+    .resource-card-title {
+        @apply mt-3 font-primary font-normal leading-[1.15];
+        @apply text-[clamp(1.375rem,1.7vw,1.75rem)];
+    }
+
+    .resource-card-copy {
+        @apply mt-3 mb-6 max-w-[42ch] font-secondary font-light leading-[1.6] opacity-80;
+        @apply text-[clamp(0.75rem,0.8vw,0.875rem)];
+    }
+
+    .resource-card-meta {
+        @apply mt-auto flex items-center justify-between gap-4 border-t border-current/25 pt-4;
+        @apply font-secondary text-[12px];
+    }
+
+    .resource-card-format {
+        @apply opacity-60;
+    }
+
+    .resource-card-status {
+        @apply inline-flex items-center gap-2 font-medium;
+
+        &.is-soon {
+            @apply font-light italic opacity-60;
+        }
+    }
+
+    .resource-card-arrow {
+        @apply inline-block not-italic transition-transform duration-300;
+    }
+
+    /* =====================================================
+       RESOURCE PAGE
+    ====================================================== */
+
+    /* Download (or "coming soon") band under the facts. */
+    .resource-download {
+        @apply flex flex-col gap-5 border-b border-black bg-black px-3 py-8 text-white;
+        @apply sm:flex-row sm:items-center sm:justify-between sm:px-5;
+        @apply md:px-8 md:py-10;
+        @apply lg:px-12;
+    }
+
+    .resource-download-title {
+        @apply font-primary font-normal leading-[1.15];
+        @apply text-[clamp(1.5rem,2.2vw,2.25rem)];
+    }
+
+    .resource-download-note {
+        @apply mt-2 max-w-[52ch] font-secondary text-[13px] font-light leading-[1.6] text-white/70;
+    }
+
+    .resource-download-btn {
+        @apply inline-flex shrink-0 cursor-pointer items-center justify-center gap-3 bg-white px-7 py-4 font-secondary text-[12px] uppercase tracking-[0.08em] text-black transition-colors;
+        @apply hover:bg-blue hover:text-white;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white;
+    }
+
+    .resource-download-link {
+        @apply shrink-0 self-start font-secondary text-[13px] text-white;
+        @apply sm:self-auto;
+    }
+
+    /* A single list, so it takes the full width the article facts share out. */
+    .resource-needs {
+        @apply grid-cols-1;
+    }
+
+    /* "What's inside": numbered rows. */
+    .resource-includes {
+        @apply mt-4 max-w-[600px];
+        counter-reset: include;
+
+        li {
+            @apply flex gap-4 border-t border-black/15 py-3 font-secondary font-light leading-[1.5];
+            @apply text-[clamp(0.9375rem,1vw,1.0625rem)];
+            counter-increment: include;
+        }
+
+        li:last-child {
+            @apply border-b;
+        }
+
+        li::before {
+            @apply w-6 shrink-0 font-primary italic text-blue;
+            content: counter(include, decimal-leading-zero);
+        }
+    }
+}
+
+@keyframes link-redraw {
+    0% {
+        background-position: 100% 100%;
+        background-size: 100% 1px;
+    }
+    50% {
+        background-position: 100% 100%;
+        background-size: 0% 1px;
+    }
+    50.01% {
+        background-position: 0% 100%;
+        background-size: 0% 1px;
+    }
+    100% {
+        background-position: 0% 100%;
+        background-size: 100% 1px;
+    }
+}

@@ -1,41 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# pradipta.online
 
-## Getting Started
+Portfolio and lead-generation site for Pradipta Das, built with Next.js (App Router), Tailwind CSS v4 and GSAP. Content comes from a headless WordPress at logicncolor.com.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # then fill in the values
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run build` makes a production build, and `npm run lint` checks the code.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | What it is |
+| --- | --- |
+| `/` | Homepage |
+| `/about` | About me |
+| `/case-studies`, `/case-studies/[slug]` | Case studies from the `case-study` post type |
+| `/blog`, `/blog/[slug]` | The Journal: WordPress posts |
+| `/cost-estimator` | AI cost estimator (Claude), saved to WordPress |
+| `/free-consultation` | Consultation booking, saved to WordPress |
+| `/resources`, `/resources/[slug]` | Free downloads, listed in `src/app/lib/resources.ts` (files go in `public/downloads/`) |
+| `/privacy-policy`, `/terms-and-conditions` | Legal pages |
 
-## Learn More
+API routes: `POST /api/estimate` and `POST /api/consultation`.
 
-To learn more about Next.js, take a look at the following resources:
+## Project layout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/app/
+  components/   Page sections and shared UI (header, footer, forms, cards, cookie banner)
+  lib/          Data and integrations: WordPress, case studies, blog, estimate (Claude),
+                consultation, analytics (consent-gated GA4 + Meta Pixel), legal details
+  utils/        GSAP helpers: section animations, border drawing, magnetic links
+  input.css     All styles (Tailwind v4 theme and components)
+wordpress/      WordPress plugins the site relies on (install on logicncolor.com)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## WordPress
 
-## Deploy on Vercel
+The site reads WordPress over its REST API, server-side only, sending `WORDPRESS_API_SECRET` with every request. The plugins in `wordpress/` must be installed and active:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Plugin | Purpose | wp-config.php |
+| --- | --- | --- |
+| `pradipta-rest-lock` | Blocks the REST API for anyone without the key | `PRADIPTA_API_SECRET` |
+| `pradipta-redirect` | Sends visitors of logicncolor.com to pradipta.online | |
+| `pradipta-estimates` | Stores cost estimates | `PRADIPTA_ESTIMATE_SECRET` |
+| `pradipta-consultations` | Stores consultation requests and emails a notification | (uses `PRADIPTA_API_SECRET`) |
+| `pradipta-case-studies` | The Case Studies post type and its fields | |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To install one, zip its folder and upload it under Plugins → Add New → Upload Plugin.
 
-## WordPress Integration
+## Analytics and privacy
 
-This project includes integration with a headless WordPress CMS for blog content.
-For details on setting up and using the WordPress integration, see [README-WORDPRESS.md](README-WORDPRESS.md).
+Google Analytics and the Meta Pixel load only after a visitor accepts cookies (`src/app/components/CookieConsent.tsx`, `src/app/lib/analytics.ts`). If you add a tracking service or change what's collected, update the privacy policy (`src/app/privacy-policy/page.tsx`) and bump `CONSENT_VERSION` in `lib/analytics.ts` so visitors are asked again.
