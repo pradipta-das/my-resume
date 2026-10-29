@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import {siteConfig} from "./lib/seo";
+import { pageAlternates, pageOpenGraph, siteConfig } from "./lib/seo";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./input.css";
 import CookieConsent from "./components/CookieConsent";
@@ -30,18 +30,9 @@ export const metadata: Metadata = {
 
   description: siteConfig.description,
 
-  openGraph: {
-    type: "website",
-    siteName: siteConfig.name,
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
-    ],
-  },
+  // Share images come from the opengraph-image files next to each page.
+  openGraph: pageOpenGraph(),
+  alternates: pageAlternates(),
 
   robots: {
     index: true,

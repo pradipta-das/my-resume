@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageAlternates, pageOpenGraph } from "../lib/seo";
 import Link from "next/link";
 import LegalPage, { type LegalSection } from "../components/LegalPage";
 import { LEGAL } from "../lib/legal";
@@ -6,7 +7,8 @@ import { LEGAL } from "../lib/legal";
 export const metadata: Metadata = {
   title: "Terms & Conditions",
   description: `The terms for using ${LEGAL.site}, including the free cost estimator and consultation calls offered by ${LEGAL.owner}.`,
-  alternates: { canonical: "/terms-and-conditions" },
+  alternates: pageAlternates("/terms-and-conditions"),
+  openGraph: pageOpenGraph("/terms-and-conditions"),
 };
 
 const Email = () => <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>;

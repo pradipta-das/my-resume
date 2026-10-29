@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageAlternates, pageOpenGraph } from "../lib/seo";
 import Link from "next/link";
 import HomeHeader from "../components/HomeHeader";
 import HomeFooter from "../components/HomeFooter";
@@ -6,16 +7,18 @@ import AnimatedPage from "../components/AnimatedPage";
 import BlogCta from "../components/BlogCta";
 import CaseStudyCard from "../components/CaseStudyCard";
 import { getCaseStudies } from "../lib/case-studies";
+import { withBuildFallback } from "../lib/build-fallback";
 
 export const metadata: Metadata = {
   title: "Case Studies: Web Design & Development Projects",
   description:
     "Selected website and web application projects by Pradipta Das: the challenge, the approach and the results, from WordPress builds to Next.js applications.",
-  alternates: { canonical: "/case-studies" },
+  alternates: pageAlternates("/case-studies"),
+  openGraph: pageOpenGraph("/case-studies"),
 };
 
 export default async function CaseStudiesPage() {
-  const studies = await getCaseStudies();
+  const studies = await withBuildFallback("Case studies", getCaseStudies, []);
 
   return (
     <>

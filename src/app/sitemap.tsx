@@ -1,65 +1,66 @@
 import type { MetadataRoute } from "next";
 
 import { fetchAllPosts } from "./lib/wordpress";
+import { getCategories } from "./lib/blog";
 import { getCaseStudies } from "./lib/case-studies";
 import { RESOURCES } from "./lib/resources";
+import { withBuildFallback } from "./lib/build-fallback";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, caseStudies] = await Promise.all([fetchAllPosts(), getCaseStudies()]);
+  const [posts, caseStudies, categories] = await Promise.all([
+    withBuildFallback("Blog posts", fetchAllPosts, []),
+    withBuildFallback("Case studies", getCaseStudies, []),
+    withBuildFallback("Blog categories", getCategories, []),
+  ]);
 
+  // No lastModified on pages without a real date: one that always says "now"
+  // teaches search engines to ignore the field.
   const staticPages = [
    {
       url: "https://pradipta.online",
-      lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 1,
     },
 
     {
       url: "https://pradipta.online/about",
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.9,
     },
 
     {
       url: "https://pradipta.online/case-studies",
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.9,
     },
 
     {
       url: "https://pradipta.online/blog",
-      lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
 
     {
       url: "https://pradipta.online/resources",
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     },
 
     {
       url: "https://pradipta.online/free-consultation",
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     },
 
     {
       url: "https://pradipta.online/cost-estimator",
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     },
 
     {
       url: "https://pradipta.online/privacy-policy",
-      lastModified: new Date("2026-10-28"),
+      lastModified: new Date("2026-10-29"),
       changeFrequency: "yearly" as const,
       priority: 0.3,
     },
@@ -73,7 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     /* {
       url: "https://pradipta.online/services",
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.9,
     },*/
@@ -92,6 +92,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const categoryPages = categories.map((category) => ({
+    url: `https://pradipta.online/blog?category=${category.slug}`,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
   const resourcePages = RESOURCES.map((resource) => ({
     url: `https://pradipta.online/resources/${resource.slug}`,
     changeFrequency: "monthly" as const,
@@ -103,5 +109,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...caseStudyPages,
     ...resourcePages,
     ...blogPages,
+    ...categoryPages,
   ];
 }

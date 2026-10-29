@@ -6,7 +6,7 @@ import HomeFooter from "../../components/HomeFooter";
 import AnimatedPage from "../../components/AnimatedPage";
 import BlogCta from "../../components/BlogCta";
 import { RESOURCES, getResource, type Resource } from "../../lib/resources";
-import { siteConfig } from "../../lib/seo";
+import { pageAlternates, pageOpenGraph, siteConfig } from "../../lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,8 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: resource.description,
-    alternates: { canonical: `/resources/${resource.slug}` },
-    openGraph: { type: "article", title, description: resource.description },
+    alternates: pageAlternates(`/resources/${resource.slug}`),
+    openGraph: pageOpenGraph(`/resources/${resource.slug}`, { type: "article" }),
   };
 }
 

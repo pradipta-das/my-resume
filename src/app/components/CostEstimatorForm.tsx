@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import gsap from "gsap";
 import { animateSections } from "../utils/animateSections";
 import { magnetic } from "../utils/magnetic";
 import type { Estimate } from "../lib/estimate/schema";
+import { BUDGET_OPTIONS, currencyFor } from "../lib/estimate/pricing";
 import { trackLead } from "../lib/analytics";
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -76,6 +77,24 @@ function FeatureGroup({ label, question, name, items }: { label: string; questio
       <p className="body-copy mb-3">{question}</p>
       <PillOptions type="checkbox" name={`${name}[]`} items={items} className="grid grid-cols-2 gap-3 sm:grid-cols-3" />
     </div>
+  );
+}
+
+// The business country chosen in "Your Market", for questions on later steps.
+const CountryContext = createContext("");
+
+// Budget brackets in the currency the estimate will be in. Keyed by currency,
+// so changing the country clears a bracket picked in the old currency.
+function BudgetQuestion() {
+  const currency = currencyFor(useContext(CountryContext));
+
+  return (
+    <PillOptions
+      key={currency}
+      name="budget"
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
+      items={[...BUDGET_OPTIONS[currency], "Not sure yet"]}
+    />
   );
 }
 
@@ -289,7 +308,7 @@ const STEPS: { sideLabel: string; title: string; helper: string; content: React.
   {
     sideLabel: "Your Market",
     title: "Where is the business based?",
-    helper: "Development costs vary considerably between markets, so this helps us make the estimate more relevant.",
+    helper: "Your estimate comes in your local currency, compared with what agencies near you typically charge.",
     content: (
       <>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -322,17 +341,6 @@ const STEPS: { sideLabel: string; title: string; helper: string; content: React.
             items={["Local customers", "National customers", "International customers", "B2B customers", "Global audience", "Internal users"]}
           />
         </div>
-        <div className="mt-5">
-          <p className="estimate-question">Where do you expect your development team to be based?</p>
-          <PillOptions
-            name="team_region"
-            className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
-            items={["India", "North America", "UK / Europe", "Southeast Asia", "Australia / New Zealand", "Not decided"]}
-          />
-        </div>
-        <p className="estimate-microcopy">
-          This doesn&apos;t affect what your project is worth. It helps us compare typical development rates.
-        </p>
       </>
     ),
   },
@@ -365,11 +373,7 @@ const STEPS: { sideLabel: string; title: string; helper: string; content: React.
         </div>
         <div className="mt-5">
           <p className="estimate-question">Do you already have a budget in mind?</p>
-          <PillOptions
-            name="budget"
-            className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
-            items={["Under ₹50K", "₹50K–₹1L", "₹1L–₹3L", "₹3L–₹5L", "₹5L+", "Not sure yet"]}
-          />
+          <BudgetQuestion />
           <p className="body-copy mt-3">This is optional. We won&apos;t reject your project based on your answer.</p>
         </div>
       </>
@@ -438,6 +442,8 @@ export default function CostEstimatorForm() {
   const [estimate, setEstimate] = useState<Estimate | null>(null);
   // Bumping the key remounts the form, clearing every input and step state.
   const [formKey, setFormKey] = useState<number>(0);
+  // The chosen business country; later questions use it (see CountryContext).
+  const [country, setCountry] = useState<string>("");
 
   // Steps differ in height, so when the visitor has scrolled down a long step,
   // bring the step indicator back into view for the next one.
@@ -512,6 +518,7 @@ export default function CostEstimatorForm() {
 
   const startAgain = () => {
     setFormKey((key) => key + 1);
+    setCountry("");
     setCurrentStep(0);
     setIsSubmitted(false);
     setEstimate(null);
@@ -622,7 +629,7 @@ export default function CostEstimatorForm() {
               <li data-divider>Momentum lost</li>
             </ul>
 
-            <Link href="/process" data-magnetic className="display-link link-sweep mt-6">
+            <Link href="/case-studies" data-magnetic className="display-link link-sweep mt-6">
               Discover More
             </Link>
           </div>
@@ -746,59 +753,70 @@ export default function CostEstimatorForm() {
 
         <div data-static-borders className="estimate-panel">
           <div data-reveal="fade-up" hidden={isSubmitted}>
-            <form key={formKey} ref={formRef} noValidate onSubmit={handleSubmit}>
-              {STEPS.map((step, index) => (
-                <section key={step.sideLabel} hidden={index !== currentStep}>
-                  <p className="estimate-step-count">
-                    Step {index + 1} of {STEPS.length} · {step.sideLabel}
-                  </p>
-                  <h2 className="estimate-section-title">{step.title}</h2>
-                  <p className="estimate-helper">{step.helper}</p>
+            <CountryContext.Provider value={country}>
+              <form
+                key={formKey}
+                ref={formRef}
+                noValidate
+                onSubmit={handleSubmit}
+                onChange={(e) => {
+                  const field = e.target as HTMLSelectElement;
+                  if (field.name === "country") setCountry(field.value);
+                }}
+              >
+                {STEPS.map((step, index) => (
+                  <section key={step.sideLabel} hidden={index !== currentStep}>
+                    <p className="estimate-step-count">
+                      Step {index + 1} of {STEPS.length} · {step.sideLabel}
+                    </p>
+                    <h2 className="estimate-section-title">{step.title}</h2>
+                    <p className="estimate-helper">{step.helper}</p>
 
-                  <div className="mt-6">{step.content}</div>
+                    <div className="mt-6">{step.content}</div>
 
-                  <footer className="estimate-step-footer">
-                    {index === LAST_STEP && (submitError || isSubmitting) && (
-                      <p
-                        role={submitError ? "alert" : "status"}
-                        className={submitError ? "estimate-status is-error" : "estimate-status"}
-                      >
-                        {submitError ?? "Working out your estimate. This usually takes under a minute."}
-                      </p>
-                    )}
+                    <footer className="estimate-step-footer">
+                      {index === LAST_STEP && (submitError || isSubmitting) && (
+                        <p
+                          role={submitError ? "alert" : "status"}
+                          className={submitError ? "estimate-status is-error" : "estimate-status"}
+                        >
+                          {submitError ?? "Working out your estimate. This usually takes under a minute."}
+                        </p>
+                      )}
 
-                    {index > 0 ? (
-                      <button type="button" className="estimate-back-btn" onClick={() => goToStep(index - 1)}>
-                        <span className="link-redraw">← Back</span>
-                      </button>
-                    ) : (
-                      <span></span>
-                    )}
+                      {index > 0 ? (
+                        <button type="button" className="estimate-back-btn" onClick={() => goToStep(index - 1)}>
+                          <span className="link-redraw">← Back</span>
+                        </button>
+                      ) : (
+                        <span></span>
+                      )}
 
-                    {index < LAST_STEP ? (
-                      <button
-                        type="button"
-                        data-magnetic
-                        className="estimate-primary-btn"
-                        onClick={() => goToStep(index + 1)}
-                      >
-                        Next →
-                      </button>
-                    ) : (
-                      <button
-                        type="submit"
-                        data-magnetic
-                        className="estimate-primary-btn"
-                        disabled={isSubmitting}
-                        aria-busy={isSubmitting}
-                      >
-                        {isSubmitting ? "Calculating…" : "Calculate My Estimate →"}
-                      </button>
-                    )}
-                  </footer>
-                </section>
-              ))}
-            </form>
+                      {index < LAST_STEP ? (
+                        <button
+                          type="button"
+                          data-magnetic
+                          className="estimate-primary-btn"
+                          onClick={() => goToStep(index + 1)}
+                        >
+                          Next →
+                        </button>
+                      ) : (
+                        <button
+                          type="submit"
+                          data-magnetic
+                          className="estimate-primary-btn"
+                          disabled={isSubmitting}
+                          aria-busy={isSubmitting}
+                        >
+                          {isSubmitting ? "Calculating…" : "Calculate My Estimate →"}
+                        </button>
+                      )}
+                    </footer>
+                  </section>
+                ))}
+              </form>
+            </CountryContext.Provider>
           </div>
 
           {/* THANK YOU */}
@@ -819,6 +837,34 @@ export default function CostEstimatorForm() {
                 </p>
 
                 <p className="body-copy mt-5 max-w-[520px]">{estimate.summary}</p>
+
+                {(estimate.phaseOne || estimate.agency) && (
+                  <div className="estimate-compare">
+                    {estimate.phaseOne && (
+                      <div>
+                        <p className="estimate-question">Start smaller</p>
+                        <p className="estimate-compare-range">
+                          {formatMoney(estimate.phaseOne.low, estimate.currency)} –{" "}
+                          {formatMoney(estimate.phaseOne.high, estimate.currency)}
+                        </p>
+                        <p className="estimate-compare-copy">{estimate.phaseOne.scope}</p>
+                      </div>
+                    )}
+                    {estimate.agency && (
+                      <div>
+                        <p className="estimate-question">Typical agency price</p>
+                        <p className="estimate-compare-range is-muted">
+                          {formatMoney(estimate.agency.low, estimate.currency)} –{" "}
+                          {formatMoney(estimate.agency.high, estimate.currency)}
+                        </p>
+                        <p className="estimate-compare-copy">
+                          The same work at typical agency rates in your market. Working with me directly, you skip the
+                          overheads.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <table className="estimate-breakdown">
                   <caption className="sr-only">Cost breakdown</caption>
@@ -854,7 +900,7 @@ export default function CostEstimatorForm() {
                 </div>
 
                 <p className="estimate-microcopy max-w-[520px]">
-                  A ballpark for planning, not a quote. We&apos;ll be in touch to talk it through.
+                  A ballpark for planning, not a quote. A copy is on its way to your inbox, and I&apos;m happy to talk it through.
                 </p>
               </>
             )}

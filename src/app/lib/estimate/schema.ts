@@ -26,7 +26,6 @@ export const ANSWER_LABELS = {
   country: "Business country",
   region: "City / region",
   audience: "Primary audience",
-  team_region: "Where they expect the development team to be",
   timeline: "Launch timeline",
   speed: "Importance of speed",
   budget: "Budget in mind",
@@ -59,14 +58,12 @@ export const EstimateRequestSchema = z.object({
 export type EstimateRequest = z.output<typeof EstimateRequestSchema>;
 export type EstimateAnswers = EstimateRequest["answers"];
 
-// What Claude returns. Descriptions are sent with the schema, so they double as
-// field-level instructions.
-export const EstimateSchema = z.object({
-  currency: z
-    .string()
-    .describe("ISO 4217 code of the currency the estimate is in, e.g. INR, USD, GBP, CAD, AUD"),
-  low: z.number().describe("Low end of the total project cost, in that currency"),
-  high: z.number().describe("High end of the total project cost, in that currency"),
+// What Claude returns: effort in hours, never money (lib/estimate/pricing
+// turns hours into prices). Descriptions are sent with the schema, so they
+// double as field-level instructions.
+const hours = (what: string) => z.number().describe(`${what}, in hours`);
+
+export const EffortSchema = z.object({
   timeline: z
     .object({
       minWeeks: z.number().describe("Shortest realistic build time in weeks"),
@@ -77,17 +74,44 @@ export const EstimateSchema = z.object({
     .array(
       z.object({
         item: z.string().describe("Short name of a part of the work, e.g. Design, Development, Integrations"),
-        low: z.number(),
-        high: z.number(),
+        lowHours: hours("Low end of the effort for this part"),
+        highHours: hours("High end of the effort for this part"),
       }),
     )
-    .describe("3 to 7 parts of the work whose ranges roughly add up to the total"),
-  costDrivers: z.array(z.string()).describe("2 to 5 short phrases naming what pushes the cost up or down"),
+    .describe("3 to 7 parts of the work that together make up the whole project"),
+  phaseOne: z
+    .object({
+      scope: z
+        .string()
+        .describe("One sentence, addressed to the client as 'you', describing the essential first version"),
+      lowHours: hours("Low end of the effort for the first version"),
+      highHours: hours("High end of the effort for the first version"),
+    })
+    .describe("A smaller first version the client could launch with and grow from"),
+  costDrivers: z.array(z.string()).describe("2 to 5 short phrases naming what pushes the effort up or down"),
   assumptions: z.array(z.string()).describe("2 to 5 short assumptions, especially for unanswered questions"),
-  summary: z.string().describe("2 to 3 sentences addressed to the client as 'you'"),
+  summary: z.string().describe("2 to 3 sentences addressed to the client as 'you', with no prices or hours"),
 });
 
-export type Estimate = z.infer<typeof EstimateSchema>;
+export type Effort = z.infer<typeof EffortSchema>;
+
+type Range = { low: number; high: number };
+
+// What the visitor sees, WordPress stores and the email repeats: the effort
+// priced at my rates, in the client's currency.
+export type Estimate = Range & {
+  currency: string;
+  timeline: Effort["timeline"];
+  breakdown: (Range & { item: string })[];
+  // Only when it's meaningfully smaller than the full project.
+  phaseOne?: Range & { scope: string };
+  // The same hours at typical agency rates in the client's market.
+  agency?: Range;
+  rush: boolean;
+  costDrivers: string[];
+  assumptions: string[];
+  summary: string;
+};
 
 // Relabels the answers with their questions and drops empty ones, so the AI
 // and the WordPress record read naturally.

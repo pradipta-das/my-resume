@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageAlternates, pageOpenGraph } from "../lib/seo";
 import Link from "next/link";
 import LegalPage, { type LegalSection } from "../components/LegalPage";
 import { LEGAL } from "../lib/legal";
@@ -6,7 +7,8 @@ import { LEGAL } from "../lib/legal";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: `How ${LEGAL.owner} collects, uses and protects personal information on ${LEGAL.site}, including the cost estimator and consultation forms.`,
-  alternates: { canonical: "/privacy-policy" },
+  alternates: pageAlternates("/privacy-policy"),
+  openGraph: pageOpenGraph("/privacy-policy"),
 };
 
 const Email = () => <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>;
@@ -119,10 +121,10 @@ const sections: LegalSection[] = [
       <>
         <ul>
           <li>
-            <strong>To give you your estimate</strong> and keep a copy so we can talk it through if you get in touch.
+            <strong>To give you your estimate</strong>, email you a copy, and keep one so we can talk it through if you get in touch.
           </li>
           <li>
-            <strong>To reply to your consultation request</strong>, arrange a time and prepare for our call.
+            <strong>To reply to your consultation request</strong>: confirm by email that it arrived, arrange a time and prepare for our call.
           </li>
           <li>
             <strong>To send you occasional insights, project tips and offers</strong>, only if you ticked the box to say
@@ -169,7 +171,7 @@ const sections: LegalSection[] = [
             consultation requests are stored.
           </li>
           <li>
-            <strong>Email</strong>, used to notify me of a new consultation request and to reply to you.
+            <strong>Email</strong>, used to send you your estimate or a confirmation of your consultation request, to notify me of new requests, and to reply to you.
           </li>
           <li>
             <strong>Google</strong>, for Google Analytics, if you allow analytics cookies. See{" "}

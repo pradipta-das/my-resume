@@ -10,16 +10,20 @@ import { drawBorders } from "../utils/drawBorders";
 import { magnetic } from "../utils/magnetic";
 import { openCookieSettings } from "../lib/analytics";
 import { RESOURCES } from "../lib/resources";
+import { siteConfig } from "../lib/seo";
 import ResourceCard from "./ResourceCard";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// Journal categories (WordPress category slugs); each opens the journal filtered to it.
 const TRENDING_TOPICS = [
-  "SEO for E-Commerce",
-  "React Best Practises for Web Development",
-  "Integrations & API's",
+  { label: "AI", category: "ai" },
+  { label: "WordPress", category: "wordpress" },
+  { label: "Performance", category: "performance" },
+  { label: "Shopify", category: "shopify" },
+  { label: "Next.js", category: "next-js" },
 ];
 
 export default function HomeFooter() {
@@ -85,7 +89,7 @@ export default function HomeFooter() {
             <a href="/cost-estimator" data-magnetic className="link-redraw">
               Try Free Cost Calculator
             </a>
-            <a href="#" data-magnetic className="link-redraw">
+            <a href="https://www.studiolnc.dev" data-magnetic className="link-redraw normal-case">
               Visit studiolnc.dev
             </a>
           </div>
@@ -96,15 +100,15 @@ export default function HomeFooter() {
 
           <div className="footer-meta">
             {TRENDING_TOPICS.map((topic) => (
-              <div key={topic} className="footer-topic">
-                <a href="#" className="footer-meta-value">
-                  {topic}
-                </a>
+              <div key={topic.category} className="footer-topic">
+                <Link href={`/blog?category=${topic.category}`} className="footer-meta-value">
+                  {topic.label}
+                </Link>
               </div>
             ))}
 
-            {/* Empty bricks completing the line pattern under the topics */}
-            {Array.from({ length: 5 }, (_, i) => (
+            {/* Empty bricks completing the eight-cell line pattern under the topics */}
+            {Array.from({ length: 8 - TRENDING_TOPICS.length }, (_, i) => (
               <div key={i} aria-hidden="true" className="footer-brick" />
             ))}
           </div>
@@ -128,16 +132,12 @@ export default function HomeFooter() {
 
           <span className="footer-follow">
             Follow me on{" "}
-            <a href="#" className="link-sweep">
+            <a href={siteConfig.profiles.linkedin} target="_blank" rel="noopener me" className="link-sweep">
               LinkedIn
             </a>{" "}
             |{" "}
-            <a href="#" className="link-sweep">
-              Twitter
-            </a>{" "}
-            |{" "}
-            <a href="#" className="link-sweep">
-              GitHub
+            <a href={siteConfig.profiles.x} target="_blank" rel="noopener me" className="link-sweep">
+              X
             </a>
           </span>
         </div>

@@ -6,14 +6,16 @@ import HomeFooter from "../components/HomeFooter";
 import AnimatedPage from "../components/AnimatedPage";
 import BlogCard from "../components/BlogCard";
 import { getPosts } from "../lib/blog";
-import { siteConfig } from "../lib/seo";
+import { withBuildFallback } from "../lib/build-fallback";
+import { pageAlternates, pageOpenGraph, siteConfig } from "../lib/seo";
 
 export const metadata: Metadata = {
   // Absolute: the layout's "| Pradipta Das" suffix would repeat the name.
   title: { absolute: "About Pradipta Das | Freelance Web Developer & Consultant" },
   description:
-    "I'm Pradipta Das, a freelance web developer, digital consultant and technical architect helping businesses and agencies build fast, scalable websites with Next.js, React, WordPress and Shopify.",
-  alternates: { canonical: "/about" },
+    "Pradipta Das, freelance web developer and consultant with 15+ years' experience building fast, findable websites with WordPress, Shopify and Next.js.",
+  alternates: pageAlternates("/about"),
+  openGraph: pageOpenGraph("/about"),
 };
 
 const PRINCIPLES = [
@@ -63,6 +65,9 @@ const jsonLd = {
   url: `${siteConfig.url}/about`,
   mainEntity: {
     "@type": "Person",
+    // The same Person the homepage describes.
+    "@id": `${siteConfig.url}/#person`,
+    sameAs: Object.values(siteConfig.profiles),
     name: siteConfig.name,
     url: siteConfig.url,
     image: `${siteConfig.url}/img-5.png`,
@@ -72,7 +77,11 @@ const jsonLd = {
 };
 
 export default async function AboutPage() {
-  const { posts } = await getPosts(1, 3);
+  const { posts } = await withBuildFallback("Latest journal posts", () => getPosts(1, 3), {
+    posts: [],
+    total: 0,
+    pages: 0,
+  });
 
   return (
     <>

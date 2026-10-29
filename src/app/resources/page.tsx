@@ -5,13 +5,14 @@ import AnimatedPage from "../components/AnimatedPage";
 import BlogCta from "../components/BlogCta";
 import ResourceCard from "../components/ResourceCard";
 import { RESOURCES } from "../lib/resources";
-import { siteConfig } from "../lib/seo";
+import { pageAlternates, pageOpenGraph, siteConfig } from "../lib/seo";
 
 export const metadata: Metadata = {
   title: "Free WordPress, Shopify & Next.js Resources",
   description:
     "Free starters, plugins, themes and checklists from 15+ years of web development: a headless WordPress starter, a Shopify app, a block theme and more.",
-  alternates: { canonical: "/resources" },
+  alternates: pageAlternates("/resources"),
+  openGraph: pageOpenGraph("/resources"),
 };
 
 // For search engines: a collection of free resources by one author.

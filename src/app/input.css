@@ -1248,6 +1248,30 @@
         }
     }
 
+    /* "Start smaller" and "Typical agency price", side by side from sm. */
+    .estimate-compare {
+        @apply mt-8 grid w-full max-w-[520px] grid-cols-1 border-t border-black text-left;
+        @apply sm:grid-cols-2;
+
+        > div {
+            @apply py-5;
+            @apply max-sm:[&+div]:border-t max-sm:[&+div]:border-black/15;
+            @apply sm:[&:first-child:not(:only-child)]:pr-5 sm:[&+div]:border-l sm:[&+div]:border-black/15 sm:[&+div]:pl-5;
+        }
+    }
+
+    .estimate-compare-range {
+        @apply mt-2 font-primary text-[1.5rem] leading-tight;
+
+        &.is-muted {
+            @apply text-black/45;
+        }
+    }
+
+    .estimate-compare-copy {
+        @apply mt-2 font-secondary text-[13px] font-light leading-5 text-black/70;
+    }
+
     .estimate-notes {
         @apply mt-8 grid w-full max-w-[520px] grid-cols-1 gap-6 text-left sm:grid-cols-2;
 
@@ -1678,6 +1702,21 @@
         @apply text-[clamp(1.125rem,1.5vw,1.5rem)];
     }
 
+    /* Category filter under the journal's heading; the current one is filled. */
+    .blog-categories {
+        @apply mt-8 flex flex-wrap gap-2 font-secondary text-[13px];
+
+        > a {
+            @apply border border-black px-3 py-1.5 transition-colors duration-300;
+            @apply hover:bg-black hover:text-white;
+            @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue;
+        }
+
+        > a[aria-current="page"] {
+            @apply bg-black text-white;
+        }
+    }
+
     /* Category · date · reading time */
     .blog-meta {
         @apply flex flex-wrap items-center gap-y-1 font-secondary text-[12px] font-bold capitalize;
@@ -2010,6 +2049,12 @@
             }
         }
 
+        /* WordPress wraps tables in a figure; wide comparison tables scroll
+           sideways inside it on phones instead of stretching the page. */
+        .wp-block-table {
+            @apply overflow-x-auto;
+        }
+
         table {
             @apply w-full text-[14px];
         }
@@ -2017,6 +2062,20 @@
         th,
         td {
             @apply border-b border-black/15 py-2 pr-4 text-left align-top;
+        }
+
+        th {
+            @apply whitespace-nowrap border-black font-semibold text-black;
+        }
+
+        /* Row labels stay readable on phones; the table scrolls instead. */
+        th:first-child,
+        td:first-child {
+            @apply min-w-[9rem];
+        }
+
+        td:not(:first-child) {
+            @apply tabular-nums;
         }
     }
 }

@@ -11,8 +11,11 @@ const NAV_LINKS = [
   { label: "The Journal", href: "/blog" },
   { label: "Resources", href: "/resources" },
   { label: "Cost Estimator", href: "/cost-estimator" },
-  { label: "Visit studiolnc.dev", href: "#" },
+  { label: "Visit studiolnc.dev", href: "https://www.studiolnc.dev" },
 ];
+
+// The menu capitalises labels; a link to another site shows its domain as written.
+const keepCase = (href: string) => (href.startsWith("http") ? " normal-case" : "");
 
 export default function HomeHeader() {
   const menuToggleRef = useRef<HTMLButtonElement | null>(null);
@@ -59,7 +62,7 @@ export default function HomeHeader() {
 
       <nav className="site-nav">
         {NAV_LINKS.map((link) => (
-          <a key={link.label} href={link.href} className="link-sweep">
+          <a key={link.label} href={link.href} className={`link-sweep${keepCase(link.href)}`}>
             {link.label}
           </a>
         ))}
@@ -100,7 +103,7 @@ export default function HomeHeader() {
       >
         <div>
           {NAV_LINKS.map((link) => (
-            <a key={link.label} href={link.href} className="mobile-menu-link" onClick={closeMenu}>
+            <a key={link.label} href={link.href} className={`mobile-menu-link${keepCase(link.href)}`} onClick={closeMenu}>
               {link.label}
             </a>
           ))}

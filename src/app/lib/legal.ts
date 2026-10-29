@@ -5,5 +5,5 @@ export const LEGAL = {
   site: "pradipta.online",
   email: "privacy@pradipta.online",
   country: "India",
-  updated: "2026-10-28",
+  updated: "2026-10-29",
 };

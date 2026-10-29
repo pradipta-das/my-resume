@@ -6,28 +6,45 @@ import HomeHeader from "../../components/HomeHeader";
 import HomeFooter from "../../components/HomeFooter";
 import AnimatedPage from "../../components/AnimatedPage";
 import BlogCta from "../../components/BlogCta";
-import { getCaseStudies, getCaseStudy, type CaseStudyResult } from "../../lib/case-studies";
+import { getCaseStudies, getCaseStudy, type CaseStudy, type CaseStudyResult } from "../../lib/case-studies";
+import { pageAlternates, pageOpenGraph, siteConfig } from "../../lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
+// Without generateStaticParams the route renders on every request. An empty
+// list builds nothing up front (the build doesn't depend on WordPress); each
+// case study renders on its first visit, then is cached and revalidated like its data.
+export async function generateStaticParams() {
+  return [];
+}
+
 // Narrower images would blur if stretched across the page.
 const FULL_BLEED_MIN_WIDTH = 1200;
+
+// The excerpt, or a sentence built from the project's details when it has none.
+function describe(study: CaseStudy): string {
+  if (study.excerpt) return study.excerpt;
+  const kind = [study.industry, "project"].filter(Boolean).join(" ").toLowerCase();
+  const client = study.client ? ` for ${study.client}` : "";
+  return `A ${kind}${client} by Pradipta Das: the challenge, the approach and the results.`;
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const study = await getCaseStudy((await params).slug);
   if (!study) return {};
 
-  const title = `Case Study: ${study.title}`;
+  const path = `/case-studies/${study.slug}`;
   return {
-    title,
-    description: study.excerpt,
-    alternates: { canonical: `/case-studies/${study.slug}` },
-    openGraph: {
+    title: `Case Study: ${study.title}`,
+    description: describe(study),
+    alternates: pageAlternates(path),
+    openGraph: pageOpenGraph(path, {
       type: "article",
-      title,
-      description: study.excerpt,
-      ...(study.image && { images: [{ url: study.image.url }] }),
-    },
+      // The project's screenshot, or the case studies share image when it has none.
+      images: study.image
+        ? [{ url: study.image.url, width: study.image.width, height: study.image.height }]
+        : [{ url: "/case-studies/opengraph-image", width: 1200, height: 630 }],
+    }),
   };
 }
 
@@ -93,8 +110,24 @@ export default async function CaseStudyPage({ params }: Props) {
 
   const hasContent = study.content.replace(/<[^>]*>/g, "").trim() !== "";
 
+  const url = `${siteConfig.url}/case-studies/${study.slug}`;
+  const breadcrumbs = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { name: "Home", item: siteConfig.url },
+      { name: "Case Studies", item: `${siteConfig.url}/case-studies` },
+      { name: study.title, item: url },
+    ].map((crumb, i) => ({ "@type": "ListItem", position: i + 1, ...crumb })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs).replace(/</g, "\\u003c") }}
+      />
+
       <HomeHeader />
 
       <AnimatedPage>

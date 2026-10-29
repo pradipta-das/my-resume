@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Pradipta REST Lock
  * Description: Closes the public REST API (/wp-json and ?rest_route=). Only logged-in users, the Next.js site (by API key) and a short allowlist of routes get through; everyone else gets a 401.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      Pradipta Das
  * Requires PHP: 7.4
  *
@@ -35,6 +35,37 @@ function pradipta_rest_lock_public_routes() {
 		)
 	);
 }
+
+/* =========================================================
+   APPLICATION PASSWORDS ON HOSTS THAT DROP THE HEADER
+   Some Apache/FastCGI setups remove the Authorization header
+   before PHP runs, so Application Password logins never reach
+   WordPress. Clients can send the same "Basic ..." value in
+   X-WP-Authorization instead. It's copied to where WordPress
+   reads credentials (wp_validate_application_password, which
+   runs after plugins load), and the password is still checked
+   by WordPress, so it grants nothing the usual header wouldn't.
+========================================================= */
+
+function pradipta_rest_lock_alternate_basic_auth() {
+	if ( isset( $_SERVER['PHP_AUTH_USER'] ) || ! isset( $_SERVER['HTTP_X_WP_AUTHORIZATION'] ) ) {
+		return;
+	}
+
+	// The same format check WordPress applies to the Authorization header.
+	$header = (string) $_SERVER['HTTP_X_WP_AUTHORIZATION'];
+	if ( ! preg_match( '%^Basic [a-z\d/+]*={0,2}$%i', $header ) ) {
+		return;
+	}
+
+	$userpass = base64_decode( substr( $header, 6 ) );
+	if ( false === $userpass || false === strpos( $userpass, ':' ) ) {
+		return;
+	}
+
+	list( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) = explode( ':', $userpass, 2 );
+}
+pradipta_rest_lock_alternate_basic_auth();
 
 /* =========================================================
    GATE

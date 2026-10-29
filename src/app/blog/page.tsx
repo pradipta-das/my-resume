@@ -7,22 +7,59 @@ import HomeFooter from "../components/HomeFooter";
 import AnimatedPage from "../components/AnimatedPage";
 import BlogCard from "../components/BlogCard";
 import BlogCta from "../components/BlogCta";
-import { formatDate, getPosts } from "../lib/blog";
+import { formatDate, getCategories, getPosts } from "../lib/blog";
+import { pageAlternates, pageOpenGraph } from "../lib/seo";
 
 const PER_PAGE = 9;
 
-export const metadata: Metadata = {
-  title: "The Journal: Web Development Blog",
-  description:
-    "A blog on web development, WordPress, Next.js and the business of getting websites right, by Pradipta Das.",
-  alternates: { canonical: "/blog" },
-};
+type SearchParams = Promise<{ page?: string; category?: string }>;
 
-export default async function BlogPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const page = Number((await searchParams).page ?? 1);
-  if (!Number.isInteger(page) || page < 1) notFound();
+// The page number and category from the query string, or null when either
+// doesn't exist (the page then 404s).
+async function readParams(searchParams: SearchParams) {
+  const { page: rawPage, category: slug } = await searchParams;
+  const page = Number(rawPage ?? 1);
+  if (!Number.isInteger(page) || page < 1) return null;
 
-  const { posts, total, pages } = await getPosts(page, PER_PAGE);
+  const categories = await getCategories();
+  const category = slug ? categories.find((item) => item.slug === slug) : undefined;
+  if (slug && !category) return null;
+
+  return { page, category, categories };
+}
+
+// /blog, /blog?category=ai, /blog?category=ai&page=2 …
+function blogPath(category?: string, page = 1) {
+  const query = new URLSearchParams();
+  if (category) query.set("category", category);
+  if (page > 1) query.set("page", String(page));
+  return query.size ? `/blog?${query}` : "/blog";
+}
+
+export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
+  const params = await readParams(searchParams);
+  const category = params?.category;
+  const page = params?.page ?? 1;
+  // Each page of a listing is its own canonical URL.
+  const path = blogPath(category?.slug, page);
+  const title = category ? `${category.name} Articles` : "The Journal: Web Development Blog";
+
+  return {
+    title: page > 1 ? `${title} (Page ${page})` : title,
+    description: category
+      ? `Articles on ${category.name} by Pradipta Das: practical, measured writing from 15+ years of building for the web.`
+      : "A blog on web development, WordPress, Next.js and the business of getting websites right, by Pradipta Das.",
+    alternates: pageAlternates(path),
+    openGraph: pageOpenGraph(path),
+  };
+}
+
+export default async function BlogPage({ searchParams }: { searchParams: SearchParams }) {
+  const params = await readParams(searchParams);
+  if (!params) notFound();
+  const { page, category, categories } = params;
+
+  const { posts, total, pages } = await getPosts(page, PER_PAGE, category?.id);
   if (page > 1 && posts.length === 0) notFound();
 
   // The newest post leads the first page; everything else goes in the grid,
@@ -46,7 +83,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
           </span>
 
           <h1 data-split="words" className="blog-hero-title">
-            Ideas, lessons and notes from building for the web.
+            {category ? `Writing on ${category.name}.` : "Ideas, lessons and notes from building for the web."}
           </h1>
 
           <div data-reveal="fade-up" className="blog-hero-meta">
@@ -57,6 +94,23 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
               {total} {total === 1 ? "article" : "articles"}
             </span>
           </div>
+
+          {categories.length > 0 && (
+            <nav data-reveal="fade-up" aria-label="Categories" className="blog-categories">
+              <Link href="/blog" aria-current={category ? undefined : "page"}>
+                All
+              </Link>
+              {categories.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={blogPath(item.slug)}
+                  aria-current={item.slug === category?.slug ? "page" : undefined}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          )}
         </section>
 
         {/* =====================================================
@@ -112,7 +166,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
           <section className="blog-list">
             <div className="blog-list-head">
               <h2 data-reveal="fade-up" className="section-caption">
-                {page === 1 ? "More from the journal" : `Page ${page}`}
+                {page > 1 ? `Page ${page}` : category ? `More on ${category.name}` : "More from the journal"}
               </h2>
             </div>
 
@@ -137,7 +191,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
         {pages > 1 && (
           <nav className="blog-pagination" aria-label="Journal pages">
             {page > 1 ? (
-              <Link href={page === 2 ? "/blog" : `/blog?page=${page - 1}`} className="link-sweep">
+              <Link href={blogPath(category?.slug, page - 1)} className="link-sweep">
                 ← Newer
               </Link>
             ) : (
@@ -149,7 +203,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
             </span>
 
             {page < pages ? (
-              <Link href={`/blog?page=${page + 1}`} className="link-sweep">
+              <Link href={blogPath(category?.slug, page + 1)} className="link-sweep">
                 Older →
               </Link>
             ) : (

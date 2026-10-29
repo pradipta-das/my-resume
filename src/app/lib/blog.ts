@@ -1,4 +1,4 @@
-import { fetchBlogPosts, fetchPostBySlug } from "./wordpress";
+import { fetchBlogPosts, fetchCategories, fetchPostBySlug, fetchPostsInCategory } from "./wordpress";
 
 /*
  * Blog data for the blog pages, cleaned up for display: WordPress titles and
@@ -19,6 +19,10 @@ export interface BlogSummary {
 export interface BlogArticle extends BlogSummary {
   content: string;
   modified: string;
+  // UTC with a timezone, for structured data and Open Graph.
+  publishedAt: string;
+  modifiedAt: string;
+  categorySlug: string | null;
   // A hand-written excerpt to show under the title; null when WordPress's
   // excerpt just repeats the opening of the article.
   standfirst: string | null;
@@ -82,8 +86,25 @@ function toSummary(post: ListPost): BlogSummary {
   };
 }
 
-export async function getPosts(page: number, perPage: number) {
-  const data = await fetchBlogPosts(page, perPage);
+export interface BlogCategory {
+  id: number;
+  name: string;
+  slug: string;
+  count: number;
+}
+
+// Categories with published posts, most-used first ("Uncategorized" left out).
+export async function getCategories(): Promise<BlogCategory[]> {
+  const categories = await fetchCategories();
+  return categories
+    .filter((category) => category.slug !== "uncategorized")
+    .map((category) => ({ ...category, name: decodeEntities(category.name) }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+// One page of the journal, optionally limited to a category.
+export async function getPosts(page: number, perPage: number, categoryId?: number) {
+  const data = categoryId ? await fetchPostsInCategory(categoryId, page, perPage) : await fetchBlogPosts(page, perPage);
   return {
     posts: (data.posts as ListPost[]).map(toSummary),
     total: data.total as number,
@@ -97,6 +118,7 @@ export async function getArticle(slug: string): Promise<BlogArticle | null> {
 
   const excerpt = cleanExcerpt(post.excerpt);
   const opening = stripHtml(post.content);
+  const category = post.categories.find((term) => term.slug !== "uncategorized");
   const repeatsOpening = opening.startsWith(excerpt.replace(/…$/, "").trim());
 
   return {
@@ -107,11 +129,14 @@ export async function getArticle(slug: string): Promise<BlogArticle | null> {
     content: post.content,
     date: post.date,
     modified: post.modified,
+    publishedAt: post.date_gmt,
+    modifiedAt: post.modified_gmt,
     image: post.featured_image_url || null,
     imageWidth: post.featured_image_width,
     imageHeight: post.featured_image_height,
     imageAlt: decodeEntities(post.featured_image_alt),
     readingMinutes: readingMinutes(post.content),
-    category: null,
+    category: category ? decodeEntities(category.name) : null,
+    categorySlug: category?.slug ?? null,
   };
 }

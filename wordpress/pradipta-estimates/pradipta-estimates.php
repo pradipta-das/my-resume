@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Pradipta Project Estimates
- * Description: Stores project estimates sent by the website's cost estimator (pradipta/v1/estimates) and lists them under "Project Estimates" in the admin.
- * Version:     1.0.0
+ * Description: Stores project estimates sent by the website's cost estimator (pradipta/v1/estimates), lists them under "Project Estimates" in the admin, and emails the visitor a copy of their estimate.
+ * Version:     1.1.0
  * Author:      Pradipta Das
  * Requires PHP: 7.4
  *
@@ -13,6 +13,18 @@
  *
  * Requests without that secret are rejected, and the endpoint stays closed
  * until the constant is defined.
+ *
+ * The visitor gets a plain-text copy of their estimate from "Pradipta Das",
+ * with replies going to the admin email. It uses the same optional
+ * wp-config.php settings as the consultations plugin:
+ *
+ *     define( 'PRADIPTA_MAIL_FROM', 'hello@pradipta.online' );  // sender address
+ *     define( 'PRADIPTA_MAIL_FROM_NAME', 'Pradipta Das' );
+ *     define( 'PRADIPTA_MAIL_REPLY_TO', 'hello@pradipta.online' );
+ *     define( 'PRADIPTA_SITE_URL', 'https://pradipta.online' );
+ *
+ * Change or turn off the email with the pradipta_estimate_acknowledgement
+ * filter (return an empty array to skip it).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -149,7 +161,144 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 		return new WP_Error( 'save_failed', $post_id->get_error_message(), array( 'status' => 500 ) );
 	}
 
+	pradipta_estimates_acknowledge( $post_id, $email, $estimate );
+
 	return new WP_REST_Response( array( 'id' => $post_id ), 201 );
+}
+
+// AI-written text for the email: no links, and not too long. The estimate is
+// written from the visitor's answers and anyone can type any address into
+// the form, so the email mustn't carry links a stranger could plant.
+function pradipta_estimates_email_text( $text, $limit = 600 ) {
+	$text = preg_replace( '~(?:https?://|www\.)\S+~i', '', (string) $text );
+	$text = trim( preg_replace( '/\s+/', ' ', $text ) );
+	return mb_strlen( $text ) > $limit ? rtrim( mb_substr( $text, 0, $limit - 1 ) ) . '…' : $text;
+}
+
+// Emails the visitor a copy of their estimate. Best effort: the estimate is
+// already saved and shown on the website, so a mail failure doesn't fail it.
+function pradipta_estimates_acknowledge( $post_id, $email, $estimate ) {
+	$site     = untrailingslashit( defined( 'PRADIPTA_SITE_URL' ) ? PRADIPTA_SITE_URL : 'https://pradipta.online' );
+	$currency = isset( $estimate['currency'] ) ? strtoupper( substr( (string) $estimate['currency'], 0, 3 ) ) : '';
+	$money    = function ( $amount ) use ( $currency ) {
+		return trim( $currency . ' ' . number_format( (float) $amount ) );
+	};
+	$range    = $money( $estimate['low'] ?? 0 ) . ' – ' . number_format( (float) ( $estimate['high'] ?? 0 ) );
+
+	$lines = array(
+		'Hi there,',
+		'',
+		"Thanks for trying the cost estimator. Here's a copy of your estimate to keep.",
+		'',
+		'YOUR ESTIMATE',
+		$range,
+	);
+
+	if ( isset( $estimate['timeline']['minWeeks'], $estimate['timeline']['maxWeeks'] ) ) {
+		$lines[] = sprintf( 'Timeline: %d–%d weeks', (int) $estimate['timeline']['minWeeks'], (int) $estimate['timeline']['maxWeeks'] );
+	}
+
+	if ( ! empty( $estimate['summary'] ) ) {
+		$lines[] = '';
+		$lines[] = pradipta_estimates_email_text( $estimate['summary'] );
+	}
+
+	if ( isset( $estimate['phaseOne']['low'], $estimate['phaseOne']['high'] ) ) {
+		$lines[] = '';
+		$lines[] = 'START SMALLER';
+		$lines[] = $money( $estimate['phaseOne']['low'] ) . ' – ' . number_format( (float) $estimate['phaseOne']['high'] );
+		if ( ! empty( $estimate['phaseOne']['scope'] ) ) {
+			$lines[] = pradipta_estimates_email_text( $estimate['phaseOne']['scope'], 300 );
+		}
+	}
+
+	if ( isset( $estimate['agency']['low'], $estimate['agency']['high'] ) ) {
+		$lines[] = '';
+		$lines[] = 'TYPICAL AGENCY PRICE';
+		$lines[] = $money( $estimate['agency']['low'] ) . ' – ' . number_format( (float) $estimate['agency']['high'] );
+		$lines[] = 'The same work at typical agency rates in your market.';
+	}
+
+	if ( ! empty( $estimate['breakdown'] ) && is_array( $estimate['breakdown'] ) ) {
+		$lines[] = '';
+		$lines[] = 'BREAKDOWN';
+		foreach ( array_slice( $estimate['breakdown'], 0, 12 ) as $row ) {
+			$lines[] = sprintf(
+				'- %s: %s – %s',
+				pradipta_estimates_email_text( $row['item'] ?? '', 80 ),
+				$money( $row['low'] ?? 0 ),
+				number_format( (float) ( $row['high'] ?? 0 ) )
+			);
+		}
+	}
+
+	foreach ( array( 'costDrivers' => 'WHAT DRIVES THE COST', 'assumptions' => 'ASSUMPTIONS' ) as $key => $label ) {
+		if ( ! empty( $estimate[ $key ] ) && is_array( $estimate[ $key ] ) ) {
+			$lines[] = '';
+			$lines[] = $label;
+			foreach ( array_slice( $estimate[ $key ], 0, 8 ) as $item ) {
+				$lines[] = '- ' . pradipta_estimates_email_text( $item, 200 );
+			}
+		}
+	}
+
+	$lines = array_merge(
+		$lines,
+		array(
+			'',
+			"This is a ballpark for planning, not a quote. Every project has details a questionnaire can't capture, and the real number depends on them.",
+			'',
+			"If you'd like to talk it through, just reply to this email, or book a free consultation call:",
+			$site . '/free-consultation',
+			'',
+			'Pradipta Das',
+			$site,
+		)
+	);
+
+	$message = apply_filters(
+		'pradipta_estimate_acknowledgement',
+		array(
+			'subject' => 'Your website estimate: ' . $range,
+			'body'    => implode( "\n", $lines ),
+		),
+		$post_id,
+		$estimate
+	);
+
+	if ( empty( $message['subject'] ) || empty( $message['body'] ) ) {
+		return;
+	}
+
+	$sent = pradipta_estimates_mail_visitor( $email, $message['subject'], $message['body'] );
+	update_post_meta( $post_id, '_estimate_acknowledged', $sent ? '1' : '0' );
+}
+
+// Sends an email to a visitor as "Pradipta Das", with replies coming back to
+// the site owner. The sender filters apply to this one email only.
+function pradipta_estimates_mail_visitor( $to, $subject, $body ) {
+	$from      = defined( 'PRADIPTA_MAIL_FROM' ) && is_email( PRADIPTA_MAIL_FROM ) ? PRADIPTA_MAIL_FROM : '';
+	$from_name = defined( 'PRADIPTA_MAIL_FROM_NAME' ) ? (string) PRADIPTA_MAIL_FROM_NAME : 'Pradipta Das';
+	$reply_to  = defined( 'PRADIPTA_MAIL_REPLY_TO' ) && is_email( PRADIPTA_MAIL_REPLY_TO ) ? PRADIPTA_MAIL_REPLY_TO : get_option( 'admin_email' );
+	$from_name = str_replace( array( "\r", "\n", '<', '>', '"' ), '', $from_name );
+
+	$set_from      = function ( $address ) use ( $from ) {
+		return $from ? $from : $address;
+	};
+	$set_from_name = function () use ( $from_name ) {
+		return $from_name;
+	};
+
+	add_filter( 'wp_mail_from', $set_from );
+	add_filter( 'wp_mail_from_name', $set_from_name );
+
+	$headers = is_email( $reply_to ) ? array( sprintf( 'Reply-To: %s <%s>', $from_name, $reply_to ) ) : array();
+	$sent    = wp_mail( $to, $subject, $body, $headers );
+
+	remove_filter( 'wp_mail_from', $set_from );
+	remove_filter( 'wp_mail_from_name', $set_from_name );
+
+	return $sent;
 }
 
 /* =========================================================
@@ -214,7 +363,13 @@ function pradipta_estimates_details_box( WP_Post $post ) {
 	<h3>Contact</h3>
 	<p>
 		<a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a><br />
-		Newsletter: <?php echo $consent ? esc_html( 'Yes (opted in ' . $consent_at . ' UTC)' ) : 'No'; ?>
+		Newsletter: <?php echo $consent ? esc_html( 'Yes (opted in ' . $consent_at . ' UTC)' ) : 'No'; ?><br />
+		<?php
+		// Estimates saved before version 1.1 have no record.
+		$acknowledged = get_post_meta( $post->ID, '_estimate_acknowledged', true );
+		$ack_label    = '1' === $acknowledged ? 'Sent' : ( '0' === $acknowledged ? 'Failed (check your mail setup)' : 'Not sent' );
+		?>
+		Copy emailed to visitor: <?php echo esc_html( $ack_label ); ?>
 	</p>
 
 	<?php if ( $estimate ) : ?>
@@ -227,6 +382,27 @@ function pradipta_estimates_details_box( WP_Post $post ) {
 		</p>
 		<?php if ( ! empty( $estimate['summary'] ) ) : ?>
 			<p><?php echo esc_html( $estimate['summary'] ); ?></p>
+		<?php endif; ?>
+
+		<?php if ( isset( $estimate['phaseOne']['low'], $estimate['phaseOne']['high'] ) ) : ?>
+			<p>
+				<strong>Start smaller:</strong>
+				<?php echo $money( $estimate['phaseOne']['low'] ); ?> – <?php echo $money( $estimate['phaseOne']['high'] ); ?>
+				<?php if ( ! empty( $estimate['phaseOne']['scope'] ) ) : ?>
+					· <?php echo esc_html( $estimate['phaseOne']['scope'] ); ?>
+				<?php endif; ?>
+			</p>
+		<?php endif; ?>
+
+		<?php if ( isset( $estimate['agency']['low'], $estimate['agency']['high'] ) ) : ?>
+			<p>
+				<strong>Shown as typical agency price:</strong>
+				<?php echo $money( $estimate['agency']['low'] ); ?> – <?php echo $money( $estimate['agency']['high'] ); ?>
+			</p>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $estimate['rush'] ) ) : ?>
+			<p><strong>Rush premium applied.</strong></p>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $estimate['breakdown'] ) ) : ?>

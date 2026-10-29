@@ -8,9 +8,16 @@ import AnimatedPage from "../../components/AnimatedPage";
 import BlogCard from "../../components/BlogCard";
 import BlogCta from "../../components/BlogCta";
 import { formatDate, getArticle, getPosts } from "../../lib/blog";
-import { siteConfig } from "../../lib/seo";
+import { pageAlternates, pageOpenGraph, siteConfig } from "../../lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
+
+// Without generateStaticParams the route renders on every request. An empty
+// list builds nothing up front (the build doesn't depend on WordPress); each
+// post renders on its first visit, then is cached and revalidated like its data.
+export async function generateStaticParams() {
+  return [];
+}
 
 // Narrower featured images would blur if stretched across the page.
 const FULL_BLEED_MIN_WIDTH = 1200;
@@ -19,18 +26,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = await getArticle((await params).slug);
   if (!article) return {};
 
+  const path = `/blog/${article.slug}`;
   return {
-    title: article.title,
+    // Absolute: article titles are long enough without "| Pradipta Das"; the
+    // author is in the structured data.
+    title: { absolute: article.title },
     description: article.excerpt,
-    alternates: { canonical: `/blog/${article.slug}` },
-    openGraph: {
+    alternates: pageAlternates(path),
+    // The share image comes from opengraph-image.tsx (with the featured image
+    // alongside the title once the post has one).
+    openGraph: pageOpenGraph(path, {
       type: "article",
-      title: article.title,
-      description: article.excerpt,
-      publishedTime: article.date,
-      modifiedTime: article.modified,
-      ...(article.image && { images: [{ url: article.image }] }),
-    },
+      publishedTime: article.publishedAt,
+      modifiedTime: article.modifiedAt,
+      authors: [`${siteConfig.url}/about`],
+      ...(article.category && { section: article.category }),
+    }),
   };
 }
 
@@ -44,9 +55,45 @@ export default async function BlogPostPage({ params }: Props) {
 
   const url = `${siteConfig.url}/blog/${article.slug}`;
   const updated = article.modified.slice(0, 10) !== article.date.slice(0, 10);
+  const categoryUrl = article.categorySlug && `${siteConfig.url}/blog?category=${article.categorySlug}`;
+
+  // For search engines: the article, its author, and where it sits in the site.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": `${url}#article`,
+        mainEntityOfPage: url,
+        headline: article.title,
+        description: article.excerpt,
+        datePublished: article.publishedAt,
+        dateModified: article.modifiedAt,
+        image: article.image ?? `${url}/opengraph-image`,
+        author: { "@type": "Person", "@id": `${siteConfig.url}/#person`, name: siteConfig.name, url: `${siteConfig.url}/about` },
+        publisher: { "@id": `${siteConfig.url}/#person` },
+        inLanguage: "en-IN",
+        ...(article.category && { articleSection: article.category }),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { name: "Home", item: siteConfig.url },
+          { name: "The Journal", item: `${siteConfig.url}/blog` },
+          ...(article.category && categoryUrl ? [{ name: article.category, item: categoryUrl }] : []),
+          { name: article.title, item: url },
+        ].map((crumb, i) => ({ "@type": "ListItem", position: i + 1, ...crumb })),
+      },
+    ],
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
+
       <HomeHeader />
 
       <AnimatedPage>
@@ -60,6 +107,11 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
 
           <p data-reveal="fade-up" className="blog-meta">
+            {article.category && article.categorySlug && (
+              <Link href={`/blog?category=${article.categorySlug}`} className="link-sweep">
+                {article.category}
+              </Link>
+            )}
             <time dateTime={article.date}>{formatDate(article.date)}</time>
             <span>{article.readingMinutes} min read</span>
           </p>

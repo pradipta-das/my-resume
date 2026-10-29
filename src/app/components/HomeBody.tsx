@@ -486,7 +486,7 @@ export default function HomeBody() {
                 <div className="people-copy">
                   <Image
                     src="/img-4.png"
-                    alt="Portraits of clients I've worked with"
+                    alt="Illustrated faces standing in for the clients I've worked with"
                     width={232}
                     height={730}
                   />
@@ -515,18 +515,18 @@ export default function HomeBody() {
           <h2 className="display-heading">The Real X-Factor Has Always Been the People</h2>
 
           <p className="body-copy mt-4">
-            The faces here are some of the people I&apos;ve built for: founders, marketing teams,
-            agency partners. If fifteen years have taught me anything, it&apos;s that the code is
-            rarely the hardest part of web development. Understanding the person on the other side
-            of the call is.
+            You&apos;ll notice the faces here are drawn, not photographed. Many of the people I
+            build for, founders, marketing teams and agencies who bring me in behind the scenes,
+            would rather stay out of a stranger&apos;s portfolio. I respect that, so these sketches
+            stand in for them. Discretion is part of the job.
           </p>
 
           <p className="body-copy mt-3">
-            Many of them have stayed for years, through redesigns, platform migrations and new
-            ideas, and agencies still bring me in when a project needs one more experienced pair of
-            hands. I&apos;ve never thought of that as client retention. It&apos;s simply what happens
-            when people feel heard, and when the advice is honest even if it&apos;s the simpler,
-            cheaper option.
+            If fifteen years have taught me anything, it&apos;s that the code is rarely the hardest
+            part of web development. Understanding the person on the other side of the call is.
+            Many clients have stayed for years, through redesigns, platform migrations and new
+            ideas. That&apos;s simply what happens when people feel heard, and when the advice is
+            honest even if it&apos;s the simpler, cheaper option.
           </p>
 
           <Link href="/case-studies" data-magnetic className="display-link link-sweep mt-4">
