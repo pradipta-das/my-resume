@@ -4,12 +4,18 @@
  * Description: Closes the public REST API (/wp-json and ?rest_route=). Only logged-in users, the Next.js site (by API key) and a short allowlist of routes get through; everyone else gets a 401.
  * Version:     1.1.0
  * Author:      Pradipta Das
+ * Author URI:  https://pradipta.online
  * Requires PHP: 7.4
+ * License:     GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * Setup: add the key to wp-config.php, matching WORDPRESS_API_SECRET in the
  * Next.js app:
  *
  *     define( 'PRADIPTA_API_SECRET', 'a-long-random-string' );
+ *
+ * The front end sends the same key, server-side only, in an
+ * X-Pradipta-Api-Key header on every REST request.
  *
  * Until the constant is defined, only logged-in users and the allowlist get
  * through, so set it before activating or the blog on the Next.js site stops

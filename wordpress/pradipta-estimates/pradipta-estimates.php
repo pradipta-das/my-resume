@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Pradipta Project Estimates
  * Description: Stores project estimates sent by the website's cost estimator (pradipta/v1/estimates), lists them under "Project Estimates" in the admin, and emails the visitor a copy of their estimate.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      Pradipta Das
  * Requires PHP: 7.4
  *
@@ -15,7 +15,8 @@
  * until the constant is defined.
  *
  * The visitor gets a plain-text copy of their estimate from "Pradipta Das",
- * with replies going to the admin email. It uses the same optional
+ * with the PDF the website makes attached, and replies going to the admin
+ * email. It uses the same optional
  * wp-config.php settings as the consultations plugin:
  *
  *     define( 'PRADIPTA_MAIL_FROM', 'hello@pradipta.online' );  // sender address
@@ -93,6 +94,11 @@ add_action( 'rest_api_init', function () {
 					'type'     => 'object',
 					'required' => true,
 				),
+				// The estimate as a PDF (base64), attached to the visitor's email.
+				'pdf'               => array(
+					'type'     => 'string',
+					'required' => false,
+				),
 			),
 		)
 	);
@@ -103,6 +109,41 @@ function pradipta_estimates_authorized( WP_REST_Request $request ) {
 	$provided = (string) $request->get_header( 'x-estimate-secret' );
 
 	return '' !== $secret && hash_equals( $secret, $provided );
+}
+
+// An amount as the website shows it: the currency's symbol, whole units, and
+// Indian digit grouping for rupees (₹1,50,000). Mirrors formatMoney in the
+// Next.js app (src/app/lib/estimate/format.ts).
+function pradipta_estimates_money( $amount, $currency ) {
+	$digits = (string) abs( (int) round( (float) $amount ) );
+
+	if ( 'INR' === $currency && strlen( $digits ) > 3 ) {
+		$digits = preg_replace( '/\B(?=(\d{2})+(?!\d))/', ',', substr( $digits, 0, -3 ) ) . ',' . substr( $digits, -3 );
+	} else {
+		$digits = number_format( (float) $digits );
+	}
+
+	$symbols = array(
+		'INR' => '₹',
+		'USD' => '$',
+		'GBP' => '£',
+		'CAD' => 'CA$',
+		'AUD' => 'A$',
+	);
+	return isset( $symbols[ $currency ] ) ? $symbols[ $currency ] . $digits : trim( $currency . ' ' . $digits );
+}
+
+function pradipta_estimates_range( $low, $high, $currency ) {
+	return pradipta_estimates_money( $low, $currency ) . ' – ' . pradipta_estimates_money( $high, $currency );
+}
+
+// The PDF sent with the estimate, decoded, or '' if there isn't a usable one.
+function pradipta_estimates_pdf( $base64 ) {
+	if ( ! is_string( $base64 ) || '' === $base64 || strlen( $base64 ) > 3 * 1024 * 1024 ) {
+		return '';
+	}
+	$pdf = base64_decode( $base64, true );
+	return ( false !== $pdf && 0 === strpos( $pdf, '%PDF-' ) ) ? $pdf : '';
 }
 
 // Cleans every string in a nested array of form answers or estimate fields.
@@ -141,7 +182,7 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 		array(
 			'post_type'   => PRADIPTA_ESTIMATE_POST_TYPE,
 			'post_status' => 'private',
-			'post_title'  => sprintf( '%s — %s %s–%s', $email, $currency, number_format( $low ), number_format( $high ) ),
+			'post_title'  => $email . ' — ' . pradipta_estimates_range( $low, $high, $currency ),
 			'meta_input'  => array(
 				'_estimate_email'             => $email,
 				'_estimate_marketing_consent' => $consent ? '1' : '0',
@@ -161,7 +202,7 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 		return new WP_Error( 'save_failed', $post_id->get_error_message(), array( 'status' => 500 ) );
 	}
 
-	pradipta_estimates_acknowledge( $post_id, $email, $estimate );
+	pradipta_estimates_acknowledge( $post_id, $email, $estimate, pradipta_estimates_pdf( $request->get_param( 'pdf' ) ) );
 
 	return new WP_REST_Response( array( 'id' => $post_id ), 201 );
 }
@@ -175,23 +216,26 @@ function pradipta_estimates_email_text( $text, $limit = 600 ) {
 	return mb_strlen( $text ) > $limit ? rtrim( mb_substr( $text, 0, $limit - 1 ) ) . '…' : $text;
 }
 
-// Emails the visitor a copy of their estimate. Best effort: the estimate is
-// already saved and shown on the website, so a mail failure doesn't fail it.
-function pradipta_estimates_acknowledge( $post_id, $email, $estimate ) {
+// Emails the visitor a copy of their estimate, with the PDF attached when
+// there is one. Best effort: the estimate is already saved and shown on the
+// website, so a mail failure doesn't fail it.
+function pradipta_estimates_acknowledge( $post_id, $email, $estimate, $pdf = '' ) {
 	$site     = untrailingslashit( defined( 'PRADIPTA_SITE_URL' ) ? PRADIPTA_SITE_URL : 'https://pradipta.online' );
 	$currency = isset( $estimate['currency'] ) ? strtoupper( substr( (string) $estimate['currency'], 0, 3 ) ) : '';
-	$money    = function ( $amount ) use ( $currency ) {
-		return trim( $currency . ' ' . number_format( (float) $amount ) );
+	$range    = function ( $low, $high ) use ( $currency ) {
+		return pradipta_estimates_range( $low, $high, $currency );
 	};
-	$range    = $money( $estimate['low'] ?? 0 ) . ' – ' . number_format( (float) ( $estimate['high'] ?? 0 ) );
+	$total    = $range( $estimate['low'] ?? 0, $estimate['high'] ?? 0 );
 
 	$lines = array(
 		'Hi there,',
 		'',
-		"Thanks for trying the cost estimator. Here's a copy of your estimate to keep.",
+		'' !== $pdf
+			? "Thanks for trying the cost estimator. Your estimate is attached as a PDF, with a summary below."
+			: "Thanks for trying the cost estimator. Here's a copy of your estimate to keep.",
 		'',
 		'YOUR ESTIMATE',
-		$range,
+		$total,
 	);
 
 	if ( isset( $estimate['timeline']['minWeeks'], $estimate['timeline']['maxWeeks'] ) ) {
@@ -206,17 +250,17 @@ function pradipta_estimates_acknowledge( $post_id, $email, $estimate ) {
 	if ( isset( $estimate['phaseOne']['low'], $estimate['phaseOne']['high'] ) ) {
 		$lines[] = '';
 		$lines[] = 'START SMALLER';
-		$lines[] = $money( $estimate['phaseOne']['low'] ) . ' – ' . number_format( (float) $estimate['phaseOne']['high'] );
+		$lines[] = $range( $estimate['phaseOne']['low'], $estimate['phaseOne']['high'] );
 		if ( ! empty( $estimate['phaseOne']['scope'] ) ) {
 			$lines[] = pradipta_estimates_email_text( $estimate['phaseOne']['scope'], 300 );
 		}
 	}
 
-	if ( isset( $estimate['agency']['low'], $estimate['agency']['high'] ) ) {
+	if ( isset( $estimate['freelance']['low'], $estimate['freelance']['high'] ) ) {
 		$lines[] = '';
-		$lines[] = 'TYPICAL AGENCY PRICE';
-		$lines[] = $money( $estimate['agency']['low'] ) . ' – ' . number_format( (float) $estimate['agency']['high'] );
-		$lines[] = 'The same work at typical agency rates in your market.';
+		$lines[] = 'TYPICAL FREELANCE PRICE';
+		$lines[] = $range( $estimate['freelance']['low'], $estimate['freelance']['high'] );
+		$lines[] = 'The same hours at typical rates for experienced freelancers in your market.';
 	}
 
 	if ( ! empty( $estimate['breakdown'] ) && is_array( $estimate['breakdown'] ) ) {
@@ -224,10 +268,9 @@ function pradipta_estimates_acknowledge( $post_id, $email, $estimate ) {
 		$lines[] = 'BREAKDOWN';
 		foreach ( array_slice( $estimate['breakdown'], 0, 12 ) as $row ) {
 			$lines[] = sprintf(
-				'- %s: %s – %s',
+				'- %s: %s',
 				pradipta_estimates_email_text( $row['item'] ?? '', 80 ),
-				$money( $row['low'] ?? 0 ),
-				number_format( (float) ( $row['high'] ?? 0 ) )
+				$range( $row['low'] ?? 0, $row['high'] ?? 0 )
 			);
 		}
 	}
@@ -259,7 +302,7 @@ function pradipta_estimates_acknowledge( $post_id, $email, $estimate ) {
 	$message = apply_filters(
 		'pradipta_estimate_acknowledgement',
 		array(
-			'subject' => 'Your website estimate: ' . $range,
+			'subject' => 'Your website estimate: ' . $total,
 			'body'    => implode( "\n", $lines ),
 		),
 		$post_id,
@@ -270,13 +313,33 @@ function pradipta_estimates_acknowledge( $post_id, $email, $estimate ) {
 		return;
 	}
 
-	$sent = pradipta_estimates_mail_visitor( $email, $message['subject'], $message['body'] );
+	// wp_mail attaches files, so the PDF goes in a folder of its own for the
+	// length of the send, under the name the visitor will see.
+	$dir   = '';
+	$files = array();
+	if ( '' !== $pdf ) {
+		$dir  = trailingslashit( get_temp_dir() ) . 'pradipta-estimate-' . wp_generate_password( 12, false );
+		$file = $dir . '/Pradipta-Das-website-estimate.pdf';
+		if ( wp_mkdir_p( $dir ) && false !== file_put_contents( $file, $pdf ) ) {
+			$files[] = $file;
+		}
+	}
+
+	$sent = pradipta_estimates_mail_visitor( $email, $message['subject'], $message['body'], $files );
 	update_post_meta( $post_id, '_estimate_acknowledged', $sent ? '1' : '0' );
+	update_post_meta( $post_id, '_estimate_pdf_attached', $sent && $files ? '1' : '0' );
+
+	foreach ( $files as $file ) {
+		wp_delete_file( $file );
+	}
+	if ( '' !== $dir && is_dir( $dir ) ) {
+		rmdir( $dir );
+	}
 }
 
 // Sends an email to a visitor as "Pradipta Das", with replies coming back to
 // the site owner. The sender filters apply to this one email only.
-function pradipta_estimates_mail_visitor( $to, $subject, $body ) {
+function pradipta_estimates_mail_visitor( $to, $subject, $body, $attachments = array() ) {
 	$from      = defined( 'PRADIPTA_MAIL_FROM' ) && is_email( PRADIPTA_MAIL_FROM ) ? PRADIPTA_MAIL_FROM : '';
 	$from_name = defined( 'PRADIPTA_MAIL_FROM_NAME' ) ? (string) PRADIPTA_MAIL_FROM_NAME : 'Pradipta Das';
 	$reply_to  = defined( 'PRADIPTA_MAIL_REPLY_TO' ) && is_email( PRADIPTA_MAIL_REPLY_TO ) ? PRADIPTA_MAIL_REPLY_TO : get_option( 'admin_email' );
@@ -293,7 +356,7 @@ function pradipta_estimates_mail_visitor( $to, $subject, $body ) {
 	add_filter( 'wp_mail_from_name', $set_from_name );
 
 	$headers = is_email( $reply_to ) ? array( sprintf( 'Reply-To: %s <%s>', $from_name, $reply_to ) ) : array();
-	$sent    = wp_mail( $to, $subject, $body, $headers );
+	$sent    = wp_mail( $to, $subject, $body, $headers, $attachments );
 
 	remove_filter( 'wp_mail_from', $set_from );
 	remove_filter( 'wp_mail_from_name', $set_from_name );
@@ -327,11 +390,12 @@ add_action( 'manage_' . PRADIPTA_ESTIMATE_POST_TYPE . '_posts_custom_column', fu
 			break;
 
 		case 'estimate_range':
-			printf(
-				'%s %s – %s',
-				esc_html( get_post_meta( $post_id, '_estimate_currency', true ) ),
-				esc_html( number_format( (float) get_post_meta( $post_id, '_estimate_low', true ) ) ),
-				esc_html( number_format( (float) get_post_meta( $post_id, '_estimate_high', true ) ) )
+			echo esc_html(
+				pradipta_estimates_range(
+					get_post_meta( $post_id, '_estimate_low', true ),
+					get_post_meta( $post_id, '_estimate_high', true ),
+					get_post_meta( $post_id, '_estimate_currency', true )
+				)
 			);
 			break;
 
@@ -357,7 +421,7 @@ function pradipta_estimates_details_box( WP_Post $post ) {
 	$estimate = json_decode( (string) get_post_meta( $post->ID, '_estimate_result', true ), true ) ?: array();
 	$currency = isset( $estimate['currency'] ) ? $estimate['currency'] : '';
 	$money    = function ( $amount ) use ( $currency ) {
-		return esc_html( $currency . ' ' . number_format( (float) $amount ) );
+		return esc_html( pradipta_estimates_money( $amount, $currency ) );
 	};
 	?>
 	<h3>Contact</h3>
@@ -370,6 +434,9 @@ function pradipta_estimates_details_box( WP_Post $post ) {
 		$ack_label    = '1' === $acknowledged ? 'Sent' : ( '0' === $acknowledged ? 'Failed (check your mail setup)' : 'Not sent' );
 		?>
 		Copy emailed to visitor: <?php echo esc_html( $ack_label ); ?>
+		<?php if ( '1' === $acknowledged ) : ?>
+			(<?php echo '1' === get_post_meta( $post->ID, '_estimate_pdf_attached', true ) ? 'with the PDF' : 'without a PDF'; ?>)
+		<?php endif; ?>
 	</p>
 
 	<?php if ( $estimate ) : ?>
@@ -394,12 +461,19 @@ function pradipta_estimates_details_box( WP_Post $post ) {
 			</p>
 		<?php endif; ?>
 
-		<?php if ( isset( $estimate['agency']['low'], $estimate['agency']['high'] ) ) : ?>
+		<?php
+		// Estimates from before the plugin's version 1.2 compared agency prices.
+		foreach ( array( 'freelance' => 'typical freelance price', 'agency' => 'typical agency price' ) as $key => $label ) :
+			if ( isset( $estimate[ $key ]['low'], $estimate[ $key ]['high'] ) ) :
+				?>
 			<p>
-				<strong>Shown as typical agency price:</strong>
-				<?php echo $money( $estimate['agency']['low'] ); ?> – <?php echo $money( $estimate['agency']['high'] ); ?>
+				<strong>Shown as <?php echo esc_html( $label ); ?>:</strong>
+				<?php echo $money( $estimate[ $key ]['low'] ); ?> – <?php echo $money( $estimate[ $key ]['high'] ); ?>
 			</p>
-		<?php endif; ?>
+				<?php
+			endif;
+		endforeach;
+		?>
 
 		<?php if ( ! empty( $estimate['rush'] ) ) : ?>
 			<p><strong>Rush premium applied.</strong></p>

@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { estimateProject } from "../../lib/estimate/ai";
 import { EstimateRequestSchema, type Estimate } from "../../lib/estimate/schema";
+import { renderEstimatePdf } from "../../lib/estimate/pdf";
 import { saveEstimate } from "../../lib/estimate/wordpress";
 
 // An estimate takes Claude a while to think through; give it room.
@@ -9,7 +10,8 @@ export const maxDuration = 60;
 /*
  * POST /api/estimate
  * Body: EstimateRequest (email, marketing consent, questionnaire answers).
- * Returns { estimate } on success, { error } with a visitor-facing message
+ * Returns { estimate, pdf } on success (pdf: the estimate as a base64 PDF,
+ * left out if it couldn't be made), { error } with a visitor-facing message
  * otherwise.
  */
 
@@ -69,13 +71,22 @@ export async function POST(request: Request) {
     return fail("We couldn't calculate an estimate this time. Please try again.", 502);
   }
 
+  // The PDF is a copy, not the estimate itself: without it the visitor still
+  // gets the estimate on screen and by email.
+  let pdf: string | undefined;
+  try {
+    pdf = (await renderEstimatePdf(estimate, answers)).toString("base64");
+  } catch (error) {
+    console.error("Making the estimate PDF failed:", error);
+  }
+
   // The visitor still gets their estimate if saving fails; the log keeps the
   // lead so it can be recovered.
   try {
-    await saveEstimate({ email, marketingConsent, answers, estimate });
+    await saveEstimate({ email, marketingConsent, answers, estimate, pdf });
   } catch (error) {
     console.error("Saving the estimate to WordPress failed:", error, { email, marketingConsent, answers, estimate });
   }
 
-  return Response.json({ estimate });
+  return Response.json({ estimate, pdf });
 }

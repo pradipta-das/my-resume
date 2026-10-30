@@ -435,7 +435,7 @@
     }
 
     .intro-title {
-        @apply order-first flex min-h-[160px] items-center border-b border-black p-3;
+        @apply order-first flex min-h-[160px] flex-col justify-center border-b border-black p-3;
         @apply sm:min-h-[220px] sm:p-5;
         @apply md:min-h-[300px] md:p-8;
         @apply lg:min-h-[320px] lg:p-12;
@@ -478,6 +478,12 @@
         @apply block;
     }
 
+    /* Reserves BLUEPRINTS' width without putting the word in the page text. */
+    .statement-sizer::before {
+        @apply invisible;
+        content: attr(data-text);
+    }
+
     .statement-sequence.is-sequenced {
         @apply grid;
 
@@ -496,18 +502,27 @@
        BLUEPRINT GRID
     ====================================================== */
 
+    /* From sm, two columns that each sit at the bottom of the grid. Chapter IV
+       (.blueprint-synapse) closes the left column but comes last in the
+       markup, so the chapters read in order: the left column's top part fills
+       row 1 (bottom-aligned, so it sits on Chapter IV), Chapter IV takes
+       row 2, and the right column spans both rows. */
     .blueprint-grid {
-        @apply grid grid-cols-1 sm:grid-cols-2 items-end;
+        @apply grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-[1fr_auto];
     }
 
     /* Mobile: both columns dissolve into one flow, re-ordered in HomeBody so
        each image follows the copy it illustrates. */
     .blueprint-left {
-        @apply contents sm:block sm:border-r border-black;
+        @apply contents sm:block sm:col-start-1 sm:row-start-1 sm:self-end sm:border-r border-black;
     }
 
     .blueprint-right {
-        @apply contents sm:block min-w-0;
+        @apply contents sm:block sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:self-end min-w-0;
+    }
+
+    .blueprint-synapse {
+        @apply sm:col-start-1 sm:row-start-2 sm:border-r border-black;
     }
 
     /* Mobile: caption and image share a row. */
@@ -1248,7 +1263,7 @@
         }
     }
 
-    /* "Start smaller" and "Typical agency price", side by side from sm. */
+    /* "Start smaller" and "Typical freelance price", side by side from sm. */
     .estimate-compare {
         @apply mt-8 grid w-full max-w-[520px] grid-cols-1 border-t border-black text-left;
         @apply sm:grid-cols-2;

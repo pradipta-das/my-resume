@@ -1,11 +1,12 @@
 // Free resources: shown in the footer, listed at /resources, and written up
 // at /resources/[slug].
 //
-// Leave `href` out until the file exists: the resource is then shown as
-// "Coming soon" and its page has no download button. `href` is either a file
-// in public/downloads (e.g. "/downloads/headless-starter.zip"), which
-// downloads directly, or a full URL (GitHub, the Shopify App Store), which
-// opens in a new tab. GA4 records .zip and .pdf downloads on its own.
+// Leave `href` out until the file exists: the resource is then hidden
+// everywhere (cards, /resources, its page and the sitemap), and appears once
+// `href` is added. `href` is either a file in public/downloads (e.g.
+// "/downloads/headless-starter.zip"), which downloads directly, or a full URL
+// (GitHub, the Shopify App Store), which opens in a new tab. GA4 records .zip
+// and .pdf downloads on its own.
 
 export type Resource = {
   slug: string;
@@ -30,7 +31,7 @@ export type Resource = {
   steps: string[];
 };
 
-export const RESOURCES: Resource[] = [
+const ALL_RESOURCES: Resource[] = [
   {
     slug: "headless-wordpress-starter",
     type: "WordPress · Next.js",
@@ -82,6 +83,8 @@ export const RESOURCES: Resource[] = [
     worksWith: "WordPress 6, PHP 7.4+",
     licence: "GPL-2.0-or-later",
     kind: "code",
+    href: "/downloads/pradipta-rest-lock.zip",
+    version: "1.1.0",
     story: [
       "Out of the box, WordPress publishes a REST API that lists your posts, pages, media and user names to anyone who asks. For a traditional site that's mostly harmless. For a headless site, where WordPress only exists to feed a front end, it's an open door with no reason to be open.",
       "I wrote this plugin for my own headless sites. It closes the API to everyone except logged-in editors and the front end, which proves itself with a secret key, and it stops WordPress advertising the API's address in every page.",
@@ -102,7 +105,7 @@ export const RESOURCES: Resource[] = [
     steps: [
       "Add your secret key to wp-config.php, as shown in the plugin's header comment.",
       "Upload the ZIP under Plugins → Add New → Upload Plugin, and activate it.",
-      "Send the same key in a request header from your front end's server-side requests.",
+      "Send the same key in an X-Pradipta-Api-Key header from your front end's server-side requests.",
       "Visit /wp-json in a private browser window to check that it now returns a 401.",
     ],
   },
@@ -247,5 +250,8 @@ export const RESOURCES: Resource[] = [
     ],
   },
 ];
+
+// Only the resources that can be downloaded are shown.
+export const RESOURCES = ALL_RESOURCES.filter((resource) => resource.href);
 
 export const getResource = (slug: string) => RESOURCES.find((resource) => resource.slug === slug);

@@ -151,7 +151,8 @@ export default async function AboutPage() {
               </p>
               <p>
                 I work directly with founders and business owners, and quietly alongside agencies who need a
-                dependable developer on the team. Either way, you talk to me, not an account manager.
+                dependable developer on the team, from India to the US, the UK, Canada and Australia. Either way,
+                you talk to me, not an account manager.
               </p>
               <p className="about-signature">Pradipta</p>
             </div>

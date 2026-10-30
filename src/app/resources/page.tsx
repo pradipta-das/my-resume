@@ -10,7 +10,7 @@ import { pageAlternates, pageOpenGraph, siteConfig } from "../lib/seo";
 export const metadata: Metadata = {
   title: "Free WordPress, Shopify & Next.js Resources",
   description:
-    "Free starters, plugins, themes and checklists from 15+ years of web development: a headless WordPress starter, a Shopify app, a block theme and more.",
+    "Free WordPress, Shopify and Next.js plugins, starters and checklists from 15+ years of web development, made for real projects and free to use.",
   alternates: pageAlternates("/resources"),
   openGraph: pageOpenGraph("/resources"),
 };
@@ -57,9 +57,8 @@ export default function ResourcesPage() {
 
           <div data-reveal="fade-up" className="blog-hero-meta">
             <p className="body-copy max-w-[560px]">
-              Most of what&apos;s here started as something I needed on a real project and kept
-              reaching for afterwards: WordPress and Next.js starters, Shopify extensions,
-              checklists and notes. Use them, change them, ship something with them.
+              Everything here started as something I needed on a real project and kept reaching
+              for afterwards. Use it, change it, ship something with it.
             </p>
             <span className="blog-hero-count">
               {RESOURCES.length} {RESOURCES.length === 1 ? "resource" : "resources"}

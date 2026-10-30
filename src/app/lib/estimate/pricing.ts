@@ -7,25 +7,25 @@
 
 export type Currency = "INR" | "USD" | "GBP" | "CAD" | "AUD";
 
-// My hourly rate in each client's currency. International work is priced at
-// $20 an hour; the others are that, converted and rounded.
+// My hourly rate in each client's currency.
 export const HOURLY_RATE: Record<Currency, number> = {
-  INR: 800,
-  USD: 20,
-  GBP: 16,
-  CAD: 28,
-  AUD: 30,
+  INR: 300,
+  USD: 8,
+  GBP: 8,
+  CAD: 12,
+  AUD: 15,
 };
 
-// What agencies in the client's market typically charge an hour (low, high),
-// for the "typical agency price" comparison. Applied to the same hours, so the
-// comparison is conservative: agencies usually bill more hours too.
-export const AGENCY_RATE: Record<Currency, [number, number]> = {
-  INR: [2_000, 3_500],
-  USD: [100, 150],
-  GBP: [75, 110],
-  CAD: [110, 160],
-  AUD: [120, 170],
+// What experienced freelance web developers in the client's market charge an
+// hour (low, high), taken from the lower end so the comparison stays modest,
+// for the "typical freelance price". Applied to the same hours. (Agency rates
+// made the gap so wide it read as too good to be true.)
+export const FREELANCE_RATE: Record<Currency, [number, number]> = {
+  INR: [600, 1_200],
+  USD: [30, 50],
+  GBP: [25, 45],
+  CAD: [40, 65],
+  AUD: [45, 70],
 };
 
 // Added to the price when the client needs it urgently (see isRush).
@@ -46,20 +46,22 @@ export const currencyFor = (country: string | string[] | undefined): Currency =>
 // The budget brackets the estimator offers, in the client's currency. Sized
 // around what projects come out at with the rates above.
 export const BUDGET_OPTIONS: Record<Currency, string[]> = {
-  INR: ["Under ₹50K", "₹50K–₹1L", "₹1L–₹3L", "₹3L–₹5L", "₹5L+"],
-  USD: ["Under $1,000", "$1,000–$2,500", "$2,500–$5,000", "$5,000–$10,000", "$10,000+"],
-  GBP: ["Under £1,000", "£1,000–£2,000", "£2,000–£4,000", "£4,000–£8,000", "£8,000+"],
-  CAD: ["Under CA$1,500", "CA$1,500–CA$3,500", "CA$3,500–CA$7,000", "CA$7,000–CA$14,000", "CA$14,000+"],
-  AUD: ["Under A$1,500", "A$1,500–A$4,000", "A$4,000–A$8,000", "A$8,000–A$15,000", "A$15,000+"],
+  INR: ["Under ₹15K", "₹15K–₹30K", "₹30K–₹60K", "₹60K–₹1L", "₹1L+"],
+  USD: ["Under $300", "$300–$600", "$600–$1,200", "$1,200–$2,500", "$2,500+"],
+  GBP: ["Under £300", "£300–£600", "£600–£1,200", "£1,200–£2,500", "£2,500+"],
+  CAD: ["Under CA$450", "CA$450–CA$900", "CA$900–CA$1,800", "CA$1,800–CA$3,500", "CA$3,500+"],
+  AUD: ["Under A$500", "A$500–A$1,000", "A$1,000–A$2,000", "A$2,000–A$4,000", "A$4,000+"],
 };
 
-// Rounds to figures a person would quote: rupees to the nearest thousand (five
-// thousand above a lakh), other currencies to the nearest 50 (100 above 2,000).
-// Line items ("fine") round more finely, so small parts don't all look alike.
+// Rounds to figures a person would quote, in steps that grow with the amount
+// so small projects aren't rounded out of shape: rupees to the nearest 500
+// (1,000 from ₹25K, 5,000 from a lakh), other currencies to the nearest 25 (50
+// from 1,000, 100 from 2,000). Line items ("fine") round more finely, so small
+// parts don't all look alike.
 export function roundPrice(amount: number, currency: Currency, fine = false): number {
   let step: number;
-  if (currency === "INR") step = fine ? 500 : amount < 100_000 ? 1_000 : 5_000;
-  else step = fine ? 10 : amount < 2_000 ? 50 : 100;
+  if (currency === "INR") step = fine ? 100 : amount < 25_000 ? 500 : amount < 100_000 ? 1_000 : 5_000;
+  else step = fine ? 5 : amount < 1_000 ? 25 : amount < 2_000 ? 50 : 100;
 
   return Math.max(step, Math.round(amount / step) * step);
 }

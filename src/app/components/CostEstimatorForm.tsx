@@ -6,23 +6,22 @@ import Image from "next/image";
 import gsap from "gsap";
 import { animateSections } from "../utils/animateSections";
 import { magnetic } from "../utils/magnetic";
-import type { Estimate } from "../lib/estimate/schema";
+import { ESTIMATE_PDF_FILENAME, type Estimate } from "../lib/estimate/schema";
 import { BUDGET_OPTIONS, currencyFor } from "../lib/estimate/pricing";
+import { formatMoney } from "../lib/estimate/format";
 import { trackLead } from "../lib/analytics";
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// Whole amounts in the estimate's currency; Indian digit grouping for rupees.
-function formatMoney(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  } catch {
-    return `${currency} ${Math.round(amount).toLocaleString()}`;
-  }
+// Saves the estimate PDF (base64, from /api/estimate) to the visitor's device.
+function downloadPdf(base64: string) {
+  const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+  const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = ESTIMATE_PDF_FILENAME;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
 /* =========================================================
@@ -440,6 +439,8 @@ export default function CostEstimatorForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<Estimate | null>(null);
+  // The same estimate as a PDF, when the server could make one.
+  const [pdf, setPdf] = useState<string | null>(null);
   // Bumping the key remounts the form, clearing every input and step state.
   const [formKey, setFormKey] = useState<number>(0);
   // The chosen business country; later questions use it (see CountryContext).
@@ -498,7 +499,7 @@ export default function CostEstimatorForm() {
           honeypot: hp_field,
         }),
       });
-      const result = (await response.json().catch(() => ({}))) as { estimate?: Estimate; error?: string };
+      const result = (await response.json().catch(() => ({}))) as { estimate?: Estimate; pdf?: string; error?: string };
 
       if (!response.ok || !result.estimate) {
         setSubmitError(result.error ?? "We couldn't calculate an estimate this time. Please try again.");
@@ -506,6 +507,7 @@ export default function CostEstimatorForm() {
       }
 
       setEstimate(result.estimate);
+      setPdf(result.pdf ?? null);
       setIsSubmitted(true);
       trackLead("cost_estimator");
       stepperRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
@@ -522,6 +524,7 @@ export default function CostEstimatorForm() {
     setCurrentStep(0);
     setIsSubmitted(false);
     setEstimate(null);
+    setPdf(null);
     setSubmitError(null);
   };
 
@@ -582,13 +585,14 @@ export default function CostEstimatorForm() {
       ====================================================== */}
 
       <section className="estimator-hero">
-        <span data-reveal="fade-up" className="eyebrow">
-          Get a free quote for your next project.
-        </span>
-
-        <h1 data-split="words" className="estimator-hero-title">
-          Don&apos;t let a bad estimate kill a good idea.
+        {/* The h1 names the tool, for search; the line under it is display copy. */}
+        <h1 data-reveal="fade-up" className="eyebrow normal-case">
+          Website Cost Calculator: Estimate Your Website or App Budget
         </h1>
+
+        <p data-split="words" className="estimator-hero-title">
+          Don&apos;t let a bad estimate kill a good idea.
+        </p>
 
         <div data-reveal="fade-up">
           <a href="#estimateForm" data-magnetic className="display-link link-redraw mt-6">
@@ -838,7 +842,7 @@ export default function CostEstimatorForm() {
 
                 <p className="body-copy mt-5 max-w-[520px]">{estimate.summary}</p>
 
-                {(estimate.phaseOne || estimate.agency) && (
+                {(estimate.phaseOne || estimate.freelance) && (
                   <div className="estimate-compare">
                     {estimate.phaseOne && (
                       <div>
@@ -850,16 +854,15 @@ export default function CostEstimatorForm() {
                         <p className="estimate-compare-copy">{estimate.phaseOne.scope}</p>
                       </div>
                     )}
-                    {estimate.agency && (
+                    {estimate.freelance && (
                       <div>
-                        <p className="estimate-question">Typical agency price</p>
+                        <p className="estimate-question">Typical freelance price</p>
                         <p className="estimate-compare-range is-muted">
-                          {formatMoney(estimate.agency.low, estimate.currency)} –{" "}
-                          {formatMoney(estimate.agency.high, estimate.currency)}
+                          {formatMoney(estimate.freelance.low, estimate.currency)} –{" "}
+                          {formatMoney(estimate.freelance.high, estimate.currency)}
                         </p>
                         <p className="estimate-compare-copy">
-                          The same work at typical agency rates in your market. Working with me directly, you skip the
-                          overheads.
+                          The same hours at typical rates for experienced freelancers in your market.
                         </p>
                       </div>
                     )}
@@ -900,19 +903,32 @@ export default function CostEstimatorForm() {
                 </div>
 
                 <p className="estimate-microcopy max-w-[520px]">
-                  A ballpark for planning, not a quote. A copy is on its way to your inbox, and I&apos;m happy to talk it through.
+                  A ballpark for planning, not a quote. A {pdf ? "PDF " : ""}copy is on its way to your inbox, and
+                  I&apos;m happy to talk it through.
                 </p>
               </>
             )}
 
-            <button
-              type="button"
-              data-magnetic
-              className="estimate-primary-btn mt-8 min-w-[145px]"
-              onClick={startAgain}
-            >
-              Start Again
-            </button>
+            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
+              {pdf && (
+                <button
+                  type="button"
+                  data-magnetic
+                  className="estimate-primary-btn min-w-[145px]"
+                  onClick={() => downloadPdf(pdf)}
+                >
+                  Download PDF
+                </button>
+              )}
+              <button
+                type="button"
+                data-magnetic={pdf ? undefined : true}
+                className={pdf ? "estimate-back-btn" : "estimate-primary-btn min-w-[145px]"}
+                onClick={startAgain}
+              >
+                Start Again
+              </button>
+            </div>
           </div>
         </div>
       </section>

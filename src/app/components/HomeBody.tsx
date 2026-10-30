@@ -244,7 +244,11 @@ export default function HomeBody() {
 
         <div className="intro-content">
           <div className="intro-title">
-            {/* A tagline, not a heading: the page's h1 is the chapter heading below. */}
+            {/* The h1 says what I do, for search; the tagline under it is display copy. */}
+            <h1 data-reveal="fade-up" className="eyebrow normal-case">
+              Pradipta Das · Freelance WordPress, Shopify &amp; Next.js Developer
+            </h1>
+
             <p data-split="words" className="display-title">
               Every remarkable website begins long before the first line of code.
             </p>
@@ -253,9 +257,9 @@ export default function HomeBody() {
           <div data-reveal="fade-up" className="content-block-large">
             <span className="eyebrow">Chapter I - The Seed</span>
 
-            <h1 className="display-heading">
+            <h2 className="display-heading">
               What Fifteen Years as a Freelance Web Developer Taught Me About Ideas
-            </h1>
+            </h2>
 
             <p className="body-copy mt-4">
               Somewhere along the way, I noticed that the projects which went well rarely started
@@ -265,7 +269,8 @@ export default function HomeBody() {
             </p>
 
             <p className="body-copy mt-3">
-              Those conversations have taken me through most corners of the web: custom WordPress
+              Those conversations, with clients from India to the US, the UK, Canada and Australia,
+              have taken me through most corners of the web: custom WordPress
               builds, Shopify stores, Next.js and React applications, Tailwind CSS interfaces, and
               the SQL and MySQL databases quietly holding it all together. The tools keep changing.
               The lesson hasn&apos;t: a good idea deserves patience before it gets pixels.
@@ -283,20 +288,23 @@ export default function HomeBody() {
       ====================================================== */}
 
       <section data-section="statement" className="statement">
-        {/* Two lines sharing one spot (see the STATEMENT SEQUENCE effect):
-            "Ideas become BLUEPRINTS", then "BLUEPRINTS become Experiences."
-            The visible lines are decorative; the sr-only text reads once. */}
-        <h2 data-sequence className="section-caption statement-sequence">
-          <span className="sr-only">Ideas become blueprints. Blueprints become experiences.</span>
+        {/* The heading is the sentence once, for screen readers and search
+            engines. The visible lines beside it are decorative and kept out
+            of the heading, so its text doesn't repeat the animated words. */}
+        <h2 className="sr-only">Ideas become blueprints. Blueprints become experiences.</h2>
 
-          <span aria-hidden="true" className="statement-line">
+        {/* Two lines sharing one spot (see the STATEMENT SEQUENCE effect):
+            "Ideas become BLUEPRINTS", then "BLUEPRINTS become Experiences." */}
+        <div aria-hidden="true" data-sequence className="section-caption statement-sequence">
+          <span className="statement-line">
             <span data-seq="ideas" className="inline-block">
               Ideas become
             </span>{" "}
-            {/* The invisible copy reserves the final width, so the centred line
-                doesn't shift while the overlay scrambles through wider letters. */}
+            {/* The sizer reserves the final width (drawn by CSS, so it adds no
+                text), so the centred line doesn't shift while the overlay
+                scrambles through wider letters. */}
             <span data-seq="blueprints" className="text-brand relative inline-block">
-              <span className="invisible">BLUEPRINTS</span>
+              <span data-text="BLUEPRINTS" className="statement-sizer"></span>
               <span data-seq="scramble" className="absolute left-0 top-0 whitespace-nowrap">
                 BLUEPRINTS
               </span>
@@ -304,7 +312,7 @@ export default function HomeBody() {
           </span>
 
           {/* The slot marks where BLUEPRINTS moves to for the second line. */}
-          <span aria-hidden="true" className="statement-line">
+          <span className="statement-line">
             <span data-seq="slot" className="text-brand inline-block">
               BLUEPRINTS
             </span>{" "}
@@ -312,7 +320,7 @@ export default function HomeBody() {
               become Experiences.
             </span>
           </span>
-        </h2>
+        </div>
       </section>
 
       {/* =====================================================
@@ -368,33 +376,6 @@ export default function HomeBody() {
                 className="image-cover"
               />
             </div>
-          </div>
-
-          <div data-reveal="fade-up" className="content-block max-sm:order-6">
-            <span className="eyebrow">Chapter IV - The Synapse</span>
-
-            <h2 className="display-heading">
-              Human Intelligence, Artificial Intelligence, and What Happens in Between
-            </h2>
-
-            <p className="body-copy mt-4">
-              AI is remarkably good at the repetitive parts of web development: boilerplate, first
-              drafts of tests, digging through documentation. What it can&apos;t do is sit with a
-              client and hear what they didn&apos;t quite say. That part is still human, and I
-              suspect it always will be.
-            </p>
-
-            <p className="body-copy mt-3">
-              The interesting work happens where the two meet. I treat AI like a fast, eager junior
-              colleague: helpful, occasionally wrong, always reviewed. The effect is less time
-              typing and more time thinking about architecture, accessibility and the people who
-              will use the site. Done this way, AI-assisted web development doesn&apos;t make a
-              website feel less human. It leaves more room for the human parts.
-            </p>
-
-            <Link href="/cost-estimator" data-magnetic className="display-link link-sweep mt-4">
-              Try the AI Estimator
-            </Link>
           </div>
         </div>
 
@@ -459,6 +440,36 @@ export default function HomeBody() {
               </h3>
             </div>
           </div>
+        </div>
+
+        {/* Under the left column on screen, but last in the markup, so the
+            chapters read II, III, IV in order (see .blueprint-synapse). */}
+
+        <div data-reveal="fade-up" className="content-block blueprint-synapse max-sm:order-6">
+          <span className="eyebrow">Chapter IV - The Synapse</span>
+
+          <h2 className="display-heading">
+            Human Intelligence, Artificial Intelligence, and What Happens in Between
+          </h2>
+
+          <p className="body-copy mt-4">
+            AI is remarkably good at the repetitive parts of web development: boilerplate, first
+            drafts of tests, digging through documentation. What it can&apos;t do is sit with a
+            client and hear what they didn&apos;t quite say. That part is still human, and I
+            suspect it always will be.
+          </p>
+
+          <p className="body-copy mt-3">
+            The interesting work happens where the two meet. I treat AI like a fast, eager junior
+            colleague: helpful, occasionally wrong, always reviewed. The effect is less time
+            typing and more time thinking about architecture, accessibility and the people who
+            will use the site. Done this way, AI-assisted web development doesn&apos;t make a
+            website feel less human. It leaves more room for the human parts.
+          </p>
+
+          <Link href="/cost-estimator" data-magnetic className="display-link link-sweep mt-4">
+            Try the AI Estimator
+          </Link>
         </div>
       </section>
 

@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { EffortSchema, labelAnswers, type Effort, type Estimate, type EstimateAnswers } from "./schema";
-import { AGENCY_RATE, EFFORT_GUIDE, HOURLY_RATE, RUSH_PREMIUM, currencyFor, roundPrice, type Currency } from "./pricing";
+import { EFFORT_GUIDE, FREELANCE_RATE, HOURLY_RATE, RUSH_PREMIUM, currencyFor, roundPrice, type Currency } from "./pricing";
 
 // Server only: reads ANTHROPIC_API_KEY from the environment.
 const client = new Anthropic();
@@ -86,7 +86,7 @@ export function priceEffort(effort: Effort, currency: Currency, rush: boolean): 
   }
 
   const [phaseLow, phaseHigh] = span(effort.phaseOne.lowHours, effort.phaseOne.highHours);
-  const [agencyLow, agencyHigh] = AGENCY_RATE[currency];
+  const [freelanceLow, freelanceHigh] = FREELANCE_RATE[currency];
   const midHours = (lowHours + highHours) / 2;
   const premium = rush ? 1 + RUSH_PREMIUM : 1;
 
@@ -100,9 +100,9 @@ export function priceEffort(effort: Effort, currency: Currency, rush: boolean): 
     ...(phaseLow > 0 && phaseHigh < lowHours && {
       phaseOne: { scope: effort.phaseOne.scope, low: price(phaseLow), high: price(phaseHigh) },
     }),
-    // Mid-range hours at the low and high agency rates: a fair middle, not
+    // Mid-range hours at the low and high freelance rates: a fair middle, not
     // the widest possible spread.
-    agency: { low: price(midHours, agencyLow * premium), high: price(midHours, agencyHigh * premium) },
+    freelance: { low: price(midHours, freelanceLow * premium), high: price(midHours, freelanceHigh * premium) },
     rush,
     costDrivers: rush
       ? [...effort.costDrivers, `Urgent timeline (+${Math.round(RUSH_PREMIUM * 100)}%)`]

@@ -107,7 +107,8 @@ export default async function ResourcePage({ params }: Props) {
   const resource = getResource((await params).slug);
   if (!resource) notFound();
 
-  // The next resource in listing order, wrapping round to the first.
+  // The next resource in listing order, wrapping round to the first (none
+  // while this is the only one).
   const position = RESOURCES.indexOf(resource);
   const next = RESOURCES[(position + 1) % RESOURCES.length];
 
@@ -232,12 +233,14 @@ export default async function ResourcePage({ params }: Props) {
             NEXT RESOURCE
         ====================================================== */}
 
-        <Link href={`/resources/${next.slug}`} className="case-next">
-          <span className="eyebrow">Next from the workbench</span>
-          <span data-reveal="fade-up" className="case-next-title">
-            {next.title} <span aria-hidden="true">→</span>
-          </span>
-        </Link>
+        {next !== resource && (
+          <Link href={`/resources/${next.slug}`} className="case-next">
+            <span className="eyebrow">Next from the workbench</span>
+            <span data-reveal="fade-up" className="case-next-title">
+              {next.title} <span aria-hidden="true">→</span>
+            </span>
+          </Link>
+        )}
 
         <BlogCta />
       </AnimatedPage>

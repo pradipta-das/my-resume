@@ -105,13 +105,16 @@ export type Estimate = Range & {
   breakdown: (Range & { item: string })[];
   // Only when it's meaningfully smaller than the full project.
   phaseOne?: Range & { scope: string };
-  // The same hours at typical agency rates in the client's market.
-  agency?: Range;
+  // The same hours at typical freelance rates in the client's market.
+  freelance?: Range;
   rush: boolean;
   costDrivers: string[];
   assumptions: string[];
   summary: string;
 };
+
+// The PDF's file name, for the email attachment and the download button.
+export const ESTIMATE_PDF_FILENAME = "Pradipta-Das-website-estimate.pdf";
 
 // Relabels the answers with their questions and drops empty ones, so the AI
 // and the WordPress record read naturally.
