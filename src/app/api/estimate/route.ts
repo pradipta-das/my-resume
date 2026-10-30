@@ -3,6 +3,7 @@ import { estimateProject } from "../../lib/estimate/ai";
 import { EstimateRequestSchema, type Estimate } from "../../lib/estimate/schema";
 import { renderEstimatePdf } from "../../lib/estimate/pdf";
 import { saveEstimate } from "../../lib/estimate/wordpress";
+import { sendEstimateEmail } from "../../lib/estimate/email";
 
 // An estimate takes Claude a while to think through; give it room.
 export const maxDuration = 60;
@@ -73,20 +74,29 @@ export async function POST(request: Request) {
 
   // The PDF is a copy, not the estimate itself: without it the visitor still
   // gets the estimate on screen and by email.
-  let pdf: string | undefined;
+  let pdf: Buffer | undefined;
   try {
-    pdf = (await renderEstimatePdf(estimate, answers)).toString("base64");
+    pdf = await renderEstimatePdf(estimate, answers);
   } catch (error) {
     console.error("Making the estimate PDF failed:", error);
+  }
+
+  // Best effort too: the estimate is on screen, with the PDF to download.
+  let emailed = false;
+  try {
+    await sendEstimateEmail(email, estimate, pdf);
+    emailed = true;
+  } catch (error) {
+    console.error("Emailing the estimate failed:", error);
   }
 
   // The visitor still gets their estimate if saving fails; the log keeps the
   // lead so it can be recovered.
   try {
-    await saveEstimate({ email, marketingConsent, answers, estimate, pdf });
+    await saveEstimate({ email, marketingConsent, answers, estimate, emailed, pdfAttached: emailed && Boolean(pdf) });
   } catch (error) {
     console.error("Saving the estimate to WordPress failed:", error, { email, marketingConsent, answers, estimate });
   }
 
-  return Response.json({ estimate, pdf });
+  return Response.json({ estimate, pdf: pdf?.toString("base64") });
 }

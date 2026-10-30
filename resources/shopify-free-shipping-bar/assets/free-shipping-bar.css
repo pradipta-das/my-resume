@@ -1,0 +1,42 @@
+/* Free shipping bar. Colours come from the section settings as custom
+   properties on each bar. */
+
+.free-shipping-bar {
+  color: var(--fsb-text, currentColor);
+}
+
+.free-shipping-bar[hidden] {
+  display: none;
+}
+
+.free-shipping-bar__message {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.free-shipping-bar__track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--fsb-track, #e6e6e6);
+  overflow: hidden;
+}
+
+.free-shipping-bar__fill {
+  display: block;
+  height: 100%;
+  max-width: 100%;
+  border-radius: inherit;
+  background: var(--fsb-bar, #121212);
+  transition: width 0.4s ease;
+}
+
+.free-shipping-bar-section--center .free-shipping-bar {
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .free-shipping-bar__fill {
+    transition: none;
+  }
+}

@@ -171,7 +171,11 @@ const sections: LegalSection[] = [
             consultation requests are stored.
           </li>
           <li>
-            <strong>Email</strong>, used to send you your estimate or a confirmation of your consultation request, to notify me of new requests, and to reply to you.
+            <strong>Titan</strong>, the email service for pradipta.online, used to send you your estimate or a confirmation of your consultation request, to notify me of new requests, and to reply to you. See{" "}
+            <a href="https://titan.email/privacy-policy/" target="_blank" rel="noopener">
+              Titan&apos;s privacy policy
+            </a>
+            .
           </li>
           <li>
             <strong>Google</strong>, for Google Analytics, if you allow analytics cookies. See{" "}

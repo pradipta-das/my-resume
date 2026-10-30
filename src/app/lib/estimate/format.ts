@@ -1,7 +1,6 @@
 /*
  * Money formatting shared by the results screen and the PDF, so both show
- * amounts the same way. The WordPress email mirrors it in PHP
- * (pradipta_estimates_money in wordpress/pradipta-estimates).
+ * amounts the same way, and by the estimate email (lib/estimate/email.ts).
  */
 
 // Whole amounts in the estimate's currency; Indian digit grouping for rupees.

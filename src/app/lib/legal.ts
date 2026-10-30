@@ -3,7 +3,7 @@
 export const LEGAL = {
   owner: "Pradipta Das",
   site: "pradipta.online",
-  email: "privacy@pradipta.online",
+  email: "hello@pradipta.online",
   country: "India",
-  updated: "2026-10-29",
+  updated: "2026-10-30",
 };

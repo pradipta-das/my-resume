@@ -1,5 +1,6 @@
 import { ConsultationRequestSchema } from "../../lib/consultation/schema";
 import { saveConsultation } from "../../lib/consultation/wordpress";
+import { sendConsultationAcknowledgement, sendConsultationNotification } from "../../lib/consultation/email";
 
 /*
  * POST /api/consultation
@@ -52,11 +53,21 @@ export async function POST(request: Request) {
 
   // Unlike the estimator, saving is the whole point here: if WordPress can't
   // take the request, the visitor needs to know so they can try again.
+  let id: number;
   try {
-    await saveConsultation(entry);
+    id = await saveConsultation(entry);
   } catch (error) {
     console.error("Saving the consultation request to WordPress failed:", error, entry);
     return fail("Your request didn't go through this time. Please try again in a moment.", 502);
+  }
+
+  // Best effort: the request is saved, so a mail failure doesn't fail it.
+  const sent = await Promise.allSettled([
+    sendConsultationNotification(entry, id),
+    sendConsultationAcknowledgement(entry),
+  ]);
+  for (const result of sent) {
+    if (result.status === "rejected") console.error("Sending a consultation email failed:", result.reason, { id });
   }
 
   return Response.json({ ok: true });

@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/*
+ * Post and page content comes from the block editor as HTML. The typography
+ * plugin (`prose`) styles the text; the rules below cover the block classes
+ * that most often appear. For full block styling, load WordPress's own
+ * block-library stylesheet instead (see README.md).
+ */
+@layer components {
+  .wp-content .aligncenter {
+    @apply mx-auto text-center;
+  }
+  .wp-content .alignleft {
+    @apply float-left mr-6 mb-4;
+  }
+  .wp-content .alignright {
+    @apply float-right ml-6 mb-4;
+  }
+  .wp-content .has-text-align-center {
+    @apply text-center;
+  }
+  .wp-content .has-text-align-right {
+    @apply text-right;
+  }
+  .wp-content figure figcaption,
+  .wp-content .wp-element-caption {
+    @apply mt-2 text-center text-sm text-zinc-500;
+  }
+  .wp-content .wp-block-buttons {
+    @apply flex flex-wrap gap-3;
+  }
+  .wp-content .wp-block-button__link {
+    @apply inline-block rounded-md bg-zinc-900 px-5 py-2.5 font-semibold text-white no-underline hover:bg-zinc-700;
+  }
+  .wp-content .wp-block-columns {
+    @apply grid gap-8 md:grid-flow-col md:auto-cols-fr;
+  }
+  .wp-content .wp-block-embed iframe,
+  .wp-content .wp-block-video video {
+    @apply aspect-video h-auto w-full;
+  }
+}

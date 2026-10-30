@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Pradipta Project Estimates
- * Description: Stores project estimates sent by the website's cost estimator (pradipta/v1/estimates), lists them under "Project Estimates" in the admin, and emails the visitor a copy of their estimate.
- * Version:     1.2.0
+ * Description: Stores project estimates sent by the website's cost estimator (pradipta/v1/estimates) and lists them under "Project Estimates" in the admin.
+ * Version:     1.3.0
  * Author:      Pradipta Das
  * Requires PHP: 7.4
  *
@@ -14,18 +14,9 @@
  * Requests without that secret are rejected, and the endpoint stays closed
  * until the constant is defined.
  *
- * The visitor gets a plain-text copy of their estimate from "Pradipta Das",
- * with the PDF the website makes attached, and replies going to the admin
- * email. It uses the same optional
- * wp-config.php settings as the consultations plugin:
- *
- *     define( 'PRADIPTA_MAIL_FROM', 'hello@pradipta.online' );  // sender address
- *     define( 'PRADIPTA_MAIL_FROM_NAME', 'Pradipta Das' );
- *     define( 'PRADIPTA_MAIL_REPLY_TO', 'hello@pradipta.online' );
- *     define( 'PRADIPTA_SITE_URL', 'https://pradipta.online' );
- *
- * Change or turn off the email with the pradipta_estimate_acknowledgement
- * filter (return an empty array to skip it).
+ * The website emails the visitor their copy itself, from its own domain, and
+ * tells this plugin whether it went out, which the details panel shows. Since
+ * version 1.3 the plugin sends no email.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -94,9 +85,13 @@ add_action( 'rest_api_init', function () {
 					'type'     => 'object',
 					'required' => true,
 				),
-				// The estimate as a PDF (base64), attached to the visitor's email.
-				'pdf'               => array(
-					'type'     => 'string',
+				// Whether the website emailed the visitor a copy, and with the PDF.
+				'emailed'           => array(
+					'type'     => 'boolean',
+					'required' => false,
+				),
+				'pdf_attached'      => array(
+					'type'     => 'boolean',
 					'required' => false,
 				),
 			),
@@ -137,15 +132,6 @@ function pradipta_estimates_range( $low, $high, $currency ) {
 	return pradipta_estimates_money( $low, $currency ) . ' – ' . pradipta_estimates_money( $high, $currency );
 }
 
-// The PDF sent with the estimate, decoded, or '' if there isn't a usable one.
-function pradipta_estimates_pdf( $base64 ) {
-	if ( ! is_string( $base64 ) || '' === $base64 || strlen( $base64 ) > 3 * 1024 * 1024 ) {
-		return '';
-	}
-	$pdf = base64_decode( $base64, true );
-	return ( false !== $pdf && 0 === strpos( $pdf, '%PDF-' ) ) ? $pdf : '';
-}
-
 // Cleans every string in a nested array of form answers or estimate fields.
 function pradipta_estimates_clean( $value ) {
 	if ( is_array( $value ) ) {
@@ -171,6 +157,7 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 	}
 
 	$consent  = (bool) $request->get_param( 'marketing_consent' );
+	$emailed  = (bool) $request->get_param( 'emailed' );
 	$answers  = pradipta_estimates_clean( (array) $request->get_param( 'answers' ) );
 	$estimate = pradipta_estimates_clean( (array) $request->get_param( 'estimate' ) );
 
@@ -183,6 +170,8 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 			'post_type'   => PRADIPTA_ESTIMATE_POST_TYPE,
 			'post_status' => 'private',
 			'post_title'  => $email . ' — ' . pradipta_estimates_range( $low, $high, $currency ),
+			// wp_insert_post strips slashes from meta, which would break the JSON's
+			// escapes (line breaks, quotes, non-English text), so they're added first.
 			'meta_input'  => array(
 				'_estimate_email'             => $email,
 				'_estimate_marketing_consent' => $consent ? '1' : '0',
@@ -191,8 +180,10 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 				'_estimate_currency'          => $currency,
 				'_estimate_low'               => $low,
 				'_estimate_high'              => $high,
-				'_estimate_answers'           => wp_json_encode( $answers ),
-				'_estimate_result'            => wp_json_encode( $estimate ),
+				'_estimate_answers'           => wp_slash( wp_json_encode( $answers ) ),
+				'_estimate_result'            => wp_slash( wp_json_encode( $estimate ) ),
+				'_estimate_acknowledged'      => $emailed ? '1' : '0',
+				'_estimate_pdf_attached'      => $emailed && $request->get_param( 'pdf_attached' ) ? '1' : '0',
 			),
 		),
 		true
@@ -202,166 +193,7 @@ function pradipta_estimates_create( WP_REST_Request $request ) {
 		return new WP_Error( 'save_failed', $post_id->get_error_message(), array( 'status' => 500 ) );
 	}
 
-	pradipta_estimates_acknowledge( $post_id, $email, $estimate, pradipta_estimates_pdf( $request->get_param( 'pdf' ) ) );
-
 	return new WP_REST_Response( array( 'id' => $post_id ), 201 );
-}
-
-// AI-written text for the email: no links, and not too long. The estimate is
-// written from the visitor's answers and anyone can type any address into
-// the form, so the email mustn't carry links a stranger could plant.
-function pradipta_estimates_email_text( $text, $limit = 600 ) {
-	$text = preg_replace( '~(?:https?://|www\.)\S+~i', '', (string) $text );
-	$text = trim( preg_replace( '/\s+/', ' ', $text ) );
-	return mb_strlen( $text ) > $limit ? rtrim( mb_substr( $text, 0, $limit - 1 ) ) . '…' : $text;
-}
-
-// Emails the visitor a copy of their estimate, with the PDF attached when
-// there is one. Best effort: the estimate is already saved and shown on the
-// website, so a mail failure doesn't fail it.
-function pradipta_estimates_acknowledge( $post_id, $email, $estimate, $pdf = '' ) {
-	$site     = untrailingslashit( defined( 'PRADIPTA_SITE_URL' ) ? PRADIPTA_SITE_URL : 'https://pradipta.online' );
-	$currency = isset( $estimate['currency'] ) ? strtoupper( substr( (string) $estimate['currency'], 0, 3 ) ) : '';
-	$range    = function ( $low, $high ) use ( $currency ) {
-		return pradipta_estimates_range( $low, $high, $currency );
-	};
-	$total    = $range( $estimate['low'] ?? 0, $estimate['high'] ?? 0 );
-
-	$lines = array(
-		'Hi there,',
-		'',
-		'' !== $pdf
-			? "Thanks for trying the cost estimator. Your estimate is attached as a PDF, with a summary below."
-			: "Thanks for trying the cost estimator. Here's a copy of your estimate to keep.",
-		'',
-		'YOUR ESTIMATE',
-		$total,
-	);
-
-	if ( isset( $estimate['timeline']['minWeeks'], $estimate['timeline']['maxWeeks'] ) ) {
-		$lines[] = sprintf( 'Timeline: %d–%d weeks', (int) $estimate['timeline']['minWeeks'], (int) $estimate['timeline']['maxWeeks'] );
-	}
-
-	if ( ! empty( $estimate['summary'] ) ) {
-		$lines[] = '';
-		$lines[] = pradipta_estimates_email_text( $estimate['summary'] );
-	}
-
-	if ( isset( $estimate['phaseOne']['low'], $estimate['phaseOne']['high'] ) ) {
-		$lines[] = '';
-		$lines[] = 'START SMALLER';
-		$lines[] = $range( $estimate['phaseOne']['low'], $estimate['phaseOne']['high'] );
-		if ( ! empty( $estimate['phaseOne']['scope'] ) ) {
-			$lines[] = pradipta_estimates_email_text( $estimate['phaseOne']['scope'], 300 );
-		}
-	}
-
-	if ( isset( $estimate['freelance']['low'], $estimate['freelance']['high'] ) ) {
-		$lines[] = '';
-		$lines[] = 'TYPICAL FREELANCE PRICE';
-		$lines[] = $range( $estimate['freelance']['low'], $estimate['freelance']['high'] );
-		$lines[] = 'The same hours at typical rates for experienced freelancers in your market.';
-	}
-
-	if ( ! empty( $estimate['breakdown'] ) && is_array( $estimate['breakdown'] ) ) {
-		$lines[] = '';
-		$lines[] = 'BREAKDOWN';
-		foreach ( array_slice( $estimate['breakdown'], 0, 12 ) as $row ) {
-			$lines[] = sprintf(
-				'- %s: %s',
-				pradipta_estimates_email_text( $row['item'] ?? '', 80 ),
-				$range( $row['low'] ?? 0, $row['high'] ?? 0 )
-			);
-		}
-	}
-
-	foreach ( array( 'costDrivers' => 'WHAT DRIVES THE COST', 'assumptions' => 'ASSUMPTIONS' ) as $key => $label ) {
-		if ( ! empty( $estimate[ $key ] ) && is_array( $estimate[ $key ] ) ) {
-			$lines[] = '';
-			$lines[] = $label;
-			foreach ( array_slice( $estimate[ $key ], 0, 8 ) as $item ) {
-				$lines[] = '- ' . pradipta_estimates_email_text( $item, 200 );
-			}
-		}
-	}
-
-	$lines = array_merge(
-		$lines,
-		array(
-			'',
-			"This is a ballpark for planning, not a quote. Every project has details a questionnaire can't capture, and the real number depends on them.",
-			'',
-			"If you'd like to talk it through, just reply to this email, or book a free consultation call:",
-			$site . '/free-consultation',
-			'',
-			'Pradipta Das',
-			$site,
-		)
-	);
-
-	$message = apply_filters(
-		'pradipta_estimate_acknowledgement',
-		array(
-			'subject' => 'Your website estimate: ' . $total,
-			'body'    => implode( "\n", $lines ),
-		),
-		$post_id,
-		$estimate
-	);
-
-	if ( empty( $message['subject'] ) || empty( $message['body'] ) ) {
-		return;
-	}
-
-	// wp_mail attaches files, so the PDF goes in a folder of its own for the
-	// length of the send, under the name the visitor will see.
-	$dir   = '';
-	$files = array();
-	if ( '' !== $pdf ) {
-		$dir  = trailingslashit( get_temp_dir() ) . 'pradipta-estimate-' . wp_generate_password( 12, false );
-		$file = $dir . '/Pradipta-Das-website-estimate.pdf';
-		if ( wp_mkdir_p( $dir ) && false !== file_put_contents( $file, $pdf ) ) {
-			$files[] = $file;
-		}
-	}
-
-	$sent = pradipta_estimates_mail_visitor( $email, $message['subject'], $message['body'], $files );
-	update_post_meta( $post_id, '_estimate_acknowledged', $sent ? '1' : '0' );
-	update_post_meta( $post_id, '_estimate_pdf_attached', $sent && $files ? '1' : '0' );
-
-	foreach ( $files as $file ) {
-		wp_delete_file( $file );
-	}
-	if ( '' !== $dir && is_dir( $dir ) ) {
-		rmdir( $dir );
-	}
-}
-
-// Sends an email to a visitor as "Pradipta Das", with replies coming back to
-// the site owner. The sender filters apply to this one email only.
-function pradipta_estimates_mail_visitor( $to, $subject, $body, $attachments = array() ) {
-	$from      = defined( 'PRADIPTA_MAIL_FROM' ) && is_email( PRADIPTA_MAIL_FROM ) ? PRADIPTA_MAIL_FROM : '';
-	$from_name = defined( 'PRADIPTA_MAIL_FROM_NAME' ) ? (string) PRADIPTA_MAIL_FROM_NAME : 'Pradipta Das';
-	$reply_to  = defined( 'PRADIPTA_MAIL_REPLY_TO' ) && is_email( PRADIPTA_MAIL_REPLY_TO ) ? PRADIPTA_MAIL_REPLY_TO : get_option( 'admin_email' );
-	$from_name = str_replace( array( "\r", "\n", '<', '>', '"' ), '', $from_name );
-
-	$set_from      = function ( $address ) use ( $from ) {
-		return $from ? $from : $address;
-	};
-	$set_from_name = function () use ( $from_name ) {
-		return $from_name;
-	};
-
-	add_filter( 'wp_mail_from', $set_from );
-	add_filter( 'wp_mail_from_name', $set_from_name );
-
-	$headers = is_email( $reply_to ) ? array( sprintf( 'Reply-To: %s <%s>', $from_name, $reply_to ) ) : array();
-	$sent    = wp_mail( $to, $subject, $body, $headers, $attachments );
-
-	remove_filter( 'wp_mail_from', $set_from );
-	remove_filter( 'wp_mail_from_name', $set_from_name );
-
-	return $sent;
 }
 
 /* =========================================================
@@ -431,7 +263,7 @@ function pradipta_estimates_details_box( WP_Post $post ) {
 		<?php
 		// Estimates saved before version 1.1 have no record.
 		$acknowledged = get_post_meta( $post->ID, '_estimate_acknowledged', true );
-		$ack_label    = '1' === $acknowledged ? 'Sent' : ( '0' === $acknowledged ? 'Failed (check your mail setup)' : 'Not sent' );
+		$ack_label    = '1' === $acknowledged ? 'Sent' : ( '0' === $acknowledged ? 'Failed (check the website\'s logs)' : 'Not sent' );
 		?>
 		Copy emailed to visitor: <?php echo esc_html( $ack_label ); ?>
 		<?php if ( '1' === $acknowledged ) : ?>

@@ -1,0 +1,268 @@
+/*
+ * Block Editor Styles
+ * These styles are applied to blocks in the WordPress editor
+ */
+
+/* Block Editor Base Styles */
+.wp-block {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Button Styles */
+.wp-block-button .wp-block-button__link {
+    background: #007cba;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.wp-block-button .wp-block-button__link:hover {
+    background: #005a87;
+}
+
+/* Outline Button Style */
+.wp-block-button.is-style-outline .wp-block-button__link {
+    background: transparent;
+    color: #007cba;
+    border: 2px solid #007cba;
+}
+
+.wp-block-button.is-style-outline .wp-block-button__link:hover {
+    background: #007cba;
+    color: #fff;
+}
+
+/* Ghost Button Style */
+.wp-block-button.is-style-ghost .wp-block-button__link {
+    background: transparent;
+    color: #007cba;
+    border: none;
+    text-decoration: underline;
+}
+
+.wp-block-button.is-style-ghost .wp-block-button__link:hover {
+    color: #005a87;
+}
+
+/* Heading Styles */
+.wp-block-heading {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.wp-block-heading h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.wp-block-heading h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.wp-block-heading h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Paragraph Styles */
+.wp-block-paragraph {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+/* Quote Styles */
+.wp-block-quote {
+    border-left: 4px solid #007cba;
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+}
+
+.wp-block-quote cite {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Large Quote Style */
+.wp-block-quote.is-style-large-quote {
+    border: none;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 1.25rem;
+}
+
+/* Group Styles */
+.wp-block-group {
+    margin-bottom: 2rem;
+}
+
+/* Card Group Style */
+.wp-block-group.is-style-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Shadow Group Style */
+.wp-block-group.is-style-shadow {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+/* Columns Styles */
+.wp-block-columns {
+    margin-bottom: 2rem;
+}
+
+.wp-block-column {
+    margin-bottom: 1rem;
+}
+
+/* Image Styles */
+.wp-block-image {
+    margin-bottom: 1rem;
+}
+
+.wp-block-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* List Styles */
+.wp-block-list {
+    margin-bottom: 1rem;
+}
+
+.wp-block-list ul,
+.wp-block-list ol {
+    padding-left: 1.5rem;
+}
+
+.wp-block-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* Table Styles */
+.wp-block-table {
+    margin-bottom: 2rem;
+}
+
+.wp-block-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.wp-block-table th,
+.wp-block-table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.wp-block-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+/* Code Styles */
+.wp-block-code {
+    background: #f4f4f4;
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    overflow-x: auto;
+}
+
+/* Separator Styles */
+.wp-block-separator {
+    margin: 2rem 0;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+/* Spacer Styles */
+.wp-block-spacer {
+    clear: both;
+}
+
+/* Cover Styles */
+.wp-block-cover {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Gallery Styles */
+.wp-block-gallery {
+    margin-bottom: 2rem;
+}
+
+.wp-block-gallery .blocks-gallery-item {
+    margin-bottom: 1rem;
+}
+
+/* Media & Text Styles */
+.wp-block-media-text {
+    margin-bottom: 2rem;
+}
+
+.wp-block-media-text .wp-block-media-text__content {
+    padding: 1rem;
+}
+
+/* Embed Styles */
+.wp-block-embed {
+    margin-bottom: 2rem;
+}
+
+.wp-block-embed iframe {
+    max-width: 100%;
+}
+
+/* Wide and Full Width Alignments */
+.alignwide {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.alignfull {
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .wp-block-columns {
+        flex-direction: column;
+    }
+    
+    .wp-block-column {
+        margin-bottom: 1rem;
+    }
+    
+    .wp-block-group.is-style-card,
+    .wp-block-group.is-style-shadow {
+        padding: 1rem;
+    }
+    
+    .wp-block-button .wp-block-button__link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}

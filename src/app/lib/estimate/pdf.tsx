@@ -5,7 +5,7 @@ import { formatRange } from "./format";
 import type { Estimate, EstimateAnswers } from "./schema";
 
 /*
- * The estimate as a PDF: attached to the email WordPress sends, and offered
+ * The estimate as a PDF: attached to the email the site sends, and offered
  * as a download on the results screen. Server only.
  *
  * Drawn in the brand fonts from assets/fonts (next.config.ts ships them with

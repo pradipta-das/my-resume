@@ -1,0 +1,15 @@
+{
+  "name": "tailwind-block-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Builds the Tailwind CSS for the Tailwind Block Theme.",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "tailwindcss -i src/theme.css -o assets/css/theme.css --minify",
+    "watch": "tailwindcss -i src/theme.css -o assets/css/theme.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

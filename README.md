@@ -20,8 +20,8 @@ npm run dev                  # http://localhost:3000
 | `/about` | About me |
 | `/case-studies`, `/case-studies/[slug]` | Case studies from the `case-study` post type |
 | `/blog`, `/blog/[slug]` | The Journal: WordPress posts |
-| `/cost-estimator` | AI cost estimator (Claude), saved to WordPress; the visitor gets a PDF copy (`src/app/lib/estimate/pdf.tsx`) to download and by email |
-| `/free-consultation` | Consultation booking, saved to WordPress |
+| `/cost-estimator` | AI cost estimator (Claude), saved to WordPress; the visitor gets a PDF copy (`src/app/lib/estimate/pdf.tsx`) to download and by email (`src/app/lib/estimate/email.ts`) |
+| `/free-consultation` | Consultation booking, saved to WordPress; emails you a notification and the visitor an acknowledgement (`src/app/lib/consultation/email.ts`) |
 | `/resources`, `/resources/[slug]` | Free downloads, listed in `src/app/lib/resources.ts` (files go in `public/downloads/`); a resource without an `href` stays hidden |
 | `/privacy-policy`, `/terms-and-conditions` | Legal pages |
 
@@ -47,19 +47,25 @@ The site reads WordPress over its REST API, server-side only, sending `WORDPRESS
 | --- | --- | --- |
 | `pradipta-rest-lock` | Blocks the REST API for anyone without the key, and accepts Application Password logins in `X-WP-Authorization` on hosts that drop the `Authorization` header | `PRADIPTA_API_SECRET` |
 | `pradipta-redirect` | Sends visitors of logicncolor.com to pradipta.online | |
-| `pradipta-estimates` | Stores cost estimates and emails the visitor a copy, with the PDF attached | `PRADIPTA_ESTIMATE_SECRET` |
-| `pradipta-consultations` | Stores consultation requests, emails you a notification and the visitor an acknowledgement | (uses `PRADIPTA_API_SECRET`) |
+| `pradipta-estimates` | Stores cost estimates, and whether the visitor's copy was emailed | `PRADIPTA_ESTIMATE_SECRET` |
+| `pradipta-consultations` | Stores consultation requests | (uses `PRADIPTA_API_SECRET`) |
 | `pradipta-case-studies` | The Case Studies post type and its fields | |
 
 To install one, zip its folder and upload it under Plugins → Add New → Upload Plugin.
 
-Emails to visitors are sent with `wp_mail`, so they go out through whatever mail setup WordPress has. For reliable delivery, use an SMTP plugin with a transactional email service authenticated for your domain, then optionally set the sender in `wp-config.php`:
+## Email
 
-```php
-define( 'PRADIPTA_MAIL_FROM', 'hello@pradipta.online' );     // must be an address your SMTP setup may send from
-define( 'PRADIPTA_MAIL_FROM_NAME', 'Pradipta Das' );         // default
-define( 'PRADIPTA_MAIL_REPLY_TO', 'hello@pradipta.online' ); // default: the WordPress admin email
-```
+The site sends its emails itself, from hello@pradipta.online through Titan's SMTP server (`src/app/lib/mail.ts`), so they come from the same domain as the website. WordPress only stores the requests and sends nothing.
+
+| Email | To | When |
+| --- | --- | --- |
+| Estimate copy, with the PDF attached | The visitor | Each estimate; WordPress records whether it went out |
+| Acknowledgement | The visitor | Each consultation request, once it's saved |
+| New-request notification (replying answers the visitor) | `MAIL_NOTIFY_TO`, or the mailbox itself | Each consultation request, once it's saved |
+
+Set `SMTP_USER` and `SMTP_PASSWORD` (the mailbox's password) in `.env.local` and in Netlify's environment variables; see `.env.example`. Sending is best effort: if it fails, the request is still saved and the error is in the function logs.
+
+For good delivery, the domain's DNS needs Titan's MX and SPF records, its DKIM key under the selector Titan gives (`<selector>._domainkey`), and a DMARC record.
 
 ## SEO
 
@@ -68,6 +74,19 @@ define( 'PRADIPTA_MAIL_REPLY_TO', 'hello@pradipta.online' ); // default: the Wor
 - **Structured data:** WebSite, Person and ProfessionalService on the homepage; WebApplication on the cost estimator; BlogPosting and BreadcrumbList on posts; BreadcrumbList on case studies and resources.
 - **Journal:** categories filter at `/blog?category=<slug>` (WordPress category slugs); the RSS feed is at `/feed.xml`.
 - **Icons:** `src/app/icon.svg`, `apple-icon.png` and `favicon.ico` are the "P." from the logo.
+
+## Free downloads
+
+The resources at `/resources` are listed in `src/app/lib/resources.ts` and served from `public/downloads/`. Their sources live in `resources/` (the REST API Lock plugin in `wordpress/pradipta-rest-lock`):
+
+| Source | Download |
+| --- | --- |
+| `resources/headless-wordpress-starter/` | WordPress theme and Next.js front end (ZIP) |
+| `resources/tailwind-block-theme/` | Block theme (ZIP); `npm run build` in its folder rebuilds its CSS |
+| `resources/shopify-free-shipping-bar/` | Shopify theme section (ZIP) |
+| `resources/documents/` | The launch checklist and MySQL cheatsheet (PDFs, drawn with `@react-pdf/renderer`) |
+
+After changing one, run `npm run resources` (or `npm run resources -- <name>` for one) and commit what changes in `public/downloads/`. Each project in `resources/` has its own tooling, so the site's lint and TypeScript checks skip that folder.
 
 ## Analytics and privacy
 

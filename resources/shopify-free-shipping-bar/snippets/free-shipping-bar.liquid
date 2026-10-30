@@ -1,0 +1,85 @@
+{%- comment -%}
+  Free shipping progress bar.
+
+  Used by the "Free shipping bar" section, and can be rendered on its own,
+  for example in the cart drawer (snippets/cart-drawer.liquid in Dawn):
+
+    {% render 'free-shipping-bar', threshold: 50 %}
+
+  Parameters, all optional:
+  - threshold: free shipping minimum in the store's currency (default 50)
+  - message: shown below the threshold; [amount] becomes what's left to spend
+  - success_message: shown once the threshold is reached
+  - bar_color, track_color, text_color: CSS colours
+  - hide_when_empty: hide the bar while the cart is empty (default true)
+
+  assets/free-shipping-bar.js keeps every bar on the page up to date as the
+  cart changes, and converts the threshold when a shopper pays in another
+  currency.
+{%- endcomment -%}
+
+{%- liquid
+  assign threshold = threshold | default: 50
+  assign message = message | default: "You're [amount] away from free shipping."
+  assign success_message = success_message | default: "You've unlocked free shipping!"
+  assign bar_color = bar_color | default: '#121212'
+  assign track_color = track_color | default: '#e6e6e6'
+  assign text_color = text_color | default: 'currentColor'
+  assign hide_when_empty = hide_when_empty | default: true, allow_false: true
+
+  assign threshold_cents = threshold | times: 100 | round
+
+  # The server can only work the numbers out in the store's own currency. For
+  # shoppers paying in another currency, the script fills the bar in.
+  assign converted = false
+  if cart.currency.iso_code != shop.currency
+    assign converted = true
+  endif
+
+  assign left = threshold_cents | minus: cart.total_price | at_least: 0
+  if threshold_cents > 0
+    assign percent = cart.total_price | times: 100 | divided_by: threshold_cents | at_most: 100
+  else
+    assign percent = 100
+  endif
+
+  if left == 0
+    assign text = success_message
+  else
+    assign left_money = left | money
+    assign text = message | replace: '[amount]', left_money
+  endif
+
+  assign hidden = false
+  if converted or hide_when_empty and cart.item_count == 0
+    assign hidden = true
+  endif
+-%}
+
+{{ 'free-shipping-bar.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'free-shipping-bar.js' | asset_url }}" defer></script>
+
+<div
+  class="free-shipping-bar{% if left == 0 %} is-complete{% endif %}"
+  data-free-shipping-bar
+  data-threshold="{{ threshold_cents }}"
+  data-message="{{ message | escape }}"
+  data-success="{{ success_message | escape }}"
+  data-hide-when-empty="{{ hide_when_empty }}"
+  style="--fsb-bar: {{ bar_color }}; --fsb-track: {{ track_color }}; --fsb-text: {{ text_color }};"
+  {% if hidden %}
+    hidden
+  {% endif %}
+>
+  <p class="free-shipping-bar__message" aria-live="polite">{{ text | escape }}</p>
+  <div
+    class="free-shipping-bar__track"
+    role="progressbar"
+    aria-label="Progress towards free shipping"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="{{ percent }}"
+  >
+    <span class="free-shipping-bar__fill" style="width: {{ percent }}%;"></span>
+  </div>
+</div>

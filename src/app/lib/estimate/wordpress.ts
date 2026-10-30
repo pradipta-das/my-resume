@@ -12,8 +12,9 @@ export async function saveEstimate(entry: {
   marketingConsent: boolean;
   answers: EstimateAnswers;
   estimate: Estimate;
-  // The estimate as a PDF (base64), attached to the visitor's email.
-  pdf?: string;
+  // Whether the visitor's copy went out, and with the PDF attached.
+  emailed: boolean;
+  pdfAttached: boolean;
 }): Promise<number> {
   const secret = process.env.WORDPRESS_ESTIMATE_SECRET;
   if (!secret) throw new Error("WORDPRESS_ESTIMATE_SECRET is not set");
@@ -26,7 +27,8 @@ export async function saveEstimate(entry: {
       marketing_consent: entry.marketingConsent,
       answers: labelAnswers(entry.answers),
       estimate: entry.estimate,
-      pdf: entry.pdf,
+      emailed: entry.emailed,
+      pdf_attached: entry.pdfAttached,
     }),
     cache: "no-store",
     signal: AbortSignal.timeout(10_000),

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Free downloads: separate projects with their own tooling (see resources/README.md).
+    "resources/**",
   ]),
 ]);
 

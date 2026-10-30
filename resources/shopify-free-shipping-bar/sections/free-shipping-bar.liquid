@@ -1,0 +1,118 @@
+{%- comment -%}
+  Free shipping bar: a section for the cart page, or for the header group so
+  it shows on every page. The bar itself is snippets/free-shipping-bar.liquid.
+{%- endcomment -%}
+
+<div
+  class="free-shipping-bar-section free-shipping-bar-section--{{ section.settings.alignment }}"
+  style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width">
+    {%- render 'free-shipping-bar',
+      threshold: section.settings.threshold,
+      message: section.settings.message,
+      success_message: section.settings.success_message,
+      bar_color: section.settings.bar_color,
+      track_color: section.settings.track_color,
+      text_color: section.settings.text_color,
+      hide_when_empty: section.settings.hide_when_empty
+    -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Free shipping bar",
+  "tag": "section",
+  "class": "section-free-shipping-bar",
+  "settings": [
+    {
+      "type": "number",
+      "id": "threshold",
+      "label": "Free shipping minimum",
+      "info": "In your store's currency. Match the free shipping rate in Settings › Shipping and delivery.",
+      "default": 50
+    },
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Message",
+      "info": "[amount] is replaced with what's left to spend.",
+      "default": "You're [amount] away from free shipping."
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Message once reached",
+      "default": "You've unlocked free shipping!"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_when_empty",
+      "label": "Hide while the cart is empty",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Centre" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "bar_color",
+      "label": "Bar",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "track_color",
+      "label": "Track",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Free shipping bar"
+    }
+  ]
+}
+{% endschema %}

@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Pradipta Consultation Requests
- * Description: Stores free consultation call requests sent by the website (pradipta/v1/consultations), lists them under "Consultations" in the admin, emails a notification for each one, and sends the visitor a short acknowledgement.
- * Version:     1.1.0
+ * Description: Stores free consultation call requests sent by the website (pradipta/v1/consultations) and lists them under "Consultations" in the admin.
+ * Version:     1.2.0
  * Author:      Pradipta Das
  * Requires PHP: 7.4
  *
@@ -14,21 +14,9 @@
  * Requests without that key are rejected, and the endpoint stays closed until
  * the constant is defined.
  *
- * Notifications go to the site's admin email; change the address with the
- * pradipta_consultation_notify_to filter, or return '' to turn them off.
- *
- * The visitor gets a plain-text acknowledgement from "Pradipta Das". Replies
- * go to the admin email. Optional settings in wp-config.php:
- *
- *     define( 'PRADIPTA_MAIL_FROM', 'hello@pradipta.online' );  // sender address
- *     define( 'PRADIPTA_MAIL_FROM_NAME', 'Pradipta Das' );
- *     define( 'PRADIPTA_MAIL_REPLY_TO', 'hello@pradipta.online' );
- *     define( 'PRADIPTA_SITE_URL', 'https://pradipta.online' );
- *
- * Only set PRADIPTA_MAIL_FROM to an address your mail setup is allowed to send
- * from (an SMTP plugin authenticated for that domain), or the emails will land
- * in spam. Change or turn off the email with the pradipta_consultation_acknowledgement
- * filter (return an empty array to skip it).
+ * The website sends the emails itself, from its own domain: the visitor's
+ * acknowledgement and the notification of each new request. Since version
+ * 1.2 the plugin sends no email.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -150,6 +138,8 @@ function pradipta_consultations_create( WP_REST_Request $request ) {
 			'post_type'   => PRADIPTA_CONSULTATION_POST_TYPE,
 			'post_status' => 'private',
 			'post_title'  => sprintf( '%s (%s) — %s', $name, $audience, $email ),
+			// wp_insert_post strips slashes from meta, which would break the JSON's
+			// escapes (line breaks, quotes, non-English text), so they're added first.
 			'meta_input'  => array(
 				'_consultation_audience'          => $audience,
 				'_consultation_name'              => $name,
@@ -158,7 +148,7 @@ function pradipta_consultations_create( WP_REST_Request $request ) {
 				'_consultation_marketing_consent' => $consent ? '1' : '0',
 				// When consent was given, kept as a record of the opt-in.
 				'_consultation_consent_at'        => $consent ? current_time( 'mysql', true ) : '',
-				'_consultation_answers'           => wp_json_encode( $answers ),
+				'_consultation_answers'           => wp_slash( wp_json_encode( $answers ) ),
 			),
 		),
 		true
@@ -168,109 +158,7 @@ function pradipta_consultations_create( WP_REST_Request $request ) {
 		return new WP_Error( 'save_failed', $post_id->get_error_message(), array( 'status' => 500 ) );
 	}
 
-	pradipta_consultations_notify( $post_id, $audience, $name, $email, $phone, $answers );
-	pradipta_consultations_acknowledge( $post_id, $name, $email );
-
 	return new WP_REST_Response( array( 'id' => $post_id ), 201 );
-}
-
-// Tells the visitor their request arrived. Best effort, like the notification.
-//
-// Anyone can type any address into the form, so this email repeats nothing
-// they wrote except a short first name: echoing their message would let the
-// form be used to send arbitrary text to strangers from this site.
-function pradipta_consultations_acknowledge( $post_id, $name, $email ) {
-	$first = mb_substr( (string) strtok( trim( $name ), " \t" ), 0, 40 );
-	$site  = untrailingslashit( defined( 'PRADIPTA_SITE_URL' ) ? PRADIPTA_SITE_URL : 'https://pradipta.online' );
-
-	$body = implode(
-		"\n",
-		array(
-			sprintf( 'Hi %s,', $first ),
-			'',
-			'Thank you for booking a free consultation. This is just a quick note to say your request arrived safely.',
-			'',
-			"It's also the only automatic email you'll get from me. I'll read what you shared properly and reply personally within one working day, with a few times for our call.",
-			'',
-			'If you think of anything else in the meantime, just reply to this email. It comes straight to me.',
-			'',
-			'Speak soon,',
-			'Pradipta Das',
-			$site,
-		)
-	);
-
-	$message = apply_filters(
-		'pradipta_consultation_acknowledgement',
-		array(
-			'subject' => sprintf( 'Thanks, %s. Your consultation request arrived', $first ),
-			'body'    => $body,
-		),
-		$post_id
-	);
-
-	if ( empty( $message['subject'] ) || empty( $message['body'] ) ) {
-		return;
-	}
-
-	$sent = pradipta_consultations_mail_visitor( $email, $message['subject'], $message['body'] );
-	update_post_meta( $post_id, '_consultation_acknowledged', $sent ? '1' : '0' );
-}
-
-// Sends an email to a visitor as "Pradipta Das", with replies coming back to
-// the site owner. The sender filters apply to this one email only.
-function pradipta_consultations_mail_visitor( $to, $subject, $body ) {
-	$from      = defined( 'PRADIPTA_MAIL_FROM' ) && is_email( PRADIPTA_MAIL_FROM ) ? PRADIPTA_MAIL_FROM : '';
-	$from_name = defined( 'PRADIPTA_MAIL_FROM_NAME' ) ? (string) PRADIPTA_MAIL_FROM_NAME : 'Pradipta Das';
-	$reply_to  = defined( 'PRADIPTA_MAIL_REPLY_TO' ) && is_email( PRADIPTA_MAIL_REPLY_TO ) ? PRADIPTA_MAIL_REPLY_TO : get_option( 'admin_email' );
-	$from_name = str_replace( array( "\r", "\n", '<', '>', '"' ), '', $from_name );
-
-	$set_from      = function ( $address ) use ( $from ) {
-		return $from ? $from : $address;
-	};
-	$set_from_name = function () use ( $from_name ) {
-		return $from_name;
-	};
-
-	add_filter( 'wp_mail_from', $set_from );
-	add_filter( 'wp_mail_from_name', $set_from_name );
-
-	$headers = is_email( $reply_to ) ? array( sprintf( 'Reply-To: %s <%s>', $from_name, $reply_to ) ) : array();
-	$sent    = wp_mail( $to, $subject, $body, $headers );
-
-	remove_filter( 'wp_mail_from', $set_from );
-	remove_filter( 'wp_mail_from_name', $set_from_name );
-
-	return $sent;
-}
-
-// Emails the request so it can be answered quickly. Best effort: the request
-// is already saved, so a mail failure doesn't fail the submission.
-function pradipta_consultations_notify( $post_id, $audience, $name, $email, $phone, $answers ) {
-	$to = apply_filters( 'pradipta_consultation_notify_to', get_option( 'admin_email' ) );
-	if ( ! $to ) {
-		return;
-	}
-
-	$lines = array(
-		sprintf( '%s (%s)', $name, $audience ),
-		$email,
-	);
-	if ( $phone ) {
-		$lines[] = $phone;
-	}
-	$lines[] = '';
-
-	foreach ( $answers as $question => $answer ) {
-		$lines[] = $question . ': ' . ( is_array( $answer ) ? implode( ', ', $answer ) : $answer );
-	}
-
-	$lines[] = '';
-	$lines[] = 'View in WordPress: ' . admin_url( 'post.php?post=' . $post_id . '&action=edit' );
-
-	$headers = array( sprintf( 'Reply-To: %s <%s>', str_replace( array( "\r", "\n", '<', '>' ), '', $name ), $email ) );
-
-	wp_mail( $to, sprintf( 'New consultation request: %s', $name ), implode( "\n", $lines ), $headers );
 }
 
 /* =========================================================
@@ -321,14 +209,15 @@ add_action( 'add_meta_boxes_' . PRADIPTA_CONSULTATION_POST_TYPE, function () {
 	add_meta_box( 'pradipta-consultation-details', 'Request Details', 'pradipta_consultations_details_box', null, 'normal', 'high' );
 } );
 
-// Whether the visitor's acknowledgement went out. Requests saved before
-// version 1.1 have no record.
+// Whether the visitor's acknowledgement went out, for requests saved by
+// version 1.1, which sent it. The website sends it now, so newer requests
+// have no record here.
 function pradipta_consultations_ack_label( $post_id ) {
 	$sent = get_post_meta( $post_id, '_consultation_acknowledged', true );
 	if ( '1' === $sent ) {
 		return 'Sent';
 	}
-	return '0' === $sent ? 'Failed (check your mail setup)' : 'Not sent';
+	return '0' === $sent ? 'Failed' : '';
 }
 
 function pradipta_consultations_details_box( WP_Post $post ) {
@@ -347,8 +236,11 @@ function pradipta_consultations_details_box( WP_Post $post ) {
 		<?php if ( $phone ) : ?>
 			<a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a><br />
 		<?php endif; ?>
-		Newsletter: <?php echo $consent ? esc_html( 'Yes (opted in ' . $consent_at . ' UTC)' ) : 'No'; ?><br />
-		Acknowledgement email: <?php echo esc_html( pradipta_consultations_ack_label( $post->ID ) ); ?>
+		Newsletter: <?php echo $consent ? esc_html( 'Yes (opted in ' . $consent_at . ' UTC)' ) : 'No'; ?>
+		<?php $ack = pradipta_consultations_ack_label( $post->ID ); ?>
+		<?php if ( '' !== $ack ) : ?>
+			<br />Acknowledgement email: <?php echo esc_html( $ack ); ?>
+		<?php endif; ?>
 	</p>
 
 	<h3>Answers</h3>
