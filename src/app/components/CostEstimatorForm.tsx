@@ -429,7 +429,25 @@ const LAST_STEP = STEPS.length - 1;
    PAGE
 ========================================================= */
 
-export default function CostEstimatorForm() {
+// Answers in the address (e.g. ?project_type=E-commerce&technology=Shopify,
+// from a cost guide) start the form with those options chosen. Only choices
+// the form offers are applied; anything else is ignored.
+function prefill(form: HTMLFormElement): string {
+  let country = "";
+  new URLSearchParams(window.location.search).forEach((value, name) => {
+    const field = form.elements.namedItem(name);
+    if (field instanceof RadioNodeList) {
+      field.value = value;
+    } else if (field instanceof HTMLSelectElement && Array.from(field.options).some((option) => option.value === value)) {
+      field.value = value;
+      if (name === "country") country = value;
+    }
+  });
+  return country;
+}
+
+// children: sections shown under the estimator (the explanation and FAQ).
+export default function CostEstimatorForm({ children }: { children?: React.ReactNode }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const stepperRef = useRef<HTMLElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -528,6 +546,11 @@ export default function CostEstimatorForm() {
     setSubmitError(null);
   };
 
+  useEffect(() => {
+    const country = formRef.current && prefill(formRef.current);
+    if (country) setCountry(country);
+  }, []);
+
   // Page animations (see utils/animateSections for the data attributes).
   // The form panel is marked data-static-borders: its borders react to hover
   // and selection, so they aren't drawn in.
@@ -587,7 +610,7 @@ export default function CostEstimatorForm() {
       <section className="estimator-hero">
         {/* The h1 names the tool, for search; the line under it is display copy. */}
         <h1 data-reveal="fade-up" className="eyebrow normal-case">
-          Website Cost Calculator: Estimate Your Website or App Budget
+          Website Cost Calculator India: Estimate Your Website or App Budget
         </h1>
 
         <p data-split="words" className="estimator-hero-title">
@@ -932,6 +955,8 @@ export default function CostEstimatorForm() {
           </div>
         </div>
       </section>
+
+      {children}
     </main>
   );
 }

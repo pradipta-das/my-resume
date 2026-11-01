@@ -66,27 +66,64 @@ export function roundPrice(amount: number, currency: Currency, fine = false): nu
   return Math.max(step, Math.round(amount / step) * step);
 }
 
-/*
- * How long typical projects take me, sent to Claude so its hours match how I
- * actually work: one experienced developer using modern tooling, AI
- * assistance, proven starters, and existing themes, plugins and apps where
- * they fit. Whole-project totals, design through launch.
- */
-export const EFFORT_GUIDE = `
-- Portfolio or personal website, 1–5 pages: 15–35 hours
-- Business website, 6–15 pages, WordPress or Webflow, starting from a template: 30–60 hours
-- Business website, 6–15 pages, with a custom design: 50–90 hours
-- Content or blog site: 30–70 hours
-- E-commerce store on Shopify or WooCommerce with standard features: 50–110 hours
-- Membership or community site on WordPress: 70–140 hours
-- SaaS or web application MVP in Next.js: 150–350 hours
-- Marketplace MVP: 220–450 hours
+export type Hours = readonly [low: number, high: number];
 
-Typical additions:
-- Each third-party integration: 4–15 hours
-- Multi-language support: 10–25 hours
-- Premium or extraordinary design: add 25–40% to design and front-end work
-- Rich scroll animation: 10–25 hours; WebGL or 3D: 30–60 hours
-- AI features: 15–40 hours
-- Moving content from another platform: 8–30 hours, depending on volume
-`.trim();
+/*
+ * How long typical projects take me: one experienced developer using modern
+ * tooling, AI assistance, proven starters, and existing themes, plugins and
+ * apps where they fit. Whole-project totals, design through launch. Claude
+ * calibrates against these (EFFORT_GUIDE), and the cost guides price them, so
+ * both quote the same figures.
+ */
+export const PROJECT_HOURS = {
+  portfolio: { label: "Portfolio or personal website, 1–5 pages", hours: [15, 35] },
+  businessTemplate: {
+    label: "Business website, 6–15 pages, WordPress or Webflow, starting from a template",
+    hours: [30, 60],
+  },
+  businessCustom: { label: "Business website, 6–15 pages, with a custom design", hours: [50, 90] },
+  content: { label: "Content or blog site", hours: [30, 70] },
+  ecommerce: { label: "E-commerce store on Shopify or WooCommerce with standard features", hours: [50, 110] },
+  membership: { label: "Membership or community site on WordPress", hours: [70, 140] },
+  saas: { label: "SaaS or web application MVP in Next.js", hours: [150, 350] },
+  marketplace: { label: "Marketplace MVP", hours: [220, 450] },
+} as const satisfies Record<string, { label: string; hours: Hours }>;
+
+export const ADDITION_HOURS = {
+  integration: { label: "Each third-party integration", hours: [4, 15] },
+  multiLanguage: { label: "Multi-language support", hours: [10, 25] },
+  ai: { label: "AI features", hours: [15, 40] },
+  contentMigration: { label: "Moving content from another platform", hours: [8, 30] },
+} as const satisfies Record<string, { label: string; hours: Hours }>;
+
+const hoursLine = ({ label, hours: [low, high] }: { label: string; hours: Hours }, note = "") =>
+  `- ${label}: ${low}–${high} hours${note}`;
+
+// The same figures as text, for Claude.
+export const EFFORT_GUIDE = [
+  ...Object.values(PROJECT_HOURS).map((type) => hoursLine(type)),
+  "",
+  "Typical additions:",
+  hoursLine(ADDITION_HOURS.integration),
+  hoursLine(ADDITION_HOURS.multiLanguage),
+  "- Premium or extraordinary design: add 25–40% to design and front-end work",
+  "- Rich scroll animation: 10–25 hours; WebGL or 3D: 30–60 hours",
+  hoursLine(ADDITION_HOURS.ai),
+  hoursLine(ADDITION_HOURS.contentMigration, ", depending on volume"),
+].join("\n");
+
+// Hours priced at my rate, rounded the way the estimator rounds totals.
+export const priceHours = ([low, high]: Hours, currency: Currency) => ({
+  low: roundPrice(low * HOURLY_RATE[currency], currency),
+  high: roundPrice(high * HOURLY_RATE[currency], currency),
+});
+
+// The same work at typical freelance rates in that market, worked out as the
+// estimator does: mid-range hours at the low and high rate.
+export const freelancePrice = ([low, high]: Hours, currency: Currency) => {
+  const mid = (low + high) / 2;
+  return {
+    low: roundPrice(mid * FREELANCE_RATE[currency][0], currency),
+    high: roundPrice(mid * FREELANCE_RATE[currency][1], currency),
+  };
+};

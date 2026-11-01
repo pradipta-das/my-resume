@@ -1079,6 +1079,28 @@
         }
     }
 
+    /* Cost guides: what an option includes, under its name in the price table. */
+    .cost-option-includes {
+        @apply mt-1 block min-w-[14rem] font-light text-black/70;
+    }
+
+    /* Questions under the estimator: one ruled row each. */
+    .estimator-faq {
+        > div {
+            @apply border-b border-black/15 py-5 first:pt-0 last:border-b-0 last:pb-0;
+        }
+
+        h3 {
+            @apply font-primary font-normal leading-[1.2];
+            @apply text-[clamp(1.25rem,1.6vw,1.5rem)];
+        }
+
+        p {
+            @apply mt-2 max-w-[600px] font-secondary font-light leading-[1.6];
+            @apply text-[clamp(0.9375rem,1vw,1.0625rem)];
+        }
+    }
+
     /* =====================================================
        FORM SECTION
     ====================================================== */
@@ -2081,6 +2103,11 @@
 
         th {
             @apply whitespace-nowrap border-black font-semibold text-black;
+        }
+
+        /* Row headings rule like the cells beside them. */
+        tbody th {
+            @apply whitespace-normal border-black/15;
         }
 
         /* Row labels stay readable on phones; the table scrolls instead. */

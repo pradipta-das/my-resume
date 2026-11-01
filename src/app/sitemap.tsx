@@ -4,6 +4,7 @@ import { fetchAllPosts } from "./lib/wordpress";
 import { getCategories } from "./lib/blog";
 import { getCaseStudies } from "./lib/case-studies";
 import { RESOURCES } from "./lib/resources";
+import { PUBLISHED_COST_GUIDES } from "./lib/cost-guides";
 import { withBuildFallback } from "./lib/build-fallback";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -104,8 +105,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Drafts stay out until they're published (see lib/cost-guides.ts).
+  const costGuidePages = PUBLISHED_COST_GUIDES.map((guide) => ({
+    url: `https://pradipta.online/cost/${guide.slug}`,
+    lastModified: new Date(guide.updated),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
   return [
     ...staticPages,
+    ...costGuidePages,
     ...caseStudyPages,
     ...resourcePages,
     ...blogPages,
