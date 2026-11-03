@@ -4,13 +4,16 @@ import { EstimateRequestSchema, type Estimate } from "../../lib/estimate/schema"
 import { renderEstimatePdf } from "../../lib/estimate/pdf";
 import { saveEstimate } from "../../lib/estimate/wordpress";
 import { sendEstimateEmail } from "../../lib/estimate/email";
+import { verifyTurnstile } from "../../lib/turnstile";
+import { clientIp } from "../../lib/client-ip";
 
 // An estimate takes Claude a while to think through; give it room.
 export const maxDuration = 60;
 
 /*
  * POST /api/estimate
- * Body: EstimateRequest (email, marketing consent, questionnaire answers).
+ * Body: EstimateRequest (email, marketing consent, questionnaire answers,
+ * Turnstile token).
  * Returns { estimate, pdf } on success (pdf: the estimate as a base64 PDF,
  * left out if it couldn't be made), { error } with a visitor-facing message
  * otherwise.
@@ -48,12 +51,17 @@ export async function POST(request: Request) {
     return fail(emailInvalid ? "Please enter a valid email address." : "Some answers look invalid. Please check the form.", 400);
   }
 
-  const { email, marketingConsent, answers, honeypot } = parsed.data;
+  const { email, marketingConsent, answers, honeypot, turnstileToken } = parsed.data;
   if (honeypot) return fail("Something went wrong. Please try again.", 400);
 
+  // Before anything that costs money or sends email.
+  const ip = clientIp(request);
+  const check = await verifyTurnstile(turnstileToken, "estimate", ip);
+  if (check === "unavailable") return fail("The security check isn't working right now. Please try again in a minute.", 503);
+  if (check === "failed") return fail("The security check didn't go through. Please try again.", 403);
+
   // Counted only once a request is valid, since only those reach the AI.
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (isRateLimited(ip)) {
+  if (isRateLimited(ip ?? "unknown")) {
     return fail("You've requested several estimates in a short time. Please try again in an hour.", 429);
   }
 

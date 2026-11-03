@@ -1,10 +1,13 @@
 import { ConsultationRequestSchema } from "../../lib/consultation/schema";
 import { saveConsultation } from "../../lib/consultation/wordpress";
 import { sendConsultationAcknowledgement, sendConsultationNotification } from "../../lib/consultation/email";
+import { verifyTurnstile } from "../../lib/turnstile";
+import { clientIp } from "../../lib/client-ip";
 
 /*
  * POST /api/consultation
- * Body: ConsultationRequest (who they are, contact details, answers).
+ * Body: ConsultationRequest (who they are, contact details, answers,
+ * Turnstile token).
  * Returns { ok: true } once the request is saved in WordPress, { error } with
  * a visitor-facing message otherwise.
  */
@@ -43,11 +46,16 @@ export async function POST(request: Request) {
     return fail("Some answers look invalid. Please check the form.", 400);
   }
 
-  const { honeypot, ...entry } = parsed.data;
+  const { honeypot, turnstileToken, ...entry } = parsed.data;
   if (honeypot) return fail("Something went wrong. Please try again.", 400);
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (isRateLimited(ip)) {
+  // Before anything is saved or emailed.
+  const ip = clientIp(request);
+  const check = await verifyTurnstile(turnstileToken, "consultation", ip);
+  if (check === "unavailable") return fail("The security check isn't working right now. Please try again in a minute.", 503);
+  if (check === "failed") return fail("The security check didn't go through. Please try again.", 403);
+
+  if (isRateLimited(ip ?? "unknown")) {
     return fail("You've sent several requests in a short time. Please try again in an hour.", 429);
   }
 

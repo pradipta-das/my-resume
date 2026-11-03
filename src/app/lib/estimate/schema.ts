@@ -53,6 +53,8 @@ export const EstimateRequestSchema = z.object({
     ),
   // Hidden from people (and from autofill), so anything in it came from a bot.
   honeypot: z.string().max(500).optional(),
+  // From the Turnstile widget; checked with Cloudflare (lib/turnstile).
+  turnstileToken: z.string().max(2048).optional(),
 });
 
 export type EstimateRequest = z.output<typeof EstimateRequestSchema>;

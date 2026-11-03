@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Pradipta REST Lock
- * Description: Closes the public REST API (/wp-json and ?rest_route=). Only logged-in users, the Next.js site (by API key) and a short allowlist of routes get through; everyone else gets a 401.
- * Version:     1.1.0
+ * Description: Closes the public REST API (/wp-json and ?rest_route=) and turns off XML-RPC. Only logged-in users, the Next.js site (by API key) and a short allowlist of routes get through; everyone else gets a 401.
+ * Version:     1.2.0
  * Author:      Pradipta Das
  * Author URI:  https://pradipta.online
  * Requires PHP: 7.4
@@ -29,14 +29,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Routes that stay public because something legitimately calls them without
  * the key. Matched against the start of the route.
- *   - Contact Form 7 submits its forms through the REST API.
  *   - The estimates endpoint checks its own secret (pradipta-estimates).
  */
 function pradipta_rest_lock_public_routes() {
 	return apply_filters(
 		'pradipta_rest_lock_public_routes',
 		array(
-			'/contact-form-7/v1/',
 			'/pradipta/v1/estimates',
 		)
 	);
@@ -121,4 +119,22 @@ add_action( 'init', function () {
 	remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
 	remove_action( 'template_redirect', 'rest_output_link_header', 11 );
 	remove_action( 'xmlrpc_rsd_apis', 'rest_output_rsd' );
+} );
+
+/* =========================================================
+   XML-RPC OFF
+   The headless site never uses it, and it's a favourite target:
+   system.multicall tries hundreds of passwords in one request,
+   and pingbacks can be aimed at other sites. xmlrpc_enabled only
+   turns off the logged-in methods, so the method list is emptied
+   too, and the X-Pingback header stops pointing at the file.
+   (Jetpack and the WordPress mobile apps need XML-RPC.)
+========================================================= */
+
+add_filter( 'xmlrpc_enabled', '__return_false' );
+add_filter( 'xmlrpc_methods', '__return_empty_array' );
+
+add_filter( 'wp_headers', function ( $headers ) {
+	unset( $headers['X-Pingback'] );
+	return $headers;
 } );

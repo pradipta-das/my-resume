@@ -10,6 +10,7 @@ import { ESTIMATE_PDF_FILENAME, type Estimate } from "../lib/estimate/schema";
 import { BUDGET_OPTIONS, currencyFor } from "../lib/estimate/pricing";
 import { formatMoney } from "../lib/estimate/format";
 import { trackLead } from "../lib/analytics";
+import Turnstile, { TURNSTILE_FIELD, type TurnstileHandle } from "./Turnstile";
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -452,6 +453,7 @@ export default function CostEstimatorForm({ children }: { children?: React.React
   const stepperRef = useRef<HTMLElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const thanksRef = useRef<HTMLDivElement | null>(null);
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -502,7 +504,11 @@ export default function CostEstimatorForm({ children }: { children?: React.React
         data[key] = String(value);
       }
     });
-    const { email, marketing_consent, hp_field, ...answers } = data;
+    const { email, marketing_consent, hp_field, [TURNSTILE_FIELD]: turnstileToken, ...answers } = data;
+    if (!turnstileToken) {
+      setSubmitError("The security check hasn't finished yet. Please wait a few seconds and try again.");
+      return;
+    }
 
     setSubmitError(null);
     setIsSubmitting(true);
@@ -515,11 +521,14 @@ export default function CostEstimatorForm({ children }: { children?: React.React
           marketingConsent: marketing_consent === "yes",
           answers,
           honeypot: hp_field,
+          turnstileToken,
         }),
       });
       const result = (await response.json().catch(() => ({}))) as { estimate?: Estimate; pdf?: string; error?: string };
 
       if (!response.ok || !result.estimate) {
+        // The token is used up either way, so a retry needs a new one.
+        turnstileRef.current?.reset();
         setSubmitError(result.error ?? "We couldn't calculate an estimate this time. Please try again.");
         return;
       }
@@ -530,6 +539,7 @@ export default function CostEstimatorForm({ children }: { children?: React.React
       trackLead("cost_estimator");
       stepperRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
     } catch {
+      turnstileRef.current?.reset();
       setSubmitError("We couldn't reach the estimator. Check your connection and try again.");
     } finally {
       setIsSubmitting(false);
@@ -800,6 +810,11 @@ export default function CostEstimatorForm({ children }: { children?: React.React
                     <p className="estimate-helper">{step.helper}</p>
 
                     <div className="mt-6">{step.content}</div>
+
+                    {/* Mounted only while visible, so a challenge can be seen and clicked. */}
+                    {index === LAST_STEP && currentStep === LAST_STEP && (
+                      <Turnstile ref={turnstileRef} action="estimate" />
+                    )}
 
                     <footer className="estimate-step-footer">
                       {index === LAST_STEP && (submitError || isSubmitting) && (

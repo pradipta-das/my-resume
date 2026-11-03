@@ -8,6 +8,7 @@ import { animateSections } from "../utils/animateSections";
 import { magnetic } from "../utils/magnetic";
 import type { Audience } from "../lib/consultation/schema";
 import { trackLead } from "../lib/analytics";
+import Turnstile, { TURNSTILE_FIELD, type TurnstileHandle } from "./Turnstile";
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -362,6 +363,7 @@ export default function ConsultationForm() {
   const cardBodyRef = useRef<HTMLDivElement | null>(null);
   const thanksRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
   const [audience, setAudience] = useState<Audience | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -422,7 +424,20 @@ export default function ConsultationForm() {
       return;
     }
 
-    const { audience: who, name, email, phone, marketing_consent, hp_field, ...answers } = readForm(event.currentTarget);
+    const {
+      audience: who,
+      name,
+      email,
+      phone,
+      marketing_consent,
+      hp_field,
+      [TURNSTILE_FIELD]: turnstileToken,
+      ...answers
+    } = readForm(event.currentTarget);
+    if (!turnstileToken) {
+      setStepError("The security check hasn't finished yet. Please wait a few seconds and try again.");
+      return;
+    }
 
     setStepError(null);
     setIsSubmitting(true);
@@ -438,11 +453,14 @@ export default function ConsultationForm() {
           marketingConsent: marketing_consent === "yes",
           answers,
           honeypot: hp_field,
+          turnstileToken,
         }),
       });
       const result = (await response.json().catch(() => ({}))) as { ok?: boolean; error?: string };
 
       if (!response.ok || !result.ok) {
+        // The token is used up either way, so a retry needs a new one.
+        turnstileRef.current?.reset();
         setStepError(result.error ?? "Your request didn't go through this time. Please try again.");
         return;
       }
@@ -465,6 +483,7 @@ export default function ConsultationForm() {
       });
       sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch {
+      turnstileRef.current?.reset();
       setStepError("I couldn't send that. Check your connection and try again.");
     } finally {
       setIsSubmitting(false);
@@ -775,6 +794,11 @@ export default function ConsultationForm() {
                     <p className="estimate-helper">{step.helper}</p>
 
                     <div className="mt-6">{step.content}</div>
+
+                    {/* Mounted only while visible, so a challenge can be seen and clicked. */}
+                    {index === LAST_STEP && currentStep === LAST_STEP && (
+                      <Turnstile ref={turnstileRef} action="consultation" />
+                    )}
 
                     <footer className="estimate-step-footer">
                       {index === currentStep && (stepError || (index === LAST_STEP && isSubmitting)) && (
